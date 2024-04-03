@@ -9,4 +9,5 @@ public class EditUserDTO {
 
     private String password;
     private String email;
+    private String usename;
 }

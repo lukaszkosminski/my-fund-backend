@@ -2,8 +2,10 @@ package com.myfund.controller;
 
 import com.myfund.model.DTO.BudgetDTO;
 import com.myfund.model.DTO.CreateBudgetDTO;
+import com.myfund.model.User;
 import com.myfund.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -19,9 +21,8 @@ public class BudgetController {
     }
 
     @PostMapping("/create-budget")
-    public BudgetDTO createBudget(@RequestBody CreateBudgetDTO createBudgetDTO) {
-        // TODO: @AuthenticationPrincipal User user
-        return budgetService.createBudget(createBudgetDTO);
+    public BudgetDTO createBudget(@RequestBody CreateBudgetDTO createBudgetDTO, @AuthenticationPrincipal User user) {
+        return budgetService.createBudget(createBudgetDTO, user);
     }
     // TODO: Add more endpoints
 }

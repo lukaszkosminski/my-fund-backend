@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class BudgetService {
@@ -29,13 +31,12 @@ public class BudgetService {
         log.info("Default empty budget saved for user. Email: {}", user.getEmail());
     }
 
-    public BudgetDTO createBudget(CreateBudgetDTO createBudgetDTO) {
-        // TODO: Add User user
+    public BudgetDTO createBudget(CreateBudgetDTO createBudgetDTO, User user) {
         Budget budget = BudgetMapper.createBudgetDTOMapToBudget(createBudgetDTO);
-//        budget.setUser(user);
+        budget.setUser(user);
         budgetRepository.save(budget);
-//        log.info("New budget saved for user. Email: {}. Name: {}", user.getEmail(), budget.getNameBudget());
-        log.info("New budget saved for user. Email: {}. Name: {}", budget.getNameBudget());
+        log.info("New budget saved for user. Email: {}. Name: {}", user.getEmail(), budget.getNameBudget());
         return BudgetMapper.budgetMapToBudgetDTO(budget);
     }
+
 }
