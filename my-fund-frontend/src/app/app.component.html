@@ -1,17 +1,13 @@
-<div>
-  <nav class="navbar navbar-expand navbar-dark bg-dark">
-    <a href="#" class="navbar-brand">bezKoder</a>
-    <div class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a routerLink="tutorials" class="nav-link">Tutorials</a>
-      </li>
-      <li class="nav-item">
-        <a routerLink="add" class="nav-link">Add</a>
-      </li>
-    </div>
-  </nav>
+<div class='flex flex-col min-h-screen bg-background font-sans antialiased'
+>
+  <app-topbar></app-topbar>
 
-  <div class="container mt-3">
+
+  <div
+    class='flex-grow container mx-auto max-w-7xl px-0 sm:px-6 lg:px-8 pb-8'
+  >
     <router-outlet></router-outlet>
   </div>
+
+  <app-footer></app-footer>
 </div>
