@@ -10,7 +10,7 @@ import { TutorialDetailsComponent } from './components/tutorial-details/tutorial
 import { TutorialsListComponent } from './components/tutorials-list/tutorials-list.component';
 import {AppTopBarComponent} from "./components/topbar/app.topbar.component";
 import {LandingComponent} from "./pages/landing/landing.component";
-import {ButtonModule} from "primeng/button";
+import {AppFooterComponent} from "./components/footer/app.footer.component";
 
 @NgModule({
   declarations: [
@@ -20,14 +20,13 @@ import {ButtonModule} from "primeng/button";
     TutorialsListComponent,
     AppTopBarComponent,
     LandingComponent,
-
+    AppFooterComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    ButtonModule
   ],
   providers: [],
   bootstrap: [AppComponent]
