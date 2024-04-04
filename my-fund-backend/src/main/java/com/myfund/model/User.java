@@ -23,16 +23,21 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotEmpty(message = "Password is required")
     @Size(min = 4, message = "Password must be at least 4 characters long")
     private String password;
+
     @NotEmpty(message = "Email is required")
     @Email(message = "Invalid email format")
     private String email;
+
     @NotEmpty(message = "User name is required")
     @Size(min = 4, message = "User name must be at least 4 characters long")
     private String username;
+
     private String role;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Budget> budget;
 
