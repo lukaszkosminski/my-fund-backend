@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class EditBudgetDTO {
 
-    private String nameBudget;
+    private String name;
 }
