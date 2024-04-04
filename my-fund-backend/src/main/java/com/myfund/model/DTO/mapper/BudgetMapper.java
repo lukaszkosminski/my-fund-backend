@@ -9,19 +9,19 @@ public class BudgetMapper {
 
     public static Budget createBudgetDTOMapToBudget(CreateBudgetDTO createBudgetDTO) {
         Budget budget = new Budget();
-        budget.setName(createBudgetDTO.getNameBudget());
+        budget.setName(createBudgetDTO.getName());
         return budget;
     }
 
     public static Budget editBudgetDTOMapToBudget(EditBudgetDTO editBudgetDTO) {
         Budget budget = new Budget();
-        budget.setName(editBudgetDTO.getNameBudget());
+        budget.setName(editBudgetDTO.getName());
         return budget;
     }
 
     public static BudgetDTO budgetMapToBudgetDTO(Budget budget) {
         BudgetDTO budgetDTO = new BudgetDTO();
-        budgetDTO.setNameBudget(budget.getName());
+        budgetDTO.setName(budget.getName());
         return budgetDTO;
     }
 }
