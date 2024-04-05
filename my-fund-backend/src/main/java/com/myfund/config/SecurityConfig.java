@@ -25,7 +25,6 @@ public class SecurityConfig {
                         .requestMatchers("/*").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/api/**").authenticated()
-
                 )
                 .formLogin(form -> form
                         .loginPage("/signin")
@@ -38,5 +37,4 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable());
         return http.build();
     }
-
 }

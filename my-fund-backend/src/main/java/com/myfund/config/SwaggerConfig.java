@@ -15,7 +15,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "Swagger documentation", description = "My fund", version = "v1"))
 public class SwaggerConfig {
-    // Access local: http://localhost:8080/theta/swagger-ui/index.html
+
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
