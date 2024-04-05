@@ -17,9 +17,5 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/create-user")
-    public UserDTO createUser(@RequestBody CreateUserDTO createUserDTO) {
-        return userService.createUser(createUserDTO);
-    }
     // TODO: Add more endpoints
 }
