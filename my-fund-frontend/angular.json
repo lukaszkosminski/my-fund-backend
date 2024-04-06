@@ -75,6 +75,9 @@
               "buildTarget": "angular-17-crud:build:development"
             }
           },
+          "options": {
+            "proxyConfig": "src/proxy.conf.json"
+          },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
