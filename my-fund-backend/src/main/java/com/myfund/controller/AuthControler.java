@@ -26,6 +26,7 @@ public class AuthControler {
 
     @PostMapping("/register")
     ResponseEntity<String> registereUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
+        userService.createUser(createUserDTO);
         return ResponseEntity.ok("User is valid");
     }
 
