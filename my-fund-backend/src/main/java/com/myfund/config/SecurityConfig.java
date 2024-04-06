@@ -21,15 +21,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/create-user").permitAll()
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/home").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/*").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/api/**").authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")
+                        .loginPage("/signin")
                         .successHandler((request, response, authentication) -> {
                             response.setStatus(200);
                         })
@@ -39,23 +37,4 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable());
         return http.build();
     }
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeHttpRequests((requests) -> requests
-//                        .requestMatchers("/api/create-user").permitAll()
-//                        .requestMatchers("/").permitAll()
-//                        .requestMatchers("/home").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .formLogin(form -> form
-//                        .defaultSuccessUrl("/")
-//                        .permitAll()
-//                )
-//                .logout(logout -> logout.permitAll())
-//                .csrf(csrf -> csrf.disable());
-//        return http.build();
-//    }
-
-
 }
