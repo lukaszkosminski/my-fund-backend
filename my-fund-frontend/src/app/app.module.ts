@@ -11,6 +11,8 @@ import { TutorialsListComponent } from './components/tutorials-list/tutorials-li
 import {AppTopBarComponent} from "./components/topbar/app.topbar.component";
 import {LandingComponent} from "./pages/landing/landing.component";
 import {AppFooterComponent} from "./components/footer/app.footer.component";
+import {LoginPage} from "./pages/login/login.page";
+import {RegisterPage} from "./pages/register/register.page";
 
 @NgModule({
   declarations: [
@@ -21,6 +23,8 @@ import {AppFooterComponent} from "./components/footer/app.footer.component";
     AppTopBarComponent,
     LandingComponent,
     AppFooterComponent,
+    LoginPage,
+    RegisterPage
   ],
   imports: [
     BrowserModule,
