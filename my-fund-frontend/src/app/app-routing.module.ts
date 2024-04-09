@@ -10,7 +10,7 @@ import {RegisterPage} from "./pages/register/register.page";
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: LandingComponent },
   { path: 'login', pathMatch: 'full', component: LoginPage },
-  { path: 'register', pathMatch: 'full', component: RegisterPage },
+  { path: 'join', pathMatch: 'full', component: RegisterPage },
   { path: 'tutorials', component: TutorialsListComponent },
   { path: 'tutorials/:id', component: TutorialDetailsComponent },
   { path: 'add', component: AddTutorialComponent }
