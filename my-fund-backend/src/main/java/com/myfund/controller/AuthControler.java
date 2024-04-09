@@ -1,6 +1,7 @@
 package com.myfund.controller;
 
 import com.myfund.model.DTO.CreateUserDTO;
+import com.myfund.model.DTO.UserDTO;
 import com.myfund.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,8 +26,8 @@ public class AuthControler {
     }
 
     @PostMapping("/register")
-    ResponseEntity<String> registereUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
-        return ResponseEntity.ok("User is valid");
+    public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(createUserDTO));
     }
 
     //TODO: forgot password
