@@ -3,12 +3,13 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 
 
-const httpOptions = {
+const jsonPayloadHttpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
 
 @Injectable({
   providedIn: 'root',
+
 })
 export class AuthService {
 
@@ -23,7 +24,7 @@ export class AuthService {
         email,
         password,
       },
-      httpOptions
+      jsonPayloadHttpOptions
     );
   }
 
@@ -34,7 +35,6 @@ export class AuthService {
 
     return this.http.post(`/signin`,
       formData,
-      httpOptions
     );
   }
 }
