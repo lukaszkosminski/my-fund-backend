@@ -38,7 +38,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   }
 
   private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
-   console.log(31, 'elo')
     this.router.navigate(['login']);
 
     return next.handle(request);
