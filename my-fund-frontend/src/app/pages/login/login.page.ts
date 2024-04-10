@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'login-page',
@@ -19,7 +20,7 @@ export class LoginPage {
 
   validationErrors = null;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private router: Router) {
   }
 
   onSubmit() {
@@ -29,6 +30,7 @@ export class LoginPage {
         next: () => {
           this.isLoading = false;
           this.validationErrors = null;
+          this.router.navigate(['/home'])
         },
         error: (response) => {
           this.isLoading = false;

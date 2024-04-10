@@ -13,6 +13,8 @@ import {LandingComponent} from "./pages/landing/landing.component";
 import {AppFooterComponent} from "./components/footer/app.footer.component";
 import {LoginPage} from "./pages/login/login.page";
 import {RegisterPage} from "./pages/register/register.page";
+import {HomePage} from "./pages/home/home.page";
+import {httpInterceptorProviders} from "./helpers/auth.interceptor";
 
 @NgModule({
   declarations: [
@@ -24,15 +26,17 @@ import {RegisterPage} from "./pages/register/register.page";
     LandingComponent,
     AppFooterComponent,
     LoginPage,
-    RegisterPage
+    RegisterPage,
+    HomePage
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
+
   ],
-  providers: [],
+  providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
