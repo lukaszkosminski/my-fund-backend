@@ -22,9 +22,11 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
     return next.handle(req).pipe(
       catchError((error) => {
+
+
         if (
           error instanceof HttpErrorResponse &&
-          !req.url.includes('auth/signin') &&
+          req.url.includes('api') &&
           error.status === 401
         ) {
           return this.handle401Error(req, next);
