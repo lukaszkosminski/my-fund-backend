@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,6 +28,7 @@ public class BudgetService {
         Budget budget = new Budget();
         budget.setName("Default Budget");
         budget.setUser(user);
+        budget.setLocalDateTime(LocalDateTime.now());
         budgetRepository.save(budget);
         log.info("Default empty budget saved for user. Email: {}", user.getEmail());
     }
@@ -34,6 +36,7 @@ public class BudgetService {
     public BudgetDTO createBudget(CreateBudgetDTO createBudgetDTO, User user) {
         Budget budget = BudgetMapper.createBudgetDTOMapToBudget(createBudgetDTO);
         budget.setUser(user);
+        budget.setLocalDateTime(LocalDateTime.now());
         budgetRepository.save(budget);
         log.info("New budget saved for user. Email: {}. Name: {}", user.getEmail(), budget.getName());
         return BudgetMapper.budgetMapToBudgetDTO(budget);
