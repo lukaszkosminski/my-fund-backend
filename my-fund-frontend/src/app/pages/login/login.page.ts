@@ -20,6 +20,7 @@ export class LoginPage {
 
   validationErrors = null;
 
+
   constructor(private authService: AuthService, private router: Router) {
   }
 
@@ -34,9 +35,7 @@ export class LoginPage {
         },
         error: (response) => {
           this.isLoading = false;
-          console.log(37, response.error)
           this.validationErrors = response.error;
-          console.log(39, this.validationErrors)
         }
       }
     );

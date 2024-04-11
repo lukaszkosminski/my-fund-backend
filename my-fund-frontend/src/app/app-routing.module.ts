@@ -1,19 +1,16 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { TutorialsListComponent } from './components/tutorials-list/tutorials-list.component';
-import { TutorialDetailsComponent } from './components/tutorial-details/tutorial-details.component';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
 import {LandingComponent} from "./pages/landing/landing.component";
 import {LoginPage} from "./pages/login/login.page";
 import {RegisterPage} from "./pages/register/register.page";
-import {HomePage} from "./pages/home/home.page";
+import {authGuard} from "./guards/auth.guard";
 
 const routes: Routes = [
-  { path: '', pathMatch: 'full', component: LandingComponent },
-  { path: 'login', pathMatch: 'full', component: LoginPage },
-  { path: 'join', pathMatch: 'full', component: RegisterPage },
-  { path: 'tutorials', component: TutorialsListComponent },
-  { path: 'tutorials/:id', component: TutorialDetailsComponent },
-  { path: 'home', component: HomePage },
+  {path: '', pathMatch: 'full', component: LandingComponent},
+  {path: 'login', pathMatch: 'full', component: LoginPage},
+  {path: 'join', pathMatch: 'full', component: RegisterPage},
+  {path: 'home', canActivate: [authGuard], loadChildren: () => import('./home/home.module').then(m => m.HomeModule)},
+  {path: '**', redirectTo: ''}
 ];
 
 @NgModule({
@@ -22,4 +19,5 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}

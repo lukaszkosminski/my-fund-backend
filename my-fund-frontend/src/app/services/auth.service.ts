@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {catchError, map, Observable, of, tap} from "rxjs";
 import {Router} from "@angular/router";
 
 
@@ -32,15 +32,29 @@ export class AuthService {
     formData.append('username', email);
     formData.append('password', password);
 
-    return this.http.post(`/signin`,
-      formData,
+    return this.http.post(`/signin`, formData).pipe(
+      tap(() => {
+        localStorage.setItem('login-state', 'authenticated');
+      }),
+      map((data) => {
+        return data;
+      }),
+      catchError((error) => {
+        console.log(43, error)
+        return of(null);
+      })
     );
+  }
+
+  isLoggedIn() {
+    return localStorage.getItem('login-state') === 'authenticated'
   }
 
   logout() {
     return this.http.post(`/logout`, {}).subscribe({
       next: () => {
-      this.router.navigate(['/'])
+        localStorage.removeItem('login-state');
+        this.router.navigate(['/'])
       },
       error: (response) => {
         console.log(26, response.error)

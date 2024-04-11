@@ -23,7 +23,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     return next.handle(req).pipe(
       catchError((error) => {
 
-
         if (
           error instanceof HttpErrorResponse &&
           req.url.includes('api') &&
@@ -38,7 +37,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   }
 
   private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
-    this.router.navigate(['login']);
+    this.router.navigate(['/login']);
 
     return next.handle(request);
   }
