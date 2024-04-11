@@ -2,18 +2,19 @@ package com.myfund.model.DTO;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter
 @Setter
-@ToString
-public class CreateCategoryDTO {
+public class CategoryDTO {
+
+    private Long id;
+
     @NotNull
     private String name;
 
-    private List<CreateSubCategoryDTO> subCategories;
+    private List<SubCategoryDTO> subCategories;
 
 }

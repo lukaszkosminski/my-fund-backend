@@ -3,22 +3,21 @@ package com.myfund.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
-import javax.validation.constraints.NotNull;
-@Table(name = "subcategory")
+@Entity
+@ToString
 @Getter
 @Setter
-@Entity
+@Table(name = "subcategory")
 public class SubCategory {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     private String name;
 
     @ManyToOne
+    @JoinColumn(name = "category_id")
     private Category category;
-
 }

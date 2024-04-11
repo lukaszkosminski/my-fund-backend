@@ -7,5 +7,8 @@ import lombok.Setter;
 @Setter
 public class SubCategoryDTO {
 
+    private Long id;
+
     private String name;
+
 }

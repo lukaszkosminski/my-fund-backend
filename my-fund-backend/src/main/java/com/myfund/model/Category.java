@@ -3,6 +3,7 @@ package com.myfund.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@ToString
 public class Category {
 
     @Id
@@ -20,8 +22,8 @@ public class Category {
     @NotNull
     private String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<SubCategory> subCategoryList;
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SubCategory> subCategories;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
