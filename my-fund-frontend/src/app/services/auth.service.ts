@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {catchError, map, Observable, of, tap} from "rxjs";
+import { Observable, tap} from "rxjs";
 import {Router} from "@angular/router";
 
 
@@ -36,13 +36,6 @@ export class AuthService {
       tap(() => {
         localStorage.setItem('login-state', 'authenticated');
       }),
-      map((data) => {
-        return data;
-      }),
-      catchError((error) => {
-        console.log(43, error)
-        return of(null);
-      })
     );
   }
 

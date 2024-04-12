@@ -9,16 +9,16 @@ import {Router} from "@angular/router";
 
 export class LoginPage {
   form: {
-    email: string;
+    username: string;
     password: string;
   } = {
-    email: '',
+    username: '',
     password: ''
   }
 
   isLoading = false;
 
-  validationErrors = null;
+  validationErrors = '';
 
 
   constructor(private authService: AuthService, private router: Router) {
@@ -27,15 +27,15 @@ export class LoginPage {
   onSubmit() {
     this.isLoading = true;
     console.log('Form submitted', this.form);
-    this.authService.login(this.form.email, this.form.password).subscribe({
+    this.authService.login(this.form.username, this.form.password).subscribe({
         next: () => {
           this.isLoading = false;
-          this.validationErrors = null;
+          this.validationErrors = '';
           this.router.navigate(['/home'])
         },
-        error: (response) => {
+        error: () => {
           this.isLoading = false;
-          this.validationErrors = response.error;
+          this.validationErrors = 'Credetials are invalid. Please try again.';
         }
       }
     );
