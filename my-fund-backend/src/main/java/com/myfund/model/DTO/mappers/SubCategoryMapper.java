@@ -1,4 +1,4 @@
-package com.myfund.model.DTO.mapper;
+package com.myfund.model.DTO.mappers;
 
 import com.myfund.model.DTO.CreateSubCategoryDTO;
 import com.myfund.model.SubCategory;
@@ -10,4 +10,6 @@ public class SubCategoryMapper {
         subCategory.setName(createSubCategoryDTO.getName());
         return subCategory;
     }
+
+
 }

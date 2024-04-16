@@ -1,10 +1,12 @@
 package com.myfund.controller;
 
 import com.myfund.model.DTO.UserDTO;
-import com.myfund.model.DTO.mapper.UserMapper;
+import com.myfund.model.DTO.mappers.UserMapper;
 import com.myfund.model.User;
 import com.myfund.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,8 +26,8 @@ public class UserController {
 
     @GetMapping("/current-user")
     @ResponseBody
-    public UserDTO getCurrentUser(@AuthenticationPrincipal User user) {
-        return UserMapper.userMapToUserDTO(user);
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
+        return new ResponseEntity<>(UserMapper.userMapToUserDTO(user), HttpStatus.OK);
     }
     // TODO: Add more endpoints
 }

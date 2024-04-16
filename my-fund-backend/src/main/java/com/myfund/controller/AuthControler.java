@@ -46,5 +46,4 @@ public class AuthControler {
         });
         return errors;
     }
-
 }

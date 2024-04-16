@@ -3,7 +3,7 @@ package com.myfund.service;
 import com.myfund.model.Budget;
 import com.myfund.model.DTO.BudgetDTO;
 import com.myfund.model.DTO.CreateBudgetDTO;
-import com.myfund.model.DTO.mapper.BudgetMapper;
+import com.myfund.model.DTO.mappers.BudgetMapper;
 import com.myfund.model.User;
 import com.myfund.repository.BudgetRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @Slf4j

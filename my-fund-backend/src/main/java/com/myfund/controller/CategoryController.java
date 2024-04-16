@@ -29,8 +29,7 @@ public class CategoryController {
         return new ResponseEntity<>(categoryService.findAllCategoriesByUser(user), HttpStatus.OK);
     }
 
-
-    @GetMapping("/category/{categoryId}")
+    @GetMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
         Optional<CategoryDTO> categoryOpt = categoryService.findCategoryByIdAndUser(categoryId, user);
         if (categoryOpt.isPresent()) {
@@ -40,12 +39,12 @@ public class CategoryController {
         }
     }
 
-    @PostMapping("/category")
+    @PostMapping("/categories")
     public ResponseEntity<CategoryDTO> createCategory(@RequestBody CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) {
-        return new ResponseEntity<>(categoryService.saveCategory(createCategoryDTO, user), HttpStatus.CREATED);
+        return new ResponseEntity<>(categoryService.createCategory(createCategoryDTO, user), HttpStatus.CREATED);
     }
 
-    @PutMapping("/category/{categoryId}")
+    @PutMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> updateCategory(@PathVariable("categoryId") Long categoryId, @RequestBody CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) {
         Optional<CategoryDTO> category = categoryService.updateCategory(categoryId, createCategoryDTO, user);
         if (category.isPresent()) {
@@ -55,7 +54,7 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/category/{categoryId}")
+    @DeleteMapping("/categories/{categoryId}")
     public ResponseEntity<?> deleteCategory(@PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
         try {
             categoryService.deleteCategoryByIdAndUser(categoryId, user);

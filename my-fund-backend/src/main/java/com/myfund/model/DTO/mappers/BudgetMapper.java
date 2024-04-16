@@ -1,4 +1,4 @@
-package com.myfund.model.DTO.mapper;
+package com.myfund.model.DTO.mappers;
 
 import com.myfund.model.Budget;
 import com.myfund.model.DTO.BudgetDTO;

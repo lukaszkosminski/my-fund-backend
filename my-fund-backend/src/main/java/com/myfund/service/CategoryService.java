@@ -3,8 +3,8 @@ package com.myfund.service;
 import com.myfund.model.Category;
 import com.myfund.model.DTO.CategoryDTO;
 import com.myfund.model.DTO.CreateCategoryDTO;
-import com.myfund.model.DTO.mapper.CategoryMapper;
-import com.myfund.model.DTO.mapper.SubCategoryMapper;
+import com.myfund.model.DTO.mappers.CategoryMapper;
+import com.myfund.model.DTO.mappers.SubCategoryMapper;
 import com.myfund.model.SubCategory;
 import com.myfund.model.User;
 import com.myfund.repository.CategoryRepository;
@@ -23,13 +23,11 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final SubCategoryRepository subCategoryRepository;
 
-
     @Autowired
     public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository) {
         this.categoryRepository = categoryRepository;
         this.subCategoryRepository = subCategoryRepository;
     }
-
 
     public List<CategoryDTO> findAllCategoriesByUser(User user) {
         return CategoryMapper.categoryListMapToCategoryListDTO(categoryRepository.findAllCategoriesByUser(user));
@@ -45,7 +43,7 @@ public class CategoryService {
         }
     }
 
-    public CategoryDTO saveCategory(CreateCategoryDTO createCategoryDTO, User user) {
+    public CategoryDTO createCategory(CreateCategoryDTO createCategoryDTO, User user) {
         Optional<Category> existingCategory = categoryRepository.findByNameAndUser(createCategoryDTO.getName(), user);
         Category category;
         if (existingCategory.isPresent()) {

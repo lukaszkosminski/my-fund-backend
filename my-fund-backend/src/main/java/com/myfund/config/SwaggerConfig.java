@@ -14,14 +14,12 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "Swagger documentation", description = "My fund", version = "v1"))
 public class SwaggerConfig {
-
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement().addList(AUTHORIZATION))
                 .components(new Components().addSecuritySchemes(AUTHORIZATION,
                         new io.swagger.v3.oas.models.security.SecurityScheme().type(io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));
-
     }
 
     @Bean

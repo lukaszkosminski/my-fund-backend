@@ -2,7 +2,7 @@ package com.myfund.service;
 
 import com.myfund.model.DTO.CreateUserDTO;
 import com.myfund.model.DTO.UserDTO;
-import com.myfund.model.DTO.mapper.UserMapper;
+import com.myfund.model.DTO.mappers.UserMapper;
 import com.myfund.model.User;
 import com.myfund.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;

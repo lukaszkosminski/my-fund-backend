@@ -1,7 +1,7 @@
 package com.myfund.service;
 
 import com.myfund.model.DTO.CreateExpenseDTO;
-import com.myfund.model.DTO.mapper.ExpenseMapper;
+import com.myfund.model.DTO.mappers.ExpenseMapper;
 import com.myfund.model.Expense;
 import com.myfund.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
