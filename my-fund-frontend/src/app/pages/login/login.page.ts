@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {AuthService} from "../../services/auth.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'login-page',
@@ -7,20 +9,35 @@ import { Component } from '@angular/core';
 
 export class LoginPage {
   form: {
-    email: string;
+    username: string;
     password: string;
   } = {
-    email: '',
+    username: '',
     password: ''
   }
 
   isLoading = false;
 
-  constructor() { }
+  validationErrors = '';
+
+
+  constructor(private authService: AuthService, private router: Router) {
+  }
 
   onSubmit() {
     this.isLoading = true;
     console.log('Form submitted', this.form);
-
+    this.authService.login(this.form.username, this.form.password).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.validationErrors = '';
+          this.router.navigate(['/home'])
+        },
+        error: () => {
+          this.isLoading = false;
+          this.validationErrors = 'Credetials are invalid. Please try again.';
+        }
+      }
+    );
   }
 }

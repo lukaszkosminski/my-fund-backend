@@ -1,6 +1,5 @@
 <main class="w-full py-12 md:py-24 lg:py-32 relative">
 
-
   @if (!userCreated) {
     <form
       class="max-w-sm mx-auto"
@@ -26,6 +25,11 @@
     			Username is required
       	</span>
         }
+        @if (validationErrors && validationErrors.username) {
+          <span class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+    			{{validationErrors.username}}
+      	</span>
+        }
       </div>
       <div class="mb-5">
         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
@@ -35,13 +39,17 @@
           type="email"
           id="email"
           name="email"
-          required
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="name@flowbite.com"
         />
         @if (email.errors && f.submitted) {
           <span class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
     			Email is required
+      	</span>
+        }
+        @if (validationErrors && validationErrors.email) {
+          <span class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+    			{{validationErrors.email}}
       	</span>
         }
       </div>
@@ -60,6 +68,11 @@
         @if (password.errors && f.submitted) {
           <span class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
     			Password is required
+      	</span>
+        }
+        @if (validationErrors && validationErrors.password) {
+          <span class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+    			{{validationErrors.password}}
       	</span>
         }
       </div>
