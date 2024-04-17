@@ -21,10 +21,12 @@ public class ApplicationDetailsService {
 //    @Value("${app.version}")
 //    private String appVersion;
     public ApplicationDetailsDTO getVersion() throws URISyntaxException {
+        String buildVersion = System.getProperty("build.number");
+
         ApplicationDetails applicationDetails = new ApplicationDetails();
         LocalDateTime jarFileCreationDate = getJarFileCreationDate();
         applicationDetails.setBuildDate(jarFileCreationDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")));
-        applicationDetails.setVersion(getJarFileName());
+        applicationDetails.setVersion(buildVersion);
         return ApplicationDetailsMapper.applicationDetailsToDTO(applicationDetails);
     }
 
