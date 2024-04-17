@@ -1,4 +1,4 @@
-<main class="w-full py-12 md:py-24 lg:py-32">
+<main class="w-full py-12 md:py-24 lg:py-32 mx-auto max-w-7xl px-0 sm:px-6 lg:px-8 pb-8">
   <div class="container px-4 md:px-6">
     <div class='grid items-center gap-6 lg:grid-cols-[1fr_500px] lg:gap-12 xl:grid-cols-[1fr_550px]'>
       <div class='flex flex-col justify-center space-y-4'>
@@ -9,19 +9,41 @@
           <p
             class='max-w-[500px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400'>
             My Fund is a comprehensive financial management application designed to help
-            users track and manage their finances efficiently. Built with Angular 17 for the frontend, Java 17 and Spring Boot
-            3 for the backend, and MySQL for data storage, this application offers a robust platform for personal finance
+            users track and manage their finances efficiently. Built with Angular 17 for the frontend, Java 17 and
+            Spring Boot
+            3 for the backend, and MySQL for data storage, this application offers a robust platform for personal
+            finance
             management. Whether you're looking to monitor your spending, create budgets, or track investments, My Fund
             provides the tools you need to take control of your financial health.
           </p>
         </div>
       </div>
-      <div class="flex flex-col items-center justify-center">
-        <button type="button"
-                class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
-          Sign in
-        </button>
-      </div>
+      @if (!isLoggedIn) {
+        <div class="flex flex-col items-center justify-center">
+          <a type="button"
+             routerLink="/login"
+             class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+            Log in
+          </a>
+          <a type="button"
+             routerLink="/join"
+             class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+            Sign in
+          </a>
+        </div>
+      }
+
+      @if (isLoggedIn) {
+        <div class="flex flex-col items-center justify-center">
+          <a type="button"
+             routerLink="/home"
+             class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+            Go to the App
+          </a>
+
+        </div>
+      }
+
     </div>
   </div>
 
