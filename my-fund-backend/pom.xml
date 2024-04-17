@@ -11,7 +11,7 @@
     </parent>
     <groupId>com.myfund</groupId>
     <artifactId>myfund</artifactId>
-    <version>1.0.${buildnumber}</version>
+    <version>${buildnumber}</version>
     <name>myfund</name>
     <description>My Fund - Financial Management Application</description>
     <properties>
