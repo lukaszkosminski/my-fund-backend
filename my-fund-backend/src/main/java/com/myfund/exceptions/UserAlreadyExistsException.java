@@ -1,2 +1,7 @@
-package com.myfund.exceptions;public class UserAlreadyExistsException {
+package com.myfund.exceptions;
+
+public class UserAlreadyExistsException extends RuntimeException {
+    public UserAlreadyExistsException(String message) {
+        super(message);
+    }
 }

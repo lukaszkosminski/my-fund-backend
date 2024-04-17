@@ -1,9 +1,9 @@
-package com.myfund.controller;
+package com.myfund.controllers;
 
-import com.myfund.model.DTO.BudgetDTO;
-import com.myfund.model.DTO.CreateBudgetDTO;
-import com.myfund.model.User;
-import com.myfund.service.BudgetService;
+import com.myfund.models.DTOs.BudgetDTO;
+import com.myfund.models.DTOs.CreateBudgetDTO;
+import com.myfund.models.User;
+import com.myfund.services.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

@@ -1,7 +1,7 @@
-package com.myfund.models.DTO.mappers;
+package com.myfund.models.DTOs.mappers;
 
 import com.myfund.models.ApplicationDetails;
-import com.myfund.models.DTO.ApplicationDetailsDTO;
+import com.myfund.models.DTOs.ApplicationDetailsDTO;
 
 public class ApplicationDetailsMapper {
 

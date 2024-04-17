@@ -1,4 +1,4 @@
-package com.myfund.config;
+package com.myfund.configs;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;

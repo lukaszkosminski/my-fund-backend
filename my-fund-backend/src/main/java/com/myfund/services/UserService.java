@@ -1,9 +1,9 @@
-package com.myfund.service;
+package com.myfund.services;
 
 import com.myfund.exceptions.UserAlreadyExistsException;
-import com.myfund.models.DTO.CreateUserDTO;
-import com.myfund.models.DTO.UserDTO;
-import com.myfund.models.DTO.mappers.UserMapper;
+import com.myfund.models.DTOs.CreateUserDTO;
+import com.myfund.models.DTOs.UserDTO;
+import com.myfund.models.DTOs.mappers.UserMapper;
 import com.myfund.models.User;
 import com.myfund.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;

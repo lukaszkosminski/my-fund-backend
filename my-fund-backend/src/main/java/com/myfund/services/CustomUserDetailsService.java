@@ -1,4 +1,4 @@
-package com.myfund.service;
+package com.myfund.services;
 
 import com.myfund.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

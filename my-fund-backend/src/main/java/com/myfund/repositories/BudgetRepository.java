@@ -1,11 +1,7 @@
-package com.myfund.repository;
+package com.myfund.repositories;
 
-import com.myfund.model.Budget;
-import com.myfund.model.DTO.BudgetDTO;
-import com.myfund.model.User;
+import com.myfund.models.Budget;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
 }

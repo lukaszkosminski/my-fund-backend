@@ -1,4 +1,4 @@
-package com.myfund.models.DTO;
+package com.myfund.models.DTOs;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
