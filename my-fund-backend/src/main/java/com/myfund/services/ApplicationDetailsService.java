@@ -6,17 +6,14 @@ import com.myfund.models.DTOs.mappers.ApplicationDetailsMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-;
 
 @Service
 public class ApplicationDetailsService {
-    //
+
     @Value("${app.version}")
     String appVer;
 
@@ -31,7 +28,10 @@ public class ApplicationDetailsService {
     }
 
     public static String convertToSystemTimezone(String dateTime) {
-        LocalDateTime localDateTime = LocalDateTime.parse(dateTime);
-        return localDateTime.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toString();
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        String formattedDateTime = localDateTime.atZone(ZoneId.of("UTC"))
+                .withZoneSameInstant(ZoneId.systemDefault())
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        return formattedDateTime;
     }
 }
