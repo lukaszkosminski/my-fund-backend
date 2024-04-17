@@ -11,11 +11,14 @@
     </parent>
     <groupId>com.myfund</groupId>
     <artifactId>myfund</artifactId>
-    <version>1.0.${build.number}</version>
+    <version>1.0.${buildnumber}</version>
     <name>myfund</name>
     <description>My Fund - Financial Management Application</description>
     <properties>
         <java.version>17</java.version>
+        <buildnumber>1</buildnumber>
+        <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss</maven.build.timestamp.format>
+        <build.timestamp>${maven.build.timestamp}</build.timestamp>
     </properties>
     <dependencies>
         <dependency>
@@ -104,11 +107,17 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+              </plugin>
         </plugins>
     </build>
 </project>

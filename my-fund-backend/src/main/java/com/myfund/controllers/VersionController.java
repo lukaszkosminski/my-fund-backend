@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 @RestController
@@ -23,7 +24,7 @@ public class VersionController {
     }
 
     @GetMapping("/version")
-    public ResponseEntity<ApplicationDetailsDTO> getVersion() throws URISyntaxException {
+    public ResponseEntity<ApplicationDetailsDTO> getVersion() throws URISyntaxException, IOException {
         return new ResponseEntity<>(applicationDetailsService.getVersion(), HttpStatus.OK);
     }
 }
