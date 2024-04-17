@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 ;
 
@@ -23,7 +26,12 @@ public class ApplicationDetailsService {
     public ApplicationDetailsDTO getVersion() {
         ApplicationDetails applicationDetails = new ApplicationDetails();
         applicationDetails.setVersion(appVer);
-        applicationDetails.setBuildDate(buildDate);
+        applicationDetails.setBuildDate(convertToSystemTimezone(buildDate));
         return ApplicationDetailsMapper.applicationDetailsToDTO(applicationDetails);
+    }
+
+    public static String convertToSystemTimezone(String dateTime) {
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTime);
+        return localDateTime.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toString();
     }
 }
