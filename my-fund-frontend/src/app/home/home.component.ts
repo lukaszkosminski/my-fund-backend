@@ -1,33 +1,21 @@
-import {Component} from '@angular/core';
-import {UserService} from "../services/user.service";
-import {AuthService} from "../services/auth.service";
+import {ChangeDetectionStrategy, Component, effect, inject, OnInit} from '@angular/core';
+import {UserStore} from "../stores/user.store";
+import {Store} from "@ngrx/store";
+import {getState} from "@ngrx/signals";
 
 @Component({
   selector: 'home-component',
-  templateUrl: './home.component.html'
+  templateUrl: './home.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class HomeComponent {
-  User = {
-    username: ''
+export class HomeComponent implements OnInit {
+  private readonly userStore = inject(UserStore);
+
+  User = this.userStore.user;
+  isLoading = this.userStore.isLoading;
+
+  ngOnInit(): void {
+    this.userStore.getCurrentUser();
   }
-
-  constructor(private userService: UserService, private authService: AuthService) {
-    console.log(16, 'asd')
-    this.userService.getCurrent().subscribe({
-      next: (response) => {
-        console.log(11, response)
-        this.User = response
-      },
-      error: (response) => {
-        console.log(14, response.error)
-      }
-    })
-
-  }
-
-  logout = () => {
-    this.authService.logout();
-  }
-
 }
