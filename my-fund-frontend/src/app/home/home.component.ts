@@ -1,7 +1,5 @@
-import {ChangeDetectionStrategy, Component, effect, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import {UserStore} from "../stores/user.store";
-import {Store} from "@ngrx/store";
-import {getState} from "@ngrx/signals";
 
 @Component({
   selector: 'home-component',

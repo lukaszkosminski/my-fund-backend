@@ -3,9 +3,8 @@ import {UserState} from "../models/User.model";
 import {UserService} from "../services/user.service";
 import {inject} from "@angular/core";
 import {rxMethod} from "@ngrx/signals/rxjs-interop";
-import {pipe, switchMap, tap} from "rxjs";
+import {pipe, switchMap} from "rxjs";
 import {tapResponse} from '@ngrx/operators';
-import {Store} from '@ngrx/store';
 
 
 export const UserStore = signalStore(

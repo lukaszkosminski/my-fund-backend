@@ -1,6 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {BudgetsService} from "../../../services/budgets.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {BudgetsStore} from "../../../stores/bugdets.store";
 
 @Component({
@@ -19,11 +18,9 @@ export class BudgetFormComponent implements OnInit {
   }
 
   onSubmit(form: FormGroup) {
-    console.log(22, form.value)
     if(form.valid) {
       this.budgetStore.create(form.value);
     }
-
 
     Object.keys(this.budgetForm.controls).forEach(field => {
       const control = this.budgetForm.get(field);

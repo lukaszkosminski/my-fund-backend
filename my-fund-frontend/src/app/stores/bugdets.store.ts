@@ -1,6 +1,4 @@
 import {patchState, signalStore, withMethods, withState} from "@ngrx/signals";
-import {UserState} from "../models/User.model";
-import {UserService} from "../services/user.service";
 import {inject} from "@angular/core";
 import {rxMethod} from "@ngrx/signals/rxjs-interop";
 import {pipe, switchMap, tap} from "rxjs";
