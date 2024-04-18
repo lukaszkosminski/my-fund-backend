@@ -1,6 +1,6 @@
-package com.myfund.models.DTO.mappers;
+package com.myfund.models.DTOs.mappers;
 
-import com.myfund.models.DTO.CreateSubCategoryDTO;
+import com.myfund.models.DTOs.CreateSubCategoryDTO;
 import com.myfund.models.SubCategory;
 
 public class SubCategoryMapper {

@@ -1,4 +1,4 @@
-package com.myfund.config;
+package com.myfund.configs;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;

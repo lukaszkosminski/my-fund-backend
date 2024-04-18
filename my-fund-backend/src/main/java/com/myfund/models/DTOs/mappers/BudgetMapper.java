@@ -1,9 +1,9 @@
-package com.myfund.models.DTO.mappers;
+package com.myfund.models.DTOs.mappers;
 
 import com.myfund.models.Budget;
-import com.myfund.models.DTO.BudgetDTO;
-import com.myfund.models.DTO.CreateBudgetDTO;
-import com.myfund.models.DTO.EditBudgetDTO;
+import com.myfund.models.DTOs.BudgetDTO;
+import com.myfund.models.DTOs.CreateBudgetDTO;
+import com.myfund.models.DTOs.EditBudgetDTO;
 
 public class BudgetMapper {
 

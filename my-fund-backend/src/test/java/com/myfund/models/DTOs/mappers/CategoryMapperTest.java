@@ -1,10 +1,10 @@
-package com.myfund.models.DTO.mappers;
+package com.myfund.models.DTOs.mappers;
 
 import com.myfund.models.Category;
-import com.myfund.models.DTO.CategoryDTO;
-import com.myfund.models.DTO.CreateCategoryDTO;
-import com.myfund.models.DTO.CreateSubCategoryDTO;
-import com.myfund.models.DTO.SubCategoryDTO;
+import com.myfund.models.DTOs.CategoryDTO;
+import com.myfund.models.DTOs.CreateCategoryDTO;
+import com.myfund.models.DTOs.CreateSubCategoryDTO;
+import com.myfund.models.DTOs.SubCategoryDTO;
 import com.myfund.models.SubCategory;
 import org.junit.jupiter.api.Test;
 

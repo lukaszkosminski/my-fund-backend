@@ -1,6 +1,6 @@
-package com.myfund.repository;
+package com.myfund.repositories;
 
-import com.myfund.model.User;
+import com.myfund.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 

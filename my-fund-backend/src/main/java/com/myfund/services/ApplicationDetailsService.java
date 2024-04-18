@@ -1,8 +1,8 @@
-package com.myfund.service;
+package com.myfund.services;
 
 import com.myfund.models.ApplicationDetails;
-import com.myfund.models.DTO.ApplicationDetailsDTO;
-import com.myfund.models.DTO.mappers.ApplicationDetailsMapper;
+import com.myfund.models.DTOs.ApplicationDetailsDTO;
+import com.myfund.models.DTOs.mappers.ApplicationDetailsMapper;
 ;
 import org.springframework.stereotype.Service;
 

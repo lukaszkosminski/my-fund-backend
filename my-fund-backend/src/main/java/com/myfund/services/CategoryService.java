@@ -1,11 +1,11 @@
-package com.myfund.service;
+package com.myfund.services;
 
 import com.myfund.exceptions.CategoryNotUniqueException;
 import com.myfund.models.Category;
-import com.myfund.models.DTO.CategoryDTO;
-import com.myfund.models.DTO.CreateCategoryDTO;
-import com.myfund.models.DTO.mappers.CategoryMapper;
-import com.myfund.models.DTO.mappers.SubCategoryMapper;
+import com.myfund.models.DTOs.CategoryDTO;
+import com.myfund.models.DTOs.CreateCategoryDTO;
+import com.myfund.models.DTOs.mappers.CategoryMapper;
+import com.myfund.models.DTOs.mappers.SubCategoryMapper;
 import com.myfund.models.SubCategory;
 import com.myfund.models.User;
 import com.myfund.repositories.CategoryRepository;

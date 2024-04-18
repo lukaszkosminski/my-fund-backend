@@ -1,7 +1,7 @@
-package com.myfund.repository;
+package com.myfund.repositories;
 
-import com.myfund.model.Category;
-import com.myfund.model.User;
+import com.myfund.models.Category;
+import com.myfund.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

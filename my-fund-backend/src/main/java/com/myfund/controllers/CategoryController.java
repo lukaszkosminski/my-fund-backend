@@ -1,9 +1,9 @@
-package com.myfund.controller;
+package com.myfund.controllers;
 
-import com.myfund.model.DTO.CategoryDTO;
-import com.myfund.model.DTO.CreateCategoryDTO;
-import com.myfund.model.User;
-import com.myfund.service.CategoryService;
+import com.myfund.models.DTOs.CategoryDTO;
+import com.myfund.models.DTOs.CreateCategoryDTO;
+import com.myfund.models.User;
+import com.myfund.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

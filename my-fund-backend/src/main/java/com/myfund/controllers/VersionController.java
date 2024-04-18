@@ -1,8 +1,8 @@
-package com.myfund.controller;
+package com.myfund.controllers;
 
-import com.myfund.model.ApplicationDetails;
-import com.myfund.model.DTO.ApplicationDetailsDTO;
-import com.myfund.service.ApplicationDetailsService;
+import com.myfund.models.ApplicationDetails;
+import com.myfund.models.DTOs.ApplicationDetailsDTO;
+import com.myfund.services.ApplicationDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

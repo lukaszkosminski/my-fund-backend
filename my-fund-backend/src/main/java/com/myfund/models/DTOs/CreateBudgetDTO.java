@@ -1,4 +1,4 @@
-package com.myfund.models.DTO;
+package com.myfund.models.DTOs;
 
 import lombok.Getter;
 import lombok.Setter;

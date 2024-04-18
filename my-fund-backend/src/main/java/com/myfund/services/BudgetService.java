@@ -1,9 +1,10 @@
-package com.myfund.service;
+package com.myfund.services;
+
 
 import com.myfund.models.Budget;
-import com.myfund.models.DTO.BudgetDTO;
-import com.myfund.models.DTO.CreateBudgetDTO;
-import com.myfund.models.DTO.mappers.BudgetMapper;
+import com.myfund.models.DTOs.BudgetDTO;
+import com.myfund.models.DTOs.CreateBudgetDTO;
+import com.myfund.models.DTOs.mappers.BudgetMapper;
 import com.myfund.models.User;
 import com.myfund.repositories.BudgetRepository;
 import lombok.extern.slf4j.Slf4j;

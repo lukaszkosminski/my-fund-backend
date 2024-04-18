@@ -1,4 +1,4 @@
-package com.myfund.model;
+package com.myfund.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;

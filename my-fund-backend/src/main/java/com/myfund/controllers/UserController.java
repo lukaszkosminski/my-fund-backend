@@ -1,9 +1,9 @@
-package com.myfund.controller;
+package com.myfund.controllers;
 
-import com.myfund.model.DTO.UserDTO;
-import com.myfund.model.DTO.mappers.UserMapper;
-import com.myfund.model.User;
-import com.myfund.service.UserService;
+import com.myfund.models.DTOs.UserDTO;
+import com.myfund.models.DTOs.mappers.UserMapper;
+import com.myfund.models.User;
+import com.myfund.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

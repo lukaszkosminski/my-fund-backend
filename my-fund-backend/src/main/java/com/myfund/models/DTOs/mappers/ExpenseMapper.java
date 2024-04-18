@@ -1,6 +1,6 @@
-package com.myfund.models.DTO.mappers;
+package com.myfund.models.DTOs.mappers;
 
-import com.myfund.models.DTO.CreateExpenseDTO;
+import com.myfund.models.DTOs.CreateExpenseDTO;
 import com.myfund.models.Expense;
 
 public class ExpenseMapper {

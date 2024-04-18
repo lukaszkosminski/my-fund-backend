@@ -1,8 +1,8 @@
-package com.myfund.models.DTO.mappers;
+package com.myfund.models.DTOs.mappers;
 
-import com.myfund.models.DTO.CreateUserDTO;
-import com.myfund.models.DTO.EditUserDTO;
-import com.myfund.models.DTO.UserDTO;
+import com.myfund.models.DTOs.CreateUserDTO;
+import com.myfund.models.DTOs.EditUserDTO;
+import com.myfund.models.DTOs.UserDTO;
 import com.myfund.models.User;
 
 public class UserMapper {
