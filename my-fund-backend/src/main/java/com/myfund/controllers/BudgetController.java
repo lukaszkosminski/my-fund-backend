@@ -9,7 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/budgets/")
+@RequestMapping("/api/")
 public class BudgetController {
 
     private final BudgetService budgetService;
@@ -19,7 +19,7 @@ public class BudgetController {
         this.budgetService = budgetService;
     }
 
-    @PostMapping("/create-budget")
+    @PostMapping("/budgets")
     public BudgetDTO createBudget(@RequestBody CreateBudgetDTO createBudgetDTO, @AuthenticationPrincipal User user) {
         return budgetService.createBudget(createBudgetDTO, user);
     }
