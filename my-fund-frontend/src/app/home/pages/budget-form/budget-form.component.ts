@@ -27,10 +27,6 @@ export class BudgetFormComponent implements OnInit {
       control!.markAsTouched({ onlySelf: true });
     });
   }
-
-  get name() {
-    return this.budgetForm.get('name');
-  }
 }
 
 

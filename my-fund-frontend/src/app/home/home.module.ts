@@ -6,6 +6,8 @@ import {SidebarComponent} from "../components/sidebar/sidebar.component";
 import {BudgetsComponent} from './pages/budgets/budgets.component';
 import {BudgetFormComponent} from './pages/budget-form/budget-form.component';
 import {ReactiveFormsModule} from "@angular/forms";
+import { CategoriesComponent } from './pages/categories/categories.component';
+import { CategoryFormComponent } from './pages/category-form/category-form.component';
 
 
 @NgModule({
@@ -13,7 +15,9 @@ import {ReactiveFormsModule} from "@angular/forms";
     HomeComponent,
     SidebarComponent,
     BudgetsComponent,
-    BudgetFormComponent
+    BudgetFormComponent,
+    CategoriesComponent,
+    CategoryFormComponent
   ],
   imports: [
     ReactiveFormsModule,
@@ -23,6 +27,8 @@ import {ReactiveFormsModule} from "@angular/forms";
         path: '', component: HomeComponent, children: [
           {path: 'budgets', pathMatch: 'full', component: BudgetsComponent},
           {path: 'budgets/create', pathMatch: 'full', component: BudgetFormComponent},
+          {path: 'categories', pathMatch: 'full', component: CategoriesComponent},
+          {path: 'categories/create', pathMatch: 'full', component: CategoryFormComponent},
         ]
       },
     ]),
