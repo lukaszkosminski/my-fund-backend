@@ -10,6 +10,6 @@ export class AppService {
   }
 
   getVersion(): Observable<any> {
-    return this.http.get(`api/version`);
+    return this.http.get(`version`);
   }
 }
