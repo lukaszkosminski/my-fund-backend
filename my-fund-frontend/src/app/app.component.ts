@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import { initFlowbite } from 'flowbite';
+import {AppStore} from "./stores/app.store";
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,10 @@ import { initFlowbite } from 'flowbite';
 export class AppComponent {
   title = 'myFund';
 
+  appStore = inject(AppStore)
+
   ngOnInit(): void {
     initFlowbite();
+    this.appStore.getVersion();
   }
 }

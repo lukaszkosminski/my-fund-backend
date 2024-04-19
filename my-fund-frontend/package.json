@@ -20,7 +20,6 @@
     "@angular/router": "^17.0.0",
     "@ngrx/operators": "^17.2.0",
     "@ngrx/signals": "17.1.0",
-    "@ngrx/store": "17.1.0",
     "flowbite": "^2.3.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
