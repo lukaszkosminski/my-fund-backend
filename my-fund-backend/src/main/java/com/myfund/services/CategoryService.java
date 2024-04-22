@@ -72,26 +72,17 @@ public class CategoryService {
             Category category = existingCategoryOpt.get();
             category.setName(createCategoryDTO.getName());
 
-            List<SubCategory> updatedSubCategories = new ArrayList<>();
+            List<SubCategory> existingSubCategories = category.getSubCategories();
             createCategoryDTO.getSubCategories().forEach(createSubCategoryDTO -> {
-                Optional<SubCategory> existingSubCategory = category.getSubCategories().stream()
+                Optional<SubCategory> existingSubCategory = existingSubCategories.stream()
                         .filter(subCategory -> subCategory.getName().equals(createSubCategoryDTO.getName()))
                         .findFirst();
-                if (existingSubCategory.isPresent()) {
-                    updatedSubCategories.add(existingSubCategory.get());
-                } else {
+                if (!existingSubCategory.isPresent()) {
                     SubCategory newSubCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
                     newSubCategory.setCategory(category);
-                    updatedSubCategories.add(newSubCategory);
+                    existingSubCategories.add(newSubCategory);
                 }
             });
-
-            category.getSubCategories().removeIf(subCategory ->
-                    updatedSubCategories.stream().noneMatch(updatedSubCategory ->
-                            updatedSubCategory.getName().equals(subCategory.getName())));
-
-            category.getSubCategories().clear();
-            category.getSubCategories().addAll(updatedSubCategories);
 
             categoryRepository.save(category);
             CategoryDTO categoryDTO = CategoryMapper.categoryMapToCategoryDTO(category);
@@ -100,8 +91,7 @@ public class CategoryService {
             return Optional.empty();
         }
     }
-
-    @Transactional
+        @Transactional
     public void deleteCategoryByIdAndUser(Long categoryId, User user) {
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
         if (existingCategoryOpt.isPresent()) {
