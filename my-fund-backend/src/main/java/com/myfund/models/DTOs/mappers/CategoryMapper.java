@@ -26,6 +26,9 @@ public class CategoryMapper {
     }
 
     public static CategoryDTO categoryMapToCategoryDTO(Category category) {
+        if (category == null) {
+            return null;
+        }
         CategoryDTO categoryDTO = new CategoryDTO();
         categoryDTO.setId(category.getId());
         categoryDTO.setName(category.getName());

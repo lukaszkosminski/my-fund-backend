@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,5 +28,14 @@ public class Budget {
     private LocalDateTime localDateTime;
 
     @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Expense> expense;
+    private List<Expense> expenses;
+
+    @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Income> incomes;
+
+    private BigDecimal balance;
+
+    private BigDecimal totalIncome;
+
+    private BigDecimal totalExpense;
 }

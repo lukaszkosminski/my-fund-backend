@@ -111,4 +111,21 @@ public class CategoryService {
             throw new RuntimeException("Category not found");
         }
     }
+    public Optional<Category> getCategoryByIdAndUser(Long categoryId, User user) {
+        Optional<Category> categoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
+        if (categoryOpt.isPresent()) {
+            return categoryOpt;
+        } else {
+            return Optional.empty();
+        }
+    }
+        public boolean isSubcategoryRelatedToCategory(Long subcategoryId, Long categoryId, User user) {
+        Optional<Category> categoryOpt = getCategoryByIdAndUser(categoryId, user);
+            if (categoryOpt.isEmpty()) {
+                return false;
+            }
+        Category category = categoryOpt.get();
+        return category.getSubCategories().stream()
+                .anyMatch(subCategory -> subCategory.getId().equals(subcategoryId));
+    }
 }
