@@ -68,8 +68,8 @@ public class BudgetController {
         }
     }
 
-    @PatchMapping("/budgets/{budgetId}/expenses/{expenseId}")
-    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable("budgetId") Long budgetId, @PathVariable("expenseId") Long expenseId, @RequestBody CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) {
+    @PatchMapping("/expenses/{expenseId}")
+    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable("expenseId") Long expenseId, @RequestBody CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) {
         Optional<ExpenseDTO> updatedExpenseOpt = budgetService.updateExpense(expenseId, createExpenseDTO, user);
         if (updatedExpenseOpt.isPresent()) {
             return new ResponseEntity<>(updatedExpenseOpt.get(), HttpStatus.OK);
@@ -78,8 +78,8 @@ public class BudgetController {
         }
     }
 
-    @PatchMapping("/budgets/{budgetId}/incomes/{incomeId}")
-    public ResponseEntity<IncomeDTO> updateIncome(@PathVariable("budgetId") Long budgetId, @PathVariable("incomeId") Long incomeId, @RequestBody CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) {
+    @PatchMapping("/incomes/{incomeId}")
+    public ResponseEntity<IncomeDTO> updateIncome(@PathVariable("incomeId") Long incomeId, @RequestBody CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) {
         Optional<IncomeDTO> updatedIncomeOpt = budgetService.updateIncome(incomeId, createIncomeDTO, user);
         if (updatedIncomeOpt.isPresent()) {
             return new ResponseEntity<>(updatedIncomeOpt.get(), HttpStatus.OK);

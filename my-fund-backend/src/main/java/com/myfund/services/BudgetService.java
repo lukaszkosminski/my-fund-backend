@@ -1,8 +1,6 @@
 package com.myfund.services;
 
-import com.myfund.exceptions.BudgetNotFoundException;
-import com.myfund.exceptions.BudgetNotUniqueException;
-import com.myfund.exceptions.SubcategoryNotRelatedToCategoryException;
+import com.myfund.exceptions.*;
 import com.myfund.models.Budget;
 import com.myfund.models.DTOs.*;
 import com.myfund.models.DTOs.mappers.BudgetMapper;
@@ -82,7 +80,7 @@ public class BudgetService {
         if (budgetOpt.isPresent()) {
             return Optional.of(BudgetMapper.budgetMapToBudgetDTO(budgetOpt.get()));
         } else {
-            return Optional.empty();
+            throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
         }
     }
 
@@ -135,7 +133,7 @@ public class BudgetService {
             expenseRepository.save(expense);
             return Optional.of(ExpenseMapper.expensetoExpenseDTO(expense));
         }
-        return Optional.empty();
+        throw new ExpenseNotFoundException("Expense not found for user with ID: " + user.getId() + " and expense ID: " + expenseId);
     }
 
     public Optional<IncomeDTO> updateIncome(Long incomeId, CreateIncomeDTO createIncomeDTO, User user) {
@@ -153,7 +151,7 @@ public class BudgetService {
             incomeRepository.save(income);
             return Optional.of(IncomeMapper.incomeMapToIncomeDTO(income));
         }
-        return Optional.empty();
+        throw new IncomeNotFoundException("Income not found for user with ID: " + user.getId() + " and income ID: " + incomeId);
     }
 
     public boolean validateCategoryAndSubCategory(Long categoryId, Long subCategoryId, User user) {
