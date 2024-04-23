@@ -1,5 +1,6 @@
 package com.myfund.services;
 
+import com.myfund.exceptions.CategoryNotFoundException;
 import com.myfund.exceptions.CategoryNotUniqueException;
 import com.myfund.models.Category;
 import com.myfund.models.DTOs.CategoryDTO;
@@ -93,11 +94,11 @@ class CategoryServiceTest {
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
 
-        Optional<CategoryDTO> result = categoryService.findCategoryByIdAndUser(categoryId, user);
+        CategoryDTO result = categoryService.findCategoryByIdAndUser(categoryId, user);
 
-        assertTrue(result.isPresent(), "Category should be found");
-        assertEquals(categoryDTO.getId(), result.get().getId(), "Category ID should match");
-        assertEquals(categoryDTO.getName(), result.get().getName(), "Category name should match");
+
+        assertEquals(categoryDTO.getId(), result.getId(), "Category ID should match");
+        assertEquals(categoryDTO.getName(), result.getName(), "Category name should match");
 
         verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
     }
@@ -109,9 +110,10 @@ class CategoryServiceTest {
         User user = new User();
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
-        Optional<CategoryDTO> result = categoryService.findCategoryByIdAndUser(categoryId, user);
+        assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.findCategoryByIdAndUser(categoryId, user);
+        }, "Category not found");
 
-        assertFalse(result.isPresent(), "Category should not be found");
         verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
     }
 
@@ -127,10 +129,10 @@ class CategoryServiceTest {
         when(categoryRepository.findByNameAndUser(createCategoryDTO.getName(), user)).thenReturn(Optional.empty());
         when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Optional<CategoryDTO> result = categoryService.createCategory(createCategoryDTO, user);
+        CategoryDTO result = categoryService.createCategory(createCategoryDTO, user);
 
-        assertNotNull(result.get(), "The result should not be null");
-        assertEquals(createCategoryDTO.getName(), result.get().getName(), "The name of the category does not match");
+        assertNotNull(result, "The result should not be null");
+        assertEquals(createCategoryDTO.getName(), result.getName(), "The name of the category does not match");
 
         verify(categoryRepository, times(1)).findByNameAndUser(createCategoryDTO.getName(), user);
         verify(categoryRepository, times(2)).save(any(Category.class));
@@ -188,10 +190,10 @@ class CategoryServiceTest {
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(existingCategory));
         when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Optional<CategoryDTO> updatedCategoryOpt = categoryService.updateCategory(categoryId, createCategoryDTO, user);
+        CategoryDTO updatedCategory = categoryService.updateCategory(categoryId, createCategoryDTO, user);
 
-        assertTrue(updatedCategoryOpt.isPresent(), "Updated category should be present");
-        assertEquals("Updated Category", updatedCategoryOpt.get().getName(), "Category name should be updated");
+        assertNotNull(updatedCategory, "Updated category should not be null");
+        assertEquals("Updated Category", updatedCategory.getName(), "Category name should be updated");
         verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
         verify(categoryRepository, times(1)).save(any(Category.class));
     }
@@ -208,9 +210,10 @@ class CategoryServiceTest {
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
 
-        Optional<CategoryDTO> result = categoryService.updateCategory(categoryId, createCategoryDTO, user);
+        assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.updateCategory(categoryId, createCategoryDTO, user);
+        }, "Category not found");
 
-        assertFalse(result.isPresent(), "Category should not be found");
         verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
         verify(categoryRepository, never()).save(any(Category.class));
     }
