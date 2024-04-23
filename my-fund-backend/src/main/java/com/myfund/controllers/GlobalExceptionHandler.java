@@ -71,5 +71,11 @@ public class GlobalExceptionHandler {
         errorResponse.put("message", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<Object> handleCategoryNotFoundException(CategoryNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("message", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
 
 }
