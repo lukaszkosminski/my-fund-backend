@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByBudget(Budget budget);
 
-    Optional<Expense> findByIdAndUser(Long expenseId, User user);
+    Optional<Expense> findByIdAndUserIdAndBudgetId(Long expenseId, Long userId, Long budgetId);
 }

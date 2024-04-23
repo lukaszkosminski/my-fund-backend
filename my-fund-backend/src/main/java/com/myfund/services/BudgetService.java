@@ -54,7 +54,7 @@ public class BudgetService {
         log.info("Default empty budget saved for user. Email: {}", user.getEmail());
     }
 
-    public Optional<BudgetDTO> createBudget(CreateBudgetDTO createBudgetDTO, User user) {
+    public BudgetDTO createBudget(CreateBudgetDTO createBudgetDTO, User user) {
         Optional<Budget> budgetOpt = budgetRepository.findByNameAndUser(createBudgetDTO.getName(), user);
         if (budgetOpt.isPresent()) {
             throw new BudgetNotUniqueException("budget is not unique");
@@ -67,24 +67,23 @@ public class BudgetService {
             budget.setTotalIncome(BigDecimal.ZERO);
             budgetRepository.save(budget);
             log.info("New budget saved for user. Email: {}. Name: {}", user.getEmail(), budget.getName());
-            return Optional.of(BudgetMapper.budgetMapToBudgetDTO(budget));
+            return BudgetMapper.budgetMapToBudgetDTO(budget);
         }
     }
-
     public List<BudgetSummaryDTO> findAllBudgetsByUser(User user) {
         return BudgetMapper.budgetListMapToBudgetSummaryDTOList(budgetRepository.findAllByUser(user));
     }
 
-    public Optional<BudgetDTO> findBudgetByIdAndUser(Long budgetId, User user) {
+    public BudgetDTO findBudgetByIdAndUser(Long budgetId, User user) {
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
         if (budgetOpt.isPresent()) {
-            return Optional.of(BudgetMapper.budgetMapToBudgetDTO(budgetOpt.get()));
+            return BudgetMapper.budgetMapToBudgetDTO(budgetOpt.get());
         } else {
             throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
         }
     }
 
-    public Optional<ExpenseDTO> createExpense(Long budgetId, CreateExpenseDTO createExpenseDTO, User user) {
+    public ExpenseDTO createExpense(Long budgetId, CreateExpenseDTO createExpenseDTO, User user) {
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
         if (budgetOpt.isPresent()) {
             if (!validateCategoryAndSubCategory(createExpenseDTO.getIdCategory(), createExpenseDTO.getIdSubCategory(), user)) {
@@ -96,12 +95,12 @@ public class BudgetService {
             expense.setUser(user);
             expenseRepository.save(expense);
             updateTotalExpense(budgetOpt.get());
-            return Optional.of(ExpenseMapper.expensetoExpenseDTO(expense));
+            return ExpenseMapper.expensetoExpenseDTO(expense);
         }
         throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
     }
 
-    public Optional<IncomeDTO> createIncome(Long budgetId, CreateIncomeDTO createIncomeDTO, User user) {
+    public IncomeDTO createIncome(Long budgetId, CreateIncomeDTO createIncomeDTO, User user) {
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
         if (budgetOpt.isPresent()) {
             if (!validateCategoryAndSubCategory(createIncomeDTO.getIdCategory(), createIncomeDTO.getIdSubCategory(), user)) {
@@ -113,13 +112,13 @@ public class BudgetService {
             income.setUser(user);
             incomeRepository.save(income);
             updateTotalIncome(budgetOpt.get());
-            return Optional.of(IncomeMapper.incomeMapToIncomeDTO(income));
+            return IncomeMapper.incomeMapToIncomeDTO(income);
         }
         throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
     }
 
-    public Optional<ExpenseDTO> updateExpense(Long expenseId, CreateExpenseDTO createExpenseDTO, User user) {
-        Optional<Expense> expenseOpt = expenseRepository.findByIdAndUser(expenseId, user);
+    public ExpenseDTO updateExpense(Long budgetId, Long expenseId, CreateExpenseDTO createExpenseDTO, User user) {
+        Optional<Expense> expenseOpt = expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId);
         if (expenseOpt.isPresent()) {
             Expense expense = expenseOpt.get();
             if (!validateCategoryAndSubCategory(createExpenseDTO.getIdCategory(), createExpenseDTO.getIdSubCategory(), user)) {
@@ -131,13 +130,13 @@ public class BudgetService {
             expense.setName(createExpenseDTO.getName());
             expense.setLocalDateTime(LocalDateTime.now());
             expenseRepository.save(expense);
-            return Optional.of(ExpenseMapper.expensetoExpenseDTO(expense));
+            return ExpenseMapper.expensetoExpenseDTO(expense);
         }
-        throw new ExpenseNotFoundException("Expense not found for user with ID: " + user.getId() + " and expense ID: " + expenseId);
+        throw new ExpenseNotFoundException("Expense not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and expense ID: " + expenseId);
     }
 
-    public Optional<IncomeDTO> updateIncome(Long incomeId, CreateIncomeDTO createIncomeDTO, User user) {
-        Optional<Income> incomeOpt = incomeRepository.findByIdAndUser(incomeId, user);
+    public IncomeDTO updateIncome(Long budgetId, Long incomeId, CreateIncomeDTO createIncomeDTO, User user) {
+        Optional<Income> incomeOpt = incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId);
         if (incomeOpt.isPresent()) {
             Income income = incomeOpt.get();
             if (!validateCategoryAndSubCategory(createIncomeDTO.getIdCategory(), createIncomeDTO.getIdSubCategory(), user)) {
@@ -149,19 +148,16 @@ public class BudgetService {
             income.setName(createIncomeDTO.getName());
             income.setLocalDateTime(LocalDateTime.now());
             incomeRepository.save(income);
-            return Optional.of(IncomeMapper.incomeMapToIncomeDTO(income));
+            return IncomeMapper.incomeMapToIncomeDTO(income);
         }
-        throw new IncomeNotFoundException("Income not found for user with ID: " + user.getId() + " and income ID: " + incomeId);
+        throw new IncomeNotFoundException("Income not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and expense ID: " + incomeId);
     }
 
     public boolean validateCategoryAndSubCategory(Long categoryId, Long subCategoryId, User user) {
-        if (categoryId == null & subCategoryId == null) {
+        if (categoryId == null && subCategoryId == null) {
             return true;
-        } else if (categoryService.isSubcategoryRelatedToCategory(subCategoryId, categoryId, user)) {
-            return true;
-        } else {
-            return false;
         }
+        return categoryService.isSubcategoryRelatedToCategory(subCategoryId, categoryId, user);
     }
 
     private void updateTotalExpense(Budget budget) {
