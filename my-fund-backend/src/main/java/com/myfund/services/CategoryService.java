@@ -1,5 +1,6 @@
 package com.myfund.services;
 
+import com.myfund.exceptions.CategoryNotFoundException;
 import com.myfund.exceptions.CategoryNotUniqueException;
 import com.myfund.models.Category;
 import com.myfund.models.DTOs.CategoryDTO;
@@ -35,20 +36,20 @@ public class CategoryService {
 
     }
 
-    public Optional<CategoryDTO> findCategoryByIdAndUser(Long categoryId, User user) {
+    public CategoryDTO findCategoryByIdAndUser(Long categoryId, User user) {
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
         if (existingCategoryOpt.isPresent()) {
-            return Optional.of(CategoryMapper.categoryMapToCategoryDTO(existingCategoryOpt.get()));
+            return CategoryMapper.categoryMapToCategoryDTO(existingCategoryOpt.get());
         } else {
-            return Optional.empty();
+            throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
         }
     }
 
-    public Optional<CategoryDTO> createCategory(CreateCategoryDTO createCategoryDTO, User user) {
+    public CategoryDTO createCategory(CreateCategoryDTO createCategoryDTO, User user) {
         Optional<Category> existingCategory = categoryRepository.findByNameAndUser(createCategoryDTO.getName(), user);
         Category category;
         if (existingCategory.isPresent()) {
-            throw new CategoryNotUniqueException("category is not unique");
+            throw new CategoryNotUniqueException("Category with name: " + existingCategory.get().getName() + " is not unique");
         } else {
             category = CategoryMapper.createCategoryDTOMapToCategory(createCategoryDTO);
             category.setUser(user);
@@ -62,53 +63,62 @@ public class CategoryService {
             category.getSubCategories().clear();
             category.getSubCategories().addAll(subCategoryList);
             categoryRepository.save(category);
-            return Optional.of(CategoryMapper.categoryMapToCategoryDTO(category));
+            return CategoryMapper.categoryMapToCategoryDTO(category);
         }
     }
 
-    public Optional<CategoryDTO> updateCategory(Long categoryId, CreateCategoryDTO createCategoryDTO, User user) {
+    public CategoryDTO updateCategory(Long categoryId, CreateCategoryDTO createCategoryDTO, User user) {
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
         if (existingCategoryOpt.isPresent()) {
             Category category = existingCategoryOpt.get();
             category.setName(createCategoryDTO.getName());
 
-            List<SubCategory> updatedSubCategories = new ArrayList<>();
+            List<SubCategory> existingSubCategories = category.getSubCategories();
             createCategoryDTO.getSubCategories().forEach(createSubCategoryDTO -> {
-                Optional<SubCategory> existingSubCategory = category.getSubCategories().stream()
+                Optional<SubCategory> existingSubCategory = existingSubCategories.stream()
                         .filter(subCategory -> subCategory.getName().equals(createSubCategoryDTO.getName()))
                         .findFirst();
-                if (existingSubCategory.isPresent()) {
-                    updatedSubCategories.add(existingSubCategory.get());
-                } else {
+                if (!existingSubCategory.isPresent()) {
                     SubCategory newSubCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
                     newSubCategory.setCategory(category);
-                    updatedSubCategories.add(newSubCategory);
+                    existingSubCategories.add(newSubCategory);
                 }
             });
 
-            category.getSubCategories().removeIf(subCategory ->
-                    updatedSubCategories.stream().noneMatch(updatedSubCategory ->
-                            updatedSubCategory.getName().equals(subCategory.getName())));
-
-            category.getSubCategories().clear();
-            category.getSubCategories().addAll(updatedSubCategories);
-
             categoryRepository.save(category);
             CategoryDTO categoryDTO = CategoryMapper.categoryMapToCategoryDTO(category);
-            return Optional.of(categoryDTO);
+            return categoryDTO;
         } else {
-            return Optional.empty();
+            throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
         }
     }
 
-    @Transactional
+    // TODO: Review and fix the delete operation
+        @Transactional
     public void deleteCategoryByIdAndUser(Long categoryId, User user) {
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
         if (existingCategoryOpt.isPresent()) {
             Category category = existingCategoryOpt.get();
             categoryRepository.delete(category);
         } else {
-            throw new RuntimeException("Category not found");
+            throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
         }
+    }
+    private Optional<Category> getCategoryByIdAndUser(Long categoryId, User user) {
+        Optional<Category> categoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
+        if (categoryOpt.isPresent()) {
+            return categoryOpt;
+        } else {
+            return Optional.empty();
+        }
+    }
+        public boolean isSubcategoryRelatedToCategory(Long subcategoryId, Long categoryId, User user) {
+        Optional<Category> categoryOpt = getCategoryByIdAndUser(categoryId, user);
+            if (categoryOpt.isEmpty()) {
+                return false;
+            }
+        Category category = categoryOpt.get();
+        return category.getSubCategories().stream()
+                .anyMatch(subCategory -> subCategory.getId().equals(subcategoryId));
     }
 }

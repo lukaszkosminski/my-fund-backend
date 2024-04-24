@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 @Table(name = "expense")
 @Getter
 @Setter
@@ -28,5 +29,15 @@ public class Expense {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budget_id")
     private Budget budget;
+
+    @Column(name = "category_id")
+    private Long idCategory;
+
+    @Column(name = "sub_category_id")
+    private Long idSubCategory;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

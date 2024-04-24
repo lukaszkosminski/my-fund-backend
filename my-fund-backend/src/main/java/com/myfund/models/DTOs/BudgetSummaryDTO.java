@@ -4,11 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Getter
 @Setter
-public class BudgetDTO {
+public class BudgetSummaryDTO {
 
     private Long id;
 
@@ -20,7 +19,4 @@ public class BudgetDTO {
 
     private BigDecimal totalExpense;
 
-    private List<ExpenseDTO> expenses;
-
-    private List<IncomeDTO> incomes;
 }

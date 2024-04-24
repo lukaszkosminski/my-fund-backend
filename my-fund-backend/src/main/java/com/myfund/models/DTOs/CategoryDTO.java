@@ -12,7 +12,6 @@ public class CategoryDTO {
 
     private Long id;
 
-    @NotNull
     private String name;
 
     private List<SubCategoryDTO> subCategories;

@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/")
 public class VersionController {
 
     private final ApplicationDetailsService applicationDetailsService;

@@ -1,5 +1,6 @@
 package com.myfund.models.DTOs;
 
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,9 +11,14 @@ import java.math.BigDecimal;
 @Setter
 public class ExpenseDTO {
 
-    @NotNull
+    private Long id;
+
     private String name;
 
-    @NotNull
     private BigDecimal amount;
+
+    private Long idCategory;
+
+    private Long idSubCategory;
+
 }

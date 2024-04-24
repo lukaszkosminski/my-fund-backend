@@ -29,5 +29,5 @@ public class UserController {
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
         return new ResponseEntity<>(UserMapper.userMapToUserDTO(user), HttpStatus.OK);
     }
-    // TODO: Add more endpoints
+
 }
