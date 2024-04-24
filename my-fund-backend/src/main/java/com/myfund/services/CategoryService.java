@@ -12,6 +12,7 @@ import com.myfund.models.User;
 import com.myfund.repositories.CategoryRepository;
 import com.myfund.repositories.SubCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +26,13 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final SubCategoryRepository subCategoryRepository;
 
+    private final BudgetService budgetService;
+
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository, @Lazy BudgetService budgetService) {
         this.categoryRepository = categoryRepository;
         this.subCategoryRepository = subCategoryRepository;
+        this.budgetService = budgetService;
     }
 
     public List<CategoryDTO> findAllCategoriesByUser(User user) {
@@ -93,17 +97,19 @@ public class CategoryService {
         }
     }
 
-    // TODO: Review and fix the delete operation
-        @Transactional
+    @Transactional
     public void deleteCategoryByIdAndUser(Long categoryId, User user) {
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
         if (existingCategoryOpt.isPresent()) {
             Category category = existingCategoryOpt.get();
+            budgetService.updateExpensesCategoryIdToNull(category.getId());
+            budgetService.updateIncomesCategoryIdToNull(category.getId());
             categoryRepository.delete(category);
         } else {
             throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
         }
     }
+
     private Optional<Category> getCategoryByIdAndUser(Long categoryId, User user) {
         Optional<Category> categoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
         if (categoryOpt.isPresent()) {
@@ -112,13 +118,15 @@ public class CategoryService {
             return Optional.empty();
         }
     }
-        public boolean isSubcategoryRelatedToCategory(Long subcategoryId, Long categoryId, User user) {
+
+    public boolean isSubcategoryRelatedToCategory(Long subcategoryId, Long categoryId, User user) {
         Optional<Category> categoryOpt = getCategoryByIdAndUser(categoryId, user);
-            if (categoryOpt.isEmpty()) {
-                return false;
-            }
+        if (categoryOpt.isEmpty()) {
+            return false;
+        }
         Category category = categoryOpt.get();
         return category.getSubCategories().stream()
                 .anyMatch(subCategory -> subCategory.getId().equals(subcategoryId));
     }
+
 }

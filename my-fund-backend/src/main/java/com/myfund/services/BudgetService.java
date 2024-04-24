@@ -1,14 +1,11 @@
 package com.myfund.services;
 
 import com.myfund.exceptions.*;
-import com.myfund.models.Budget;
+import com.myfund.models.*;
 import com.myfund.models.DTOs.*;
 import com.myfund.models.DTOs.mappers.BudgetMapper;
 import com.myfund.models.DTOs.mappers.ExpenseMapper;
 import com.myfund.models.DTOs.mappers.IncomeMapper;
-import com.myfund.models.Expense;
-import com.myfund.models.Income;
-import com.myfund.models.User;
 import com.myfund.repositories.BudgetRepository;
 import com.myfund.repositories.ExpenseRepository;
 import com.myfund.repositories.IncomeRepository;
@@ -183,6 +180,23 @@ public class BudgetService {
         budget.setTotalIncome(totalIncome);
         updateBalance(budget);
         budgetRepository.save(budget);
+    }
+
+    public void updateExpensesCategoryIdToNull(Long idCategory) {
+        List<Expense> expenses = expenseRepository.findByIdCategory(idCategory);
+        for (Expense expense : expenses) {
+            expense.setIdCategory(null);
+            expense.setIdSubCategory(null);
+            expenseRepository.save(expense);
+        }
+    }
+    public void updateIncomesCategoryIdToNull(Long idCategory) {
+        List<Income> incomes = incomeRepository.findByIdCategory(idCategory);
+        for (Income income : incomes) {
+            income.setIdCategory(null);
+            income.setIdSubCategory(null);
+            incomeRepository.save(income);
+        }
     }
 
 }

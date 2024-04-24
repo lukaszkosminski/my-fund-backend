@@ -29,6 +29,7 @@ public class BudgetController {
         BudgetDTO budgetDTO = budgetService.createBudget(createBudgetDTO, user);
         return new ResponseEntity<>(budgetDTO, HttpStatus.CREATED);
     }
+
     @GetMapping("/budgets/{budgetId}")
     public ResponseEntity<BudgetDTO> getBudgetById(@PathVariable("budgetId") Long budgetId, @AuthenticationPrincipal User user) {
         BudgetDTO budgetDTO = budgetService.findBudgetByIdAndUser(budgetId, user);
