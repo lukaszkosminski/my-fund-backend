@@ -80,6 +80,7 @@ public class BudgetService {
     }
 
     public BudgetDTO findBudgetByIdAndUser(Long budgetId, User user) {
+        log.debug("Starting to find budget by ID: {} for user ID: {}", budgetId, user.getId());
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
         if (budgetOpt.isPresent()) {
             log.info("Budget found for user with ID: {} and budget ID: {}", user.getId(), budgetId);
