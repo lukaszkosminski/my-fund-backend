@@ -53,4 +53,10 @@ public class CategoryController {
         categoryService.deleteCategoryByIdAndUser(categoryId, user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @DeleteMapping("/categories/{categoryId}/subcategories/{subcategoryId}")
+    public ResponseEntity<?> deleteSubcategory(@PathVariable("categoryId") Long categoryId, @PathVariable("subcategoryId") Long subcategoryId, @AuthenticationPrincipal User user) {
+        categoryService.deleteSubcategoryByIdsAndUser(categoryId,subcategoryId, user);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

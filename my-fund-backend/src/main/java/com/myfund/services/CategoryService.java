@@ -2,6 +2,7 @@ package com.myfund.services;
 
 import com.myfund.exceptions.CategoryNotFoundException;
 import com.myfund.exceptions.CategoryNotUniqueException;
+import com.myfund.exceptions.SubcategoryNotFoundException;
 import com.myfund.models.Category;
 import com.myfund.models.DTOs.CategoryDTO;
 import com.myfund.models.DTOs.CreateCategoryDTO;
@@ -11,6 +12,7 @@ import com.myfund.models.SubCategory;
 import com.myfund.models.User;
 import com.myfund.repositories.CategoryRepository;
 import com.myfund.repositories.SubCategoryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -129,4 +132,27 @@ public class CategoryService {
                 .anyMatch(subCategory -> subCategory.getId().equals(subcategoryId));
     }
 
+    public void deleteSubcategoryByIdsAndUser(Long categoryId, Long subcategoryId, User user) {
+        log.debug("Starting to delete subcategory with ID: {} from category ID: {} for user ID: {}", subcategoryId, categoryId, user.getId());
+        Optional<Category> categoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
+        if (categoryOpt.isPresent()) {
+            Category category = categoryOpt.get();
+            log.debug("Category found. Proceeding with subcategory removal.");
+            SubCategory subCategoryToRemove = category.getSubCategories().stream()
+                    .filter(subCategory -> subCategory.getId().equals(subcategoryId))
+                    .findFirst()
+                    .orElseThrow(() -> {
+                        log.warn("Subcategory not found for user with ID: {}, category ID: {}, and subcategory ID: {}", user.getId(), categoryId, subcategoryId);
+                        return new SubcategoryNotFoundException("Subcategory not found for user with ID: " + user.getId() + ", category ID: " + categoryId + " and subcategory ID: " + subcategoryId);
+                    });
+            budgetService.updateExpensesSubcategoryIdToNull(subcategoryId);
+            budgetService.updateIncomesSubcategoryIdToNull(subcategoryId);
+            category.getSubCategories().remove(subCategoryToRemove);
+            subCategoryRepository.delete(subCategoryToRemove);
+            log.info("Subcategory with ID: {} removed from category ID: {} for user ID: {}", subcategoryId, categoryId, user.getId());
+        } else {
+            log.warn("Category not found for user with ID: {} and category ID: {}. Unable to delete subcategory with ID: {}", user.getId(), categoryId, subcategoryId);
+            throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
+        }
+    }
 }

@@ -250,6 +250,25 @@ public class BudgetService {
         log.info("All incomes with category ID: {} have been updated to have null category and subcategory IDs", idCategory);
     }
 
+    public void updateExpensesSubcategoryIdToNull(Long subcategoryId) {
+        log.debug("Starting to update subcategory ID to null for all expenses with subcategory ID: {}", subcategoryId);
+        List<Expense> expenses = expenseRepository.findByIdSubCategory(subcategoryId);
+        for (Expense expense : expenses) {
+            expense.setIdSubCategory(null);
+            expenseRepository.save(expense);
+        }
+        log.info("All expenses with subcategory ID: {} have been updated to have null subcategory ID", subcategoryId);
+    }
+
+    public void updateIncomesSubcategoryIdToNull(Long subcategoryId) {
+        log.debug("Starting to update subcategory ID to null for all incomes with subcategory ID: {}", subcategoryId);
+        List<Income> incomes = incomeRepository.findByIdSubCategory(subcategoryId);
+        for (Income income : incomes) {
+            income.setIdSubCategory(null);
+            incomeRepository.save(income);
+        }
+        log.info("All incomes with subcategory ID: {} have been updated to have null subcategory ID", subcategoryId);
+    }
 }
 
 

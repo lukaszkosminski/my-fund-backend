@@ -12,4 +12,6 @@ public interface IncomeRepository extends JpaRepository<Income,Long> {
     Optional<Income> findByIdAndUserIdAndBudgetId(Long expenseId, Long userId, Long budgetId);
 
     List<Income> findByIdCategory(Long idCategory);
+
+    List<Income> findByIdSubCategory(Long subcategoryId);
 }
