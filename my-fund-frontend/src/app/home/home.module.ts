@@ -1,21 +1,38 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {HomeComponent} from "./home.component";
 import {RouterModule} from "@angular/router";
 import {SidebarComponent} from "../components/sidebar/sidebar.component";
+import {BudgetsComponent} from './pages/budgets/budgets.component';
+import {BudgetFormComponent} from './pages/budget-form/budget-form.component';
+import {ReactiveFormsModule} from "@angular/forms";
+import { CategoriesComponent } from './pages/categories/categories.component';
+import { CategoryFormComponent } from './pages/category-form/category-form.component';
 
 
 @NgModule({
   declarations: [
     HomeComponent,
-    SidebarComponent
-
+    SidebarComponent,
+    BudgetsComponent,
+    BudgetFormComponent,
+    CategoriesComponent,
+    CategoryFormComponent
   ],
   imports: [
+    ReactiveFormsModule,
     CommonModule,
     RouterModule.forChild([
-      { path: '',  pathMatch: 'full', component: HomeComponent },
+      {
+        path: '', component: HomeComponent, children: [
+          {path: 'budgets', pathMatch: 'full', component: BudgetsComponent},
+          {path: 'budgets/create', pathMatch: 'full', component: BudgetFormComponent},
+          {path: 'categories', pathMatch: 'full', component: CategoriesComponent},
+          {path: 'categories/create', pathMatch: 'full', component: CategoryFormComponent},
+        ]
+      },
     ]),
   ]
 })
-export class HomeModule { }
+export class HomeModule {
+}
