@@ -1,14 +1,12 @@
 package com.myfund.services;
 
 import com.myfund.exceptions.*;
-import com.myfund.models.Budget;
+import com.myfund.models.*;
 import com.myfund.models.DTOs.*;
 import com.myfund.models.DTOs.mappers.BudgetMapper;
 import com.myfund.models.DTOs.mappers.ExpenseMapper;
+import com.myfund.models.DTOs.mappers.FinancialAggregateMapper;
 import com.myfund.models.DTOs.mappers.IncomeMapper;
-import com.myfund.models.Expense;
-import com.myfund.models.Income;
-import com.myfund.models.User;
 import com.myfund.repositories.BudgetRepository;
 import com.myfund.repositories.ExpenseRepository;
 import com.myfund.repositories.IncomeRepository;
@@ -32,7 +30,6 @@ public class BudgetService {
     private final IncomeRepository incomeRepository;
 
     private final CategoryService categoryService;
-
 
     @Autowired
     public BudgetService(BudgetRepository budgetRepository, ExpenseRepository expenseRepository, IncomeRepository incomeRepository, CategoryService categoryService) {
@@ -201,9 +198,7 @@ public class BudgetService {
     private void updateTotalExpense(Budget budget) {
         log.debug("Starting to update total expense for budget ID: {}", budget.getId());
         List<Expense> expenses = expenseRepository.findByBudget(budget);
-        BigDecimal totalExpense = expenses.stream()
-                .map(Expense::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalExpense = expenses.stream().map(Expense::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         budget.setTotalExpense(totalExpense);
         updateBalance(budget);
         budgetRepository.save(budget);
@@ -220,9 +215,7 @@ public class BudgetService {
     private void updateTotalIncome(Budget budget) {
         log.debug("Starting to update total income for budget ID: {}", budget.getId());
         List<Income> incomes = incomeRepository.findByBudget(budget);
-        BigDecimal totalIncome = incomes.stream()
-                .map(Income::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalIncome = incomes.stream().map(Income::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         budget.setTotalIncome(totalIncome);
         updateBalance(budget);
         budgetRepository.save(budget);
@@ -269,6 +262,98 @@ public class BudgetService {
             incomeRepository.save(income);
         }
         log.info("All incomes with subcategory ID: {} have been updated to have null subcategory ID", subcategoryId);
+    }
+
+    public FinancialAggregateCategoryDTO getTotalExpensesByCategory(Long budgetId, Long categoryId, User user) {
+        log.debug("Starting to get total expenses for budget ID: {}, category ID: {}, and user ID: {}", budgetId, categoryId, user.getId());
+        FinancialAggregate financialAggregate = new FinancialAggregate();
+        try {
+            BigDecimal totalExpenses = expenseRepository.sumExpensesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId());
+            financialAggregate.setBudgetId(budgetId);
+            financialAggregate.setCategoryId(categoryId);
+            financialAggregate.setTypeAggregate(TypeAggregate.EXPENSES_BY_CATEGORY);
+            financialAggregate.setUserId(user.getId());
+            if (totalExpenses == null) {
+                log.info("No expenses found for budget ID: {}, category ID: {}, and user ID: {}. Returning ZERO.", budgetId, categoryId, user.getId());
+                financialAggregate.setValue(BigDecimal.ZERO);
+                return FinancialAggregateMapper.toFinancialAggregateCategoryDTO(financialAggregate);
+            }
+            financialAggregate.setValue(totalExpenses);
+            log.info("Total expenses retrieved for budget ID: {}, category ID: {}, and user ID: {}. Total: {}", budgetId, categoryId, user.getId(), totalExpenses);
+            return FinancialAggregateMapper.toFinancialAggregateCategoryDTO(financialAggregate);
+        } catch (Exception e) {
+            log.error("Error retrieving total expenses for budget ID: {}, category ID: {}, and user ID: {}. Error: {}", budgetId, categoryId, user.getId(), e.getMessage());
+            throw new TotalExpensesRetrievalException("Error retrieving total expenses for budget ID: " + budgetId + ", category ID: " + categoryId + ", and user ID: " + user.getId());
+        }
+    }
+
+    public FinancialAggregateSubcategoryDTO getTotalExpensesBySubcategory(Long budgetId, Long subcategoryId, User user) {
+        log.debug("Starting to get total expenses for budget ID: {}, subcategory ID: {}, and user ID: {}", budgetId, subcategoryId, user.getId());
+        FinancialAggregate financialAggregate = new FinancialAggregate();
+        try {
+            BigDecimal totalExpenses = expenseRepository.sumExpensesByBudgetIdAndSubcategoryIdAndUserId(budgetId, subcategoryId, user.getId());
+            financialAggregate.setBudgetId(budgetId);
+            financialAggregate.setSubcategoryId(subcategoryId);
+            financialAggregate.setTypeAggregate(TypeAggregate.EXPENSES_BY_SUBCATEGORY);
+            financialAggregate.setUserId(user.getId());
+            if (totalExpenses == null) {
+                log.info("No expenses found for budget ID: {}, subcategory ID: {}, and user ID: {}. Returning ZERO.", budgetId, subcategoryId, user.getId());
+                financialAggregate.setValue(BigDecimal.ZERO);
+                return FinancialAggregateMapper.toFinancialAggregateSubcategoryDTO(financialAggregate);
+            }
+            financialAggregate.setValue(totalExpenses);
+            log.info("Total expenses retrieved for budget ID: {}, subcategory ID: {}, and user ID: {}. Total: {}", budgetId, subcategoryId, user.getId(), totalExpenses);
+            return FinancialAggregateMapper.toFinancialAggregateSubcategoryDTO(financialAggregate);
+        } catch (Exception e) {
+            log.error("Error retrieving total expenses for budget ID: {}, subcategory ID: {}, and user ID: {}. Error: {}", budgetId, subcategoryId, user.getId(), e.getMessage());
+            throw new TotalExpensesRetrievalException("Error retrieving total expenses for budget ID: " + budgetId + ", subcategory ID: " + subcategoryId + ", and user ID: " + user.getId());
+        }
+    }
+
+    public FinancialAggregateCategoryDTO getTotalIncomesByCategory(Long budgetId, Long categoryId, User user) {
+        log.debug("Starting to get total incomes for budget ID: {}, category ID: {}, and user ID: {}", budgetId, categoryId, user.getId());
+        FinancialAggregate financialAggregate = new FinancialAggregate();
+        try {
+            BigDecimal totalIncomes = incomeRepository.sumIncomesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId());
+            financialAggregate.setBudgetId(budgetId);
+            financialAggregate.setCategoryId(categoryId);
+            financialAggregate.setTypeAggregate(TypeAggregate.INCOMES_BY_CATEGORY);
+            financialAggregate.setUserId(user.getId());
+            if (totalIncomes == null) {
+                log.info("No incomes found for budget ID: {}, category ID: {}, and user ID: {}. Returning ZERO.", budgetId, categoryId, user.getId());
+                financialAggregate.setValue(BigDecimal.ZERO);
+                return FinancialAggregateMapper.toFinancialAggregateCategoryDTO(financialAggregate);
+            }
+            financialAggregate.setValue(totalIncomes);
+            log.info("Total incomes retrieved for budget ID: {}, category ID: {}, and user ID: {}. Total: {}", budgetId, categoryId, user.getId(), totalIncomes);
+            return FinancialAggregateMapper.toFinancialAggregateCategoryDTO(financialAggregate);
+        } catch (Exception e) {
+            log.error("Error retrieving total incomes for budget ID: {}, category ID: {}, and user ID: {}. Error: {}", budgetId, categoryId, user.getId(), e.getMessage());
+            throw new TotalIncomesRetrievalException("Error retrieving total incomes for budget ID: " + budgetId + ", category ID: " + categoryId + ", and user ID: " + user.getId());
+        }
+    }
+
+    public FinancialAggregateSubcategoryDTO getTotalIncomesBySubcategory(Long budgetId, Long subcategoryId, User user) {
+        log.debug("Starting to get total incomes for budget ID: {}, subcategory ID: {}, and user ID: {}", budgetId, subcategoryId, user.getId());
+        FinancialAggregate financialAggregate = new FinancialAggregate();
+        try {
+            BigDecimal totalIncomes = incomeRepository.sumIncomesByBudgetIdAndSubcategoryIdAndUserId(budgetId, subcategoryId, user.getId());
+            financialAggregate.setBudgetId(budgetId);
+            financialAggregate.setSubcategoryId(subcategoryId);
+            financialAggregate.setTypeAggregate(TypeAggregate.INCOMES_BY_SUBCATEGORY);
+            financialAggregate.setUserId(user.getId());
+            if (totalIncomes == null) {
+                log.info("No incomes found for budget ID: {}, subcategory ID: {}, and user ID: {}. Returning ZERO.", budgetId, subcategoryId, user.getId());
+                financialAggregate.setValue(BigDecimal.ZERO);
+                return FinancialAggregateMapper.toFinancialAggregateSubcategoryDTO(financialAggregate);
+            }
+            financialAggregate.setValue(totalIncomes);
+            log.info("Total incomes retrieved for budget ID: {}, subcategory ID: {}, and user ID: {}. Total: {}", budgetId, subcategoryId, user.getId(), totalIncomes);
+            return FinancialAggregateMapper.toFinancialAggregateSubcategoryDTO(financialAggregate);
+        } catch (Exception e) {
+            log.error("Error retrieving total incomes for budget ID: {}, subcategory ID: {}, and user ID: {}. Error: {}", budgetId, subcategoryId, user.getId(), e.getMessage());
+            throw new TotalIncomesRetrievalException("Error retrieving total incomes for budget ID: " + budgetId + ", subcategory ID: " + subcategoryId + ", and user ID: " + user.getId());
+        }
     }
 }
 

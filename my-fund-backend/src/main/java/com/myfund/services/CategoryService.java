@@ -90,9 +90,7 @@ public class CategoryService {
 
             List<SubCategory> existingSubCategories = category.getSubCategories();
             createCategoryDTO.getSubCategories().forEach(createSubCategoryDTO -> {
-                Optional<SubCategory> existingSubCategory = existingSubCategories.stream()
-                        .filter(subCategory -> subCategory.getName().equals(createSubCategoryDTO.getName()))
-                        .findFirst();
+                Optional<SubCategory> existingSubCategory = existingSubCategories.stream().filter(subCategory -> subCategory.getName().equals(createSubCategoryDTO.getName())).findFirst();
                 if (!existingSubCategory.isPresent()) {
                     SubCategory newSubCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
                     newSubCategory.setCategory(category);
@@ -146,8 +144,7 @@ public class CategoryService {
             return false;
         }
         Category category = categoryOpt.get();
-        boolean isRelated = category.getSubCategories().stream()
-                .anyMatch(subCategory -> subCategory.getId().equals(subcategoryId));
+        boolean isRelated = category.getSubCategories().stream().anyMatch(subCategory -> subCategory.getId().equals(subcategoryId));
         log.info("Subcategory with ID: {} is {}related to category ID: {} for user ID: {}", subcategoryId, isRelated ? "" : "not ", categoryId, user.getId());
         return isRelated;
     }
@@ -158,13 +155,10 @@ public class CategoryService {
         if (categoryOpt.isPresent()) {
             Category category = categoryOpt.get();
             log.debug("Category found. Proceeding with subcategory removal.");
-            SubCategory subCategoryToRemove = category.getSubCategories().stream()
-                    .filter(subCategory -> subCategory.getId().equals(subcategoryId))
-                    .findFirst()
-                    .orElseThrow(() -> {
-                        log.warn("Subcategory not found for user with ID: {}, category ID: {}, and subcategory ID: {}", user.getId(), categoryId, subcategoryId);
-                        return new SubcategoryNotFoundException("Subcategory not found for user with ID: " + user.getId() + ", category ID: " + categoryId + " and subcategory ID: " + subcategoryId);
-                    });
+            SubCategory subCategoryToRemove = category.getSubCategories().stream().filter(subCategory -> subCategory.getId().equals(subcategoryId)).findFirst().orElseThrow(() -> {
+                log.warn("Subcategory not found for user with ID: {}, category ID: {}, and subcategory ID: {}", user.getId(), categoryId, subcategoryId);
+                return new SubcategoryNotFoundException("Subcategory not found for user with ID: " + user.getId() + ", category ID: " + categoryId + " and subcategory ID: " + subcategoryId);
+            });
             budgetService.updateExpensesSubcategoryIdToNull(subcategoryId);
             budgetService.updateIncomesSubcategoryIdToNull(subcategoryId);
             category.getSubCategories().remove(subCategoryToRemove);

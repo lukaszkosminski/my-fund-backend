@@ -1,0 +1,6 @@
+package com.myfund.models;
+
+public enum TypeAggregate {
+
+    EXPENSES_BY_CATEGORY, EXPENSES_BY_SUBCATEGORY, INCOMES_BY_CATEGORY, INCOMES_BY_SUBCATEGORY
+}

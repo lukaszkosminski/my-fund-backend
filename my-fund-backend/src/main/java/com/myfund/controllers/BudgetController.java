@@ -1,7 +1,6 @@
 package com.myfund.controllers;
 
 import com.myfund.models.DTOs.*;
-import com.myfund.models.Income;
 import com.myfund.models.User;
 import com.myfund.services.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/")
@@ -63,5 +61,29 @@ public class BudgetController {
     public ResponseEntity<IncomeDTO> updateIncome(@PathVariable("budgetId") Long budgetId, @PathVariable("incomeId") Long incomeId, @RequestBody CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) {
         IncomeDTO incomeDTO = budgetService.updateIncome(budgetId, incomeId, createIncomeDTO, user);
         return new ResponseEntity<>(incomeDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/budgets/{budgetId}/categories/{categoryId}/expenses/total")
+    public ResponseEntity<FinancialAggregateCategoryDTO> getTotalExpensesForBudgetAndCategory(@PathVariable("budgetId") Long budgetId, @PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
+        FinancialAggregateCategoryDTO totalExpensesByCategory = budgetService.getTotalExpensesByCategory(budgetId, categoryId, user);
+        return new ResponseEntity<>(totalExpensesByCategory, HttpStatus.OK);
+    }
+
+    @GetMapping("/budgets/{budgetId}/subcategories/{subcategoryId}/expenses/total")
+    public ResponseEntity<FinancialAggregateSubcategoryDTO> getTotalExpensesForBudgetAndSubcategory(@PathVariable("budgetId") Long budgetId, @PathVariable("subcategoryId") Long subcategoryId, @AuthenticationPrincipal User user) {
+        FinancialAggregateSubcategoryDTO totalExpensesBySubcategory = budgetService.getTotalExpensesBySubcategory(budgetId, subcategoryId, user);
+        return new ResponseEntity<>(totalExpensesBySubcategory, HttpStatus.OK);
+    }
+
+    @GetMapping("/budgets/{budgetId}/categories/{categoryId}/incomes/total")
+    public ResponseEntity<FinancialAggregateCategoryDTO> getTotalIncomesForBudgetAndCategory(@PathVariable("budgetId") Long budgetId, @PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
+        FinancialAggregateCategoryDTO totalIncomesByCategory = budgetService.getTotalIncomesByCategory(budgetId, categoryId, user);
+        return new ResponseEntity<>(totalIncomesByCategory, HttpStatus.OK);
+    }
+
+    @GetMapping("/budgets/{budgetId}/subcategories/{subcategoryId}/incomes/total")
+    public ResponseEntity<FinancialAggregateSubcategoryDTO> getTotalIncomesForBudgetAndSubcategory(@PathVariable("budgetId") Long budgetId, @PathVariable("subcategoryId") Long subcategoryId, @AuthenticationPrincipal User user) {
+        FinancialAggregateSubcategoryDTO totalIncomesBySubcategory = budgetService.getTotalIncomesBySubcategory(budgetId, subcategoryId, user);
+        return new ResponseEntity<>(totalIncomesBySubcategory, HttpStatus.OK);
     }
 }
