@@ -1,9 +1,11 @@
 <footer class="bg-gray-100">
-  <div class="flex items-center justify-between mx-auto py-4 pwx-4 sm:px-6 lg:px-8">
+  <div class="flex items-center justify-end font-extralight mx-auto py-4 pwx-4 sm:px-6 lg:px-8">
     <div class="flex items-center">
 <!--      <a routerLink="/">-->
 <!--        <img src="/assets/logo2.svg" alt="">-->
 <!--      </a>-->
+      Version: {{appVersion().version}}
+      Build: {{appVersion().buildDate}}
     </div>
   </div>
 </footer>
