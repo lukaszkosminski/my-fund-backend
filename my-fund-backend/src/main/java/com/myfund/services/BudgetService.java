@@ -1,11 +1,14 @@
 package com.myfund.services;
 
 import com.myfund.exceptions.*;
-import com.myfund.models.*;
+import com.myfund.models.Budget;
 import com.myfund.models.DTOs.*;
 import com.myfund.models.DTOs.mappers.BudgetMapper;
 import com.myfund.models.DTOs.mappers.ExpenseMapper;
 import com.myfund.models.DTOs.mappers.IncomeMapper;
+import com.myfund.models.Expense;
+import com.myfund.models.Income;
+import com.myfund.models.User;
 import com.myfund.repositories.BudgetRepository;
 import com.myfund.repositories.ExpenseRepository;
 import com.myfund.repositories.IncomeRepository;
@@ -67,6 +70,7 @@ public class BudgetService {
             return BudgetMapper.budgetMapToBudgetDTO(budget);
         }
     }
+
     public List<BudgetSummaryDTO> findAllBudgetsByUser(User user) {
         return BudgetMapper.budgetListMapToBudgetSummaryDTOList(budgetRepository.findAllByUser(user));
     }
@@ -154,6 +158,12 @@ public class BudgetService {
         if (categoryId == null && subCategoryId == null) {
             return true;
         }
+        if (categoryId != null && subCategoryId == null) {
+            return true;
+        }
+        if (categoryId == null) {
+            throw new SubcategoryNotFoundException("Subcategory with ID: " + subCategoryId + " cannot be assigned without a parent category for user with ID: " + user.getId());
+        }
         return categoryService.isSubcategoryRelatedToCategory(subCategoryId, categoryId, user);
     }
 
@@ -190,6 +200,7 @@ public class BudgetService {
             expenseRepository.save(expense);
         }
     }
+
     public void updateIncomesCategoryIdToNull(Long idCategory) {
         List<Income> incomes = incomeRepository.findByIdCategory(idCategory);
         for (Income income : incomes) {
