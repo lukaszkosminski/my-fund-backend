@@ -12,7 +12,10 @@ export const BudgetsStore = signalStore(
   {providedIn: 'root'},
   withState<BudgetState>(
     {
-      budgets: []
+      budgets: [],
+      currentBudget: {
+        state: 'loading'
+      }
     }
   ),
   withMethods(
@@ -22,12 +25,28 @@ export const BudgetsStore = signalStore(
       router = inject(Router),
 
     ) => ({
+        get: rxMethod<string>(
+          pipe(
+            tap(() => patchState(store, {currentBudget: {state: 'loading'}})),
+            switchMap((id: string) =>
+              budgetsService.get(id).pipe(
+                tapResponse({
+                  next: (budget) => patchState(store, {currentBudget: {data: budget, state: 'success'}}),
+                  error: ({error}) => {
+                    console.log(33, 'error')
+                  },
+                }),
+              ),
+            ),
+          ),
+        ),
+
         getAll: rxMethod<void>(
           pipe(
-            switchMap((data: any) =>
+            switchMap(() =>
               budgetsService.getAll().pipe(
                 tapResponse({
-                  next: () => patchState(store, {budgets: data}),
+                  next: (budgets) => patchState(store, {budgets}),
                   error: ({error}) => {
                     console.log(33, 'error')
                   },

@@ -1,4 +1,3 @@
-
 export interface AppState {
   version: {
     buildDate: string,

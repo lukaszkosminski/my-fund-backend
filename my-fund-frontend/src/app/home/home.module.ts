@@ -8,6 +8,8 @@ import {BudgetFormComponent} from './pages/budget-form/budget-form.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import { CategoriesComponent } from './pages/categories/categories.component';
 import { CategoryFormComponent } from './pages/category-form/category-form.component';
+import {UiModule} from "../components/ui/ui.module";
+import { BudgetComponent } from './pages/budget/budget.component';
 
 
 @NgModule({
@@ -17,7 +19,8 @@ import { CategoryFormComponent } from './pages/category-form/category-form.compo
     BudgetsComponent,
     BudgetFormComponent,
     CategoriesComponent,
-    CategoryFormComponent
+    CategoryFormComponent,
+    BudgetComponent
   ],
   imports: [
     ReactiveFormsModule,
@@ -29,9 +32,11 @@ import { CategoryFormComponent } from './pages/category-form/category-form.compo
           {path: 'budgets/create', pathMatch: 'full', component: BudgetFormComponent},
           {path: 'categories', pathMatch: 'full', component: CategoriesComponent},
           {path: 'categories/create', pathMatch: 'full', component: CategoryFormComponent},
+          {path: 'budgets/:id', pathMatch: 'full', component: BudgetComponent},
         ]
       },
     ]),
+    UiModule,
   ]
 })
 export class HomeModule {

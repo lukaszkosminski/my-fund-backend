@@ -8,6 +8,8 @@ import {BudgetsStore} from "../../../stores/bugdets.store";
 export class BudgetsComponent implements OnInit {
   private readonly budgetStore = inject(BudgetsStore);
 
+  budgets = this.budgetStore.budgets;
+
   ngOnInit(): void {
     this.budgetStore.getAll();
   }

@@ -12,6 +12,7 @@ import {LoginPage} from "./pages/login/login.page";
 import {RegisterPage} from "./pages/register/register.page";
 import {httpInterceptorProviders} from "./helpers/auth.interceptor";
 import {HomeModule} from "./home/home.module";
+import {UiModule} from "./components/ui/ui.module";
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import {HomeModule} from "./home/home.module";
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    HomeModule
+    HomeModule,
+    UiModule
   ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]

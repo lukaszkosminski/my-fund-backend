@@ -20,8 +20,12 @@ export class BudgetsService {
     return this.http.get<Budget[]>(`/api/budgets`);
   }
 
+  get(id: string) {
+    return this.http.get<Budget>(`/api/budgets/${id}`);
+  }
+
   create(budget: Budget): Observable<Budget> {
-    return this.http.post<Budget>(`/api/budgets/create-budget`, {...budget}, jsonPayloadHttpOptions);
+    return this.http.post<Budget>(`/api/budgets`, {...budget}, jsonPayloadHttpOptions);
   }
 }
 

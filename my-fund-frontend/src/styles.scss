@@ -3,3 +3,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.home-content {
+  height: calc(100vh - 56px);
+}
