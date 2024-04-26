@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class IncomeDTO {
@@ -18,4 +20,6 @@ public class IncomeDTO {
     private Long idCategory;
 
     private Long idSubCategory;
+
+    private LocalDateTime localDateTime;
 }
