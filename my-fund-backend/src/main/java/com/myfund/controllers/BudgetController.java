@@ -92,4 +92,16 @@ public class BudgetController {
         budgetService.deleteBudgetByIdAndUser(budgetId, user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @DeleteMapping("/budgets/{budgetId}/expenses/{expenseId}")
+    public ResponseEntity<?> deleteExpense(@PathVariable("budgetId") Long budgetId, @PathVariable("expenseId") Long expenseId, @AuthenticationPrincipal User user) {
+        budgetService.deleteExpenseByIdAndUser(expenseId, user, budgetId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/budgets/{budgetId}/incomes/{incomeId}")
+    public ResponseEntity<?> deleteIncome(@PathVariable("budgetId") Long budgetId, @PathVariable("incomeId") Long incomeId, @AuthenticationPrincipal User user) {
+        budgetService.deleteIncomeByIdAndUser(incomeId, user, budgetId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

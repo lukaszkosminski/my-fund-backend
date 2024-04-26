@@ -388,6 +388,40 @@ public class BudgetService {
             log.info("All incomes for budget ID: {} have been deleted. Deleted incomes: {}", budgetId, incomes.size());
         }
     }
+
+    @Transactional
+    public void deleteExpenseByIdAndUser(Long expenseId, User user, Long budgetId) {
+        log.debug("Starting to delete expense ID: {} and user ID: {}", expenseId, user.getId());
+        try {
+            Optional<Expense> expenseOpt = expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId);
+            if (expenseOpt.isEmpty()) {
+                log.error("Expense ID: {} is not associated with budget ID: {} for user ID: {}", expenseId, budgetId, user.getId());
+                throw new ExpenseNotFoundException("Expense ID: " + expenseId + " is not associated with budget ID: " + budgetId + " for user ID: " + user.getId());
+            }
+            expenseRepository.deleteExpenseByIdAndUserAndBudgetId(expenseId, user, budgetId);
+            log.info("Expense ID: {} for user ID: {} successfully deleted.", expenseId, user.getId());
+        } catch (Exception e) {
+            log.error("Error deleting expense ID: {} for user ID: {}. Error: {}", expenseId, user.getId(), e.getMessage());
+            throw new ExpenseNotFoundException(e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void deleteIncomeByIdAndUser(Long incomeId, User user, Long budgetId) {
+        log.debug("Starting to delete income ID: {} and user ID: {}", incomeId, user.getId());
+        try {
+            Optional<Income> incomeOpt = incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId);
+            if (incomeOpt.isEmpty()) {
+                log.error("Income ID: {} is not associated with budget ID: {} for user ID: {}", incomeId, budgetId, user.getId());
+                throw new IncomeNotFoundException("Income ID: " + incomeId + " is not associated with budget ID: " + budgetId + " for user ID: " + user.getId());
+            }
+            incomeRepository.deleteExpenseByIdAndUserAndBudgetId(incomeId, user, budgetId);
+            log.info("Income ID: {} for user ID: {} successfully deleted.", incomeId, user.getId());
+        } catch (Exception e) {
+            log.error("Error deleting income ID: {} for user ID: {}. Error: {}", incomeId, user.getId(), e.getMessage());
+            throw new IncomeNotFoundException(e.getMessage());
+        }
+    }
 }
 
 

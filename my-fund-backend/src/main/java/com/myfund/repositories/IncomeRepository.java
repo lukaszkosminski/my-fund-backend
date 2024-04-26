@@ -2,6 +2,7 @@ package com.myfund.repositories;
 
 import com.myfund.models.Budget;
 import com.myfund.models.Income;
+import com.myfund.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +27,8 @@ public interface IncomeRepository extends JpaRepository<Income, Long> {
     BigDecimal sumIncomesByBudgetIdAndSubcategoryIdAndUserId(@Param("budgetId") Long budgetId, @Param("subcategoryId") Long subcategoryId, @Param("userId") Long userId);
 
     List<Income> findByBudgetId(Long budgetId);
+
+    void deleteIncomeByIdAndUser(Long incomeId, User user);
+
+    void deleteExpenseByIdAndUserAndBudgetId(Long incomeId, User user, Long budgetId);
 }
