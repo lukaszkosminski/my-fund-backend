@@ -24,4 +24,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.budget.id = :budgetId AND e.idSubCategory = :subcategoryId AND e.user.id = :userId")
     BigDecimal sumExpensesByBudgetIdAndSubcategoryIdAndUserId(@Param("budgetId") Long budgetId, @Param("subcategoryId") Long subcategoryId, @Param("userId") Long userId);
+
+    List<Expense> findByBudgetId(Long budgetId);
 }

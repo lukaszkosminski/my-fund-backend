@@ -86,4 +86,10 @@ public class BudgetController {
         FinancialAggregateSubcategoryDTO totalIncomesBySubcategory = budgetService.getTotalIncomesBySubcategory(budgetId, subcategoryId, user);
         return new ResponseEntity<>(totalIncomesBySubcategory, HttpStatus.OK);
     }
+
+    @DeleteMapping("/budgets/{budgetId}")
+    public ResponseEntity<?> deleteBudget(@PathVariable("budgetId") Long budgetId, @AuthenticationPrincipal User user) {
+        budgetService.deleteBudgetByIdAndUser(budgetId, user);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

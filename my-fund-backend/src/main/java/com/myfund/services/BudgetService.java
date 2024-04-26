@@ -13,6 +13,7 @@ import com.myfund.repositories.IncomeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -353,6 +354,38 @@ public class BudgetService {
         } catch (Exception e) {
             log.error("Error retrieving total incomes for budget ID: {}, subcategory ID: {}, and user ID: {}. Error: {}", budgetId, subcategoryId, user.getId(), e.getMessage());
             throw new TotalIncomesRetrievalException("Error retrieving total incomes for budget ID: " + budgetId + ", subcategory ID: " + subcategoryId + ", and user ID: " + user.getId());
+        }
+    }
+
+    @Transactional
+    public void deleteBudgetByIdAndUser(Long budgetId, User user) {
+        log.debug("Starting to delete budget ID: {} and user ID: {}", budgetId, user.getId());
+        try {
+            deleteExpensesForBudget(budgetId);
+            deleteIncomesForBudget(budgetId);
+            budgetRepository.deleteBudgetByIdAndUser(budgetId, user);
+            log.info("Budget ID: {} for user ID: {} successfully deleted.", budgetId, user.getId());
+        } catch (Exception e) {
+            log.error("Error deleting budget ID: {} for user ID: {}. Error: {}", budgetId, user.getId(), e.getMessage());
+            throw new BudgetNotFoundException("Error deleting budget ID: " + budgetId + " and user ID: " + user.getId());
+        }
+    }
+
+    @Transactional
+    private void deleteExpensesForBudget(Long budgetId) {
+        List<Expense> expenses = expenseRepository.findByBudgetId(budgetId);
+        if (!expenses.isEmpty()) {
+            expenseRepository.deleteAll(expenses);
+            log.info("All expenses for budget ID: {} have been deleted. Deleted expenses: {}", budgetId, expenses.size());
+        }
+    }
+
+    @Transactional
+    private void deleteIncomesForBudget(Long budgetId) {
+        List<Income> incomes = incomeRepository.findByBudgetId(budgetId);
+        if (!incomes.isEmpty()) {
+            incomeRepository.deleteAll(incomes);
+            log.info("All incomes for budget ID: {} have been deleted. Deleted incomes: {}", budgetId, incomes.size());
         }
     }
 }
