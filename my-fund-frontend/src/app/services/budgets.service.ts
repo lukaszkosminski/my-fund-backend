@@ -27,5 +27,9 @@ export class BudgetsService {
   create(budget: Budget): Observable<Budget> {
     return this.http.post<Budget>(`/api/budgets`, {...budget}, jsonPayloadHttpOptions);
   }
+
+  addExpense(budgetId: string, expense: any): Observable<any> {
+    return this.http.post(`/api/budgets/${budgetId}/expenses`, {...expense}, jsonPayloadHttpOptions);
+  }
 }
 

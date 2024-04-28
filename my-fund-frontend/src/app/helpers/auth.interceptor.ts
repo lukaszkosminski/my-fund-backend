@@ -13,7 +13,8 @@ import {Router} from "@angular/router";
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {
+  }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     req = req.clone({
@@ -37,8 +38,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   }
 
   private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
+    localStorage.removeItem('login-state')
     this.router.navigate(['/login']);
-
     return next.handle(request);
   }
 }

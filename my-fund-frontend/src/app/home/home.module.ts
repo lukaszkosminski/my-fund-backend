@@ -10,6 +10,7 @@ import { CategoriesComponent } from './pages/categories/categories.component';
 import { CategoryFormComponent } from './pages/category-form/category-form.component';
 import {UiModule} from "../components/ui/ui.module";
 import { BudgetComponent } from './pages/budget/budget.component';
+import { ExpenseFormComponent } from './pages/expense-form/expense-form.component';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { BudgetComponent } from './pages/budget/budget.component';
     BudgetFormComponent,
     CategoriesComponent,
     CategoryFormComponent,
-    BudgetComponent
+    BudgetComponent,
+    ExpenseFormComponent
   ],
   imports: [
     ReactiveFormsModule,
@@ -33,6 +35,7 @@ import { BudgetComponent } from './pages/budget/budget.component';
           {path: 'categories', pathMatch: 'full', component: CategoriesComponent},
           {path: 'categories/create', pathMatch: 'full', component: CategoryFormComponent},
           {path: 'budgets/:id', pathMatch: 'full', component: BudgetComponent},
+          {path: 'budgets/:id/expenses/add', pathMatch: 'full', component: ExpenseFormComponent},
         ]
       },
     ]),
