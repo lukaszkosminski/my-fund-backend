@@ -1,0 +1,37 @@
+<div class="relative h-full overflow-y-auto bg-gray-50 pt-16 ">
+
+
+  <div *ngIf="currentBudget().state === 'loading'"
+       class="absolute top-0 bg-white bg-opacity-60 z-10 h-full w-full flex items-center justify-center">
+    <div class="flex items-center">
+      <svg class="animate-spin h-8 w-8 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none"
+           viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+      </svg>
+    </div>
+  </div>
+
+  <main *ngIf="currentBudget().state === 'success'">
+    <div class="px-4 pt-6">
+      <div>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center"><h3 class="text-2xl font-bold">{{ currentBudget().data?.name }}</h3></div>
+          <div class="sm:flex">
+            <button (click)="deleteBudget()" type="submit" class="inline-flex cursor-pointer items-center py-2 text-center ">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
+                   class="h-5 w-5 cursor-pointer text-red-500">
+                <path fill-rule="evenodd"
+                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                      clip-rule="evenodd"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <hr class="my-4">
+      </div>
+    </div>
+  </main>
+</div>

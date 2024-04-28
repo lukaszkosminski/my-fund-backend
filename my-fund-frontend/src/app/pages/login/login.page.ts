@@ -29,9 +29,8 @@ export class LoginPage {
     console.log('Form submitted', this.form);
     this.authService.login(this.form.username, this.form.password).subscribe({
         next: () => {
-          this.isLoading = false;
-          this.validationErrors = '';
           this.router.navigate(['/home'])
+          this.validationErrors = '';
         },
         error: () => {
           this.isLoading = false;

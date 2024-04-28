@@ -1,4 +1,4 @@
-<div id="main-content" class="relative h-full overflow-y-auto bg-gray-50 lg:ml-64">
+<div class="relative h-full overflow-y-auto bg-gray-50 ">
   <main>
     <div class="px-4">
       <div class="pt:mt-0 mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
@@ -7,15 +7,10 @@
             category</h2>
             <form [formGroup]="categoryForm" (submit)="onSubmit()" class="mt-8 spa2ce-y-2">
               <div>
-                <label for="name" class="mb-2 block text-sm font-medium text-gray-900">Category name</label>
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  formControlName="name"
-                  class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-cyan-600 focus:ring-cyan-600 sm:text-sm"
-                  placeholder="Food"
-                >
+                <app-form-row>
+                  <app-form-field label="Category name" formControlName="name"></app-form-field>
+                </app-form-row>
+
                 <div
                   class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1"
                   *ngIf="formStatus() === 'error'"
@@ -32,12 +27,13 @@
 
               <div class="block text-sm font-medium text-gray-900 pt-4">Subcategories</div>
 
-              <div formArrayName="subCategories">
+              <div class="" formArrayName="subCategories">
                 <div *ngFor="let subcategory of subCategories.controls; let i=index"
                      class="sub-category">
 
                   <div class="flex items-center pt-2">
                     <ng-container [formGroupName]="i">
+
                       <input
                         type="text"
                         class="block flex-1 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-cyan-600 focus:ring-cyan-600 sm:text-sm"
@@ -71,10 +67,8 @@
                 </div>
               </div>
 
-              <button type="submit"
-                      class="mt-6 text-white w-full bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
-                Create
-              </button>
+              <app-button text="Create" type="submit"/>
+
             </form>
           </div>
         </div>
