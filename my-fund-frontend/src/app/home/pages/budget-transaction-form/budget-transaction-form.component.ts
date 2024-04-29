@@ -7,11 +7,11 @@ import {CategoriesStore} from "../../../stores/categories.store";
 import {SubCategory} from "../../../models/Category.model";
 
 @Component({
-  selector: 'app-expense-form',
-  templateUrl: './expense-form.component.html',
-  styleUrl: './expense-form.component.scss'
+  selector: 'app-budget-transaction-form',
+  templateUrl: './budget-transaction-form.component.html',
+  styleUrl: './budget-transaction-form.component.scss'
 })
-export class ExpenseFormComponent implements OnInit {
+export class BudgetTransactionFormComponent implements OnInit {
   expenseForm: FormGroup;
 
   formBuilder = inject(FormBuilder);
@@ -25,11 +25,16 @@ export class ExpenseFormComponent implements OnInit {
   categories = this.categoryStore.categories;
   subCategories: SubCategory[] = []
 
+  readonly budgetId = this.route.snapshot.paramMap.get('id')!
+  readonly formType: 'expenses' | 'incomes' = this.route.snapshot.paramMap.get('type') as 'expenses' | 'incomes';
+
   ngOnInit() {
+    console.log(31, this.route)
+    console.log(31, this.formType)
     this.expenseForm = this.formBuilder.group({
       amount: ['', Validators.required],
-      idCategory: ['', Validators.required],
-      idSubCategory: ['', Validators.required],
+      idCategory: ['', this.formType === 'expenses' ? Validators.required : null],
+      idSubCategory: ['', this.formType === 'expenses' ? Validators.required : null],
       name: ['']
     })
 
@@ -43,12 +48,12 @@ export class ExpenseFormComponent implements OnInit {
   }
 
   onSubmit() {
-    const budgetId = this.route.snapshot.paramMap.get('id')!
-
     if (this.expenseForm.valid) {
-      this.budgetService.addExpense(budgetId, this.expenseForm.value).subscribe(
+      const add = this.formType === 'expenses' ? this.budgetService.addExpense : this.budgetService.addIncome;
+
+      add(this.budgetId, this.expenseForm.value).subscribe(
         (response) => {
-          this.router.navigate(['/home/budgets/', budgetId])
+          this.router.navigate(['/home/budgets/', this.budgetId])
         }
       );
 
@@ -59,8 +64,6 @@ export class ExpenseFormComponent implements OnInit {
       const control = this.expenseForm.get(field);
       control!.markAsTouched({onlySelf: true});
     });
-
-
   }
 
 }

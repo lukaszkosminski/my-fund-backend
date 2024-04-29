@@ -37,63 +37,65 @@
       <div class="grid w-full grid-cols-1 gap-4 pb-4 xl:grid-cols-3 2xl:grid-cols-2">
         <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">
           <div class="flex items-center">
-            <div class="flex-shrink-0"><span class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">{{ currentBudget().data?.totalExpense | currency }}</span>
+            <div class="flex-shrink-0"><span class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">{{ currentBudget().data?.totalIncome | currency }}</span>
               <h3 class="text-base font-normal text-gray-500">Total incomes</h3></div>
           </div>
         </div>
         <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">
           <div class="flex items-center">
-            <div class="flex-shrink-0"><span class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">{{ currentBudget().data?.totalIncome | currency }}</span>
+            <div class="flex-shrink-0"><span class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">{{ currentBudget().data?.totalExpense | currency }}</span>
               <h3 class="text-base font-normal text-gray-500">Total outgoes</h3></div>
           </div>
         </div>
       </div>
 
       <div class="grid w-full grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-2">
-<!--        <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">-->
-<!--          <div class="mb-4 flex items-center justify-between">-->
-<!--            <div>-->
-<!--              <h3 class="mb-2 text-xl font-bold text-gray-900">Income</h3>-->
-<!--              <span-->
-<!--                class="text-base font-normal text-gray-500">10 latest</span>-->
-<!--            </div>-->
-<!--            <div class="flex-shrink-0">-->
-<!--              <a class="rounded-lg p-2 text-sm font-medium text-cyan-600 hover:bg-gray-100"-->
-<!--                 href="/budgets/cluh0nofr005208l9345qh5hc/incomes/add">Add</a><a-->
+        <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <h3 class="mb-2 text-xl font-bold text-gray-900">Income</h3>
+              <span
+                class="text-base font-normal text-gray-500">10 latest</span>
+            </div>
+            <div class="flex-shrink-0">
+              <a class="rounded-lg p-2 text-sm font-medium text-cyan-600 hover:bg-gray-100"
+                 [routerLink]="['/home/budgets', currentBudget().data!.id, 'incomes', 'add']">Add</a>
+<!--              <a-->
 <!--              class="rounded-lg p-2 text-sm font-medium text-cyan-600 hover:bg-gray-100"-->
-<!--              href="/budgets/cluh0nofr005208l9345qh5hc/transactions/Income">View all</a></div>-->
-<!--          </div>-->
-<!--          <div class="mt-8 flex flex-col">-->
-<!--            <div class="overflow-x-auto rounded-lg">-->
-<!--              <div class="inline-block min-w-full align-middle">-->
-<!--                <div class="overflow-hidden shadow sm:rounded-lg">-->
-<!--                  <table class="min-w-full divide-y divide-gray-200">-->
-<!--                    <thead class="bg-gray-50">-->
-<!--                    <tr>-->
-<!--                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">-->
-<!--                        Title-->
-<!--                      </th>-->
-<!--                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">-->
-<!--                        Amount-->
-<!--                      </th>-->
-<!--                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">-->
-<!--                        Date-->
-<!--                      </th>-->
-<!--                    </tr>-->
-<!--                    </thead>-->
-<!--                    <tbody class="bg-white">-->
-<!--                    <tr>-->
-<!--                      <td class="p-4 text-sm font-normal text-gray-900"><span class="font-semibold">Pensja</span></td>-->
-<!--                      <td class="whitespace-nowrap p-4 text-sm font-semibold text-gray-900">2000,00&nbsp;zł</td>-->
+<!--              href="/budgets/cluh0nofr005208l9345qh5hc/transactions/Income">View all</a>-->
+            </div>
+          </div>
+          <div class="mt-8 flex flex-col">
+            <div class="overflow-x-auto rounded-lg">
+              <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden shadow sm:rounded-lg">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Title
+                      </th>
+                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Amount
+                      </th>
+                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Date
+                      </th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                    <tr *ngFor="let income of currentBudget().data?.incomes?.reverse()?.slice(0,10)">
+                      <td class="p-4 text-sm font-normal text-gray-900"><span class="font-semibold">{{income.name}}</span></td>
+                      <td class="whitespace-nowrap p-4 text-sm font-semibold text-gray-900">{{ income.amount | currency }}</td>
 <!--                      <td class="whitespace-nowrap p-4 text-sm font-normal text-gray-500">Apr 1, 2024</td>-->
-<!--                    </tr>-->
-<!--                    </tbody>-->
-<!--                  </table>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">
           <div class="mb-4 flex items-center justify-between">
             <div>
@@ -129,11 +131,9 @@
                     </thead>
                     <tbody class="bg-white">
                     <tr *ngFor="let expense of currentBudget().data?.expenses?.reverse()?.slice(0,10)">
-                      <td class="p-4 text-sm font-normal text-gray-900">
-                        <span class="font-semibold"></span>
-                      </td>
-                      <td class="whitespace-nowrap p-4 text-sm font-semibold text-gray-900">{{ expense.amount }}</td>
-                      <!--                      <td class="whitespace-nowrap p-4 text-sm font-normal text-gray-500">{{expense.na}}</td>-->
+
+                      <td class="whitespace-nowrap p-4 text-sm font-normal text-gray-500">{{expense.name}}</td>
+                      <td class="whitespace-nowrap p-4 text-sm font-semibold text-gray-900">{{ expense.amount | currency }}</td>
                     </tr>
 
                     </tbody>

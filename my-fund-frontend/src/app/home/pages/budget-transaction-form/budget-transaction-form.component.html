@@ -4,7 +4,9 @@
       <div class="pt:mt-0 mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
         <div class="w-full rounded-lg bg-white shadow sm:max-w-screen-sm md:mt-0 xl:p-0">
           <div class="space-y-8 p-6 sm:p-8 lg:p-16">
-            <h2 class="text-2xl font-bold text-gray-900 lg:text-3xl">Outcome</h2>
+
+            <h2 *ngIf="formType === 'expenses'" class="text-2xl font-bold text-gray-900 lg:text-3xl">Expense</h2>
+            <h2 *ngIf="formType === 'incomes'" class="text-2xl font-bold text-gray-900 lg:text-3xl">Income</h2>
             <form class="mt-8 space-y-6" [formGroup]="expenseForm" (submit)="onSubmit()">
               <app-form-row>
                 <app-form-field placeholder="2000" label="Amount" formControlName="amount"></app-form-field>
@@ -13,7 +15,8 @@
                   message="Please provide a value."/>
               </app-form-row>
 
-              <app-form-row>
+
+              <app-form-row *ngIf="formType === 'expenses'">
                 <label for="category" class="mb-2 block text-sm font-medium text-gray-900">Category</label>
                 <select
                   id="category" formControlName="idCategory"
@@ -27,7 +30,7 @@
                   message="Please provide a value."/>
               </app-form-row>
 
-              <app-form-row>
+              <app-form-row *ngIf="formType === 'expenses'">
                 <label for="subCategory" class="mb-2 block text-sm font-medium text-gray-900">SubCategory</label>
                 <select
                   id="subCategory" formControlName="idSubCategory"
