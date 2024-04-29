@@ -49,13 +49,12 @@ export class BudgetTransactionFormComponent implements OnInit {
 
   onSubmit() {
     if (this.expenseForm.valid) {
-      const add = this.formType === 'expenses' ? this.budgetService.addExpense : this.budgetService.addIncome;
-
-      add(this.budgetId, this.expenseForm.value).subscribe(
-        (response) => {
-          this.router.navigate(['/home/budgets/', this.budgetId])
-        }
-      );
+      (this.formType === 'expenses' ? this.budgetService.addExpense(this.budgetId, this.expenseForm.value) : this.budgetService.addIncome(this.budgetId, this.expenseForm.value))
+        .subscribe(
+          (response) => {
+            this.router.navigate(['/home/budgets/', this.budgetId])
+          }
+        );
 
       return;
     }
