@@ -360,6 +360,10 @@ public class BudgetService {
     @Transactional
     public void deleteBudgetByIdAndUser(Long budgetId, User user) {
         log.debug("Starting to delete budget ID: {} and user ID: {}", budgetId, user.getId());
+        if (!budgetRepository.existsByIdAndUserId(budgetId, user.getId())) {
+            log.error("Budget ID: {} for user ID: {} not found.", budgetId, user.getId());
+            throw new BudgetNotFoundException("Budget ID: " + budgetId + " and user ID: " + user.getId() + " not found.");
+        }
         try {
             deleteExpensesForBudget(budgetId);
             deleteIncomesForBudget(budgetId);
