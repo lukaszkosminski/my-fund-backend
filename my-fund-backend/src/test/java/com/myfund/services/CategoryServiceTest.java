@@ -29,6 +29,9 @@ class CategoryServiceTest {
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private BudgetService budgetService;
+
     @InjectMocks
     private CategoryService categoryService;
 
@@ -220,7 +223,6 @@ class CategoryServiceTest {
 
     @Test
     void deleteCategoryByIdAndUser_WhenCategoryExists() {
-
         Long categoryId = 1L;
         User user = new User();
         user.setId(1L);
@@ -232,6 +234,8 @@ class CategoryServiceTest {
         categoryService.deleteCategoryByIdAndUser(categoryId, user);
 
         verify(categoryRepository, times(1)).delete(category);
+        verify(budgetService, times(1)).updateExpensesCategoryIdToNull(categoryId);
+        verify(budgetService, times(1)).updateIncomesCategoryIdToNull(categoryId);
     }
 
     @Test

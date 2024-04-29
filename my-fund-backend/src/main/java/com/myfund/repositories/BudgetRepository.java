@@ -15,4 +15,8 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
     List<Budget> findAllCategoriesByUser(User user);
 
     List<Budget> findAllByUser(User user);
+
+    void deleteBudgetByIdAndUser(Long budgetId, User user);
+
+    boolean existsByIdAndUserId(Long budgetId, Long id);
 }
