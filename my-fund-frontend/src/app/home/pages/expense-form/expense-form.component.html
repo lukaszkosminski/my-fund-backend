@@ -1,16 +1,19 @@
-<div id="main-content" class="relative overflow-y-auto bg-gray-50">
+<div class="relative h-full overflow-y-auto bg-gray-50">
   <main>
     <div class="px-4">
-      <div class="pt:mt-0 mx-auto flex flex-col items-center justify-center  md:h-screen">
+      <div class="pt:mt-0 mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
         <div class="w-full rounded-lg bg-white shadow sm:max-w-screen-sm md:mt-0 xl:p-0">
-          <div class="space-y-8 p-6 sm:p-8 lg:p-16"><h2 class="text-2xl font-bold text-gray-900 lg:text-3xl">
-            Outcome</h2>
+          <div class="space-y-8 p-6 sm:p-8 lg:p-16">
+            <h2 class="text-2xl font-bold text-gray-900 lg:text-3xl">Outcome</h2>
             <form class="mt-8 space-y-6" [formGroup]="expenseForm" (submit)="onSubmit()">
               <app-form-row>
                 <app-form-field placeholder="2000" label="Amount" formControlName="amount"></app-form-field>
+                <app-form-field-error
+                  [show]="expenseForm.get('amount')!.invalid && (expenseForm.get('amount')!.dirty || expenseForm.get('amount')!.touched)"
+                  message="Please provide a value."/>
               </app-form-row>
 
-              <div>
+              <app-form-row>
                 <label for="category" class="mb-2 block text-sm font-medium text-gray-900">Category</label>
                 <select
                   id="category" formControlName="idCategory"
@@ -19,9 +22,12 @@
                   class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-cyan-600 focus:ring-cyan-600 sm:text-sm">
                   <option *ngFor="let option of categories()" [value]="option.id">{{ option.name }}</option>
                 </select>
-              </div>
+                <app-form-field-error
+                  [show]="expenseForm.get('idCategory')!.invalid && (expenseForm.get('idCategory')!.dirty || expenseForm.get('idCategory')!.touched)"
+                  message="Please provide a value."/>
+              </app-form-row>
 
-              <div>
+              <app-form-row>
                 <label for="subCategory" class="mb-2 block text-sm font-medium text-gray-900">SubCategory</label>
                 <select
                   id="subCategory" formControlName="idSubCategory"
@@ -29,13 +35,15 @@
                   class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-cyan-600 focus:ring-cyan-600 sm:text-sm">
                   <option *ngFor="let option of subCategories" [value]="option.id">{{ option.name }}</option>
                 </select>
-              </div>
-              <div>
-                <app-form-row>
-                  <app-form-field  label="Name (Optional)" formControlName="name"></app-form-field>
-                </app-form-row>
+                <app-form-field-error
+                  [show]="expenseForm.get('idSubCategory')!.invalid && (expenseForm.get('idSubCategory')!.dirty || expenseForm.get('idSubCategory')!.touched)"
+                  message="Please provide a value."/>
+              </app-form-row>
 
-              </div>
+              <app-form-row>
+                <app-form-field label="Name (Optional)" formControlName="name"></app-form-field>
+              </app-form-row>
+
               <app-button text="Create" type="submit"></app-button>
             </form>
           </div>

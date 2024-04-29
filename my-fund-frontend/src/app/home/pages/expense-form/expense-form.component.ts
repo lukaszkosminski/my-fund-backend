@@ -2,7 +2,7 @@ import {Component, inject, OnInit, signal, WritableSignal} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {BudgetsService} from "../../../services/budgets.service";
 import {BudgetsStore} from "../../../stores/bugdets.store";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {CategoriesStore} from "../../../stores/categories.store";
 import {SubCategory} from "../../../models/Category.model";
 
@@ -20,16 +20,17 @@ export class ExpenseFormComponent implements OnInit {
   budgetStore = inject(BudgetsStore);
   categoryStore = inject(CategoriesStore);
   route = inject(ActivatedRoute);
+  router = inject(Router);
 
   categories = this.categoryStore.categories;
   subCategories: SubCategory[] = []
 
   ngOnInit() {
     this.expenseForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      amount: [''],
-      idCategory: [''],
-      idSubCategory: ['']
+      amount: ['', Validators.required],
+      idCategory: ['', Validators.required],
+      idSubCategory: ['', Validators.required],
+      name: ['']
     })
 
     this.categoryStore.getAll();
@@ -42,16 +43,24 @@ export class ExpenseFormComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.expenseForm.value);
-    console.log(30, this.budgetStore.currentBudget()?.data?.id)
     const budgetId = this.route.snapshot.paramMap.get('id')!
 
-    this.budgetService.addExpense(budgetId, this.expenseForm.value).subscribe(
-      (response) => {
-        console.log(response);
+    if (this.expenseForm.valid) {
+      this.budgetService.addExpense(budgetId, this.expenseForm.value).subscribe(
+        (response) => {
+          this.router.navigate(['/home/budgets/', budgetId])
+        }
+      );
 
-      }
-    );
+      return;
+    }
+
+    Object.keys(this.expenseForm.controls).forEach(field => {
+      const control = this.expenseForm.get(field);
+      control!.markAsTouched({onlySelf: true});
+    });
+
+
   }
 
 }

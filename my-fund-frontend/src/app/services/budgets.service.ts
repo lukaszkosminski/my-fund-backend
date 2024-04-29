@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {Budget} from "../models/Budget.model";
+import {Budget, Expense} from "../models/Budget.model";
 
 const jsonPayloadHttpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
@@ -28,8 +28,8 @@ export class BudgetsService {
     return this.http.post<Budget>(`/api/budgets`, {...budget}, jsonPayloadHttpOptions);
   }
 
-  addExpense(budgetId: string, expense: any): Observable<any> {
-    return this.http.post(`/api/budgets/${budgetId}/expenses`, {...expense}, jsonPayloadHttpOptions);
+  addExpense(budgetId: string, expense: Expense): Observable<Expense> {
+    return this.http.post<Expense>(`/api/budgets/${budgetId}/expenses`, {...expense}, jsonPayloadHttpOptions);
   }
 }
 

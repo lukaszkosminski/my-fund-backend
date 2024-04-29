@@ -1,31 +1,37 @@
-<div class="relative h-full overflow-y-auto bg-gray-50 ">
+<div class="relative h-full overflow-y-auto bg-gray-50">
   <main>
     <div class="px-4">
       <div class="pt:mt-0 mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
         <div class="w-full rounded-lg bg-white shadow sm:max-w-screen-sm md:mt-0 xl:p-0">
-          <div class="space-y-8 p-6 sm:p-8 lg:p-16"><h2 class="text-2xl font-bold text-gray-900 lg:text-3xl">Create
-            category</h2>
+          <div class="space-y-8 p-6 sm:p-8 lg:p-16">
+            <h2 class="text-2xl font-bold text-gray-900 lg:text-3xl">Create category</h2>
             <form [formGroup]="categoryForm" (submit)="onSubmit()" class="mt-8 spa2ce-y-2">
               <div>
                 <app-form-row>
                   <app-form-field label="Category name" formControlName="name"></app-form-field>
+                  <app-form-field-error [show]="formStatus() === 'error'" [message]="formMessage()"/>
+                  <app-form-field-error
+                    [show]="categoryForm.get('name')!.invalid && (categoryForm.get('name')!.dirty || categoryForm.get('name')!.touched)"
+                    message="Please provide a name."/>
                 </app-form-row>
 
-                <div
-                  class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1"
-                  *ngIf="formStatus() === 'error'"
-                >
-                  {{ formMessage() }}
-                </div>
-                <div
-                  class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1"
-                  *ngIf="categoryForm.get('name')!.invalid && (categoryForm.get('name')!.dirty || categoryForm.get('name')!.touched)"
-                >
-                  Please provide a name.
-                </div>
+
+                <!--                  <div-->
+                <!--                    class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1"-->
+                <!--                    *ngIf="formStatus() === 'error'"-->
+                <!--                  >-->
+                <!--                    {{ formMessage() }}-->
+                <!--                  </div>-->
+                <!--                  <div-->
+                <!--                    class="flex items-center font-normal text-red-500 text-xs mt-as1 ml-1"-->
+                <!--                    *ngIf="categoryForm.get('name')!.invalid && (categoryForm.get('name')!.dirty || categoryForm.get('name')!.touched)"-->
+                <!--                  >-->
+                <!--                    Please provide a name.-->
+                <!--                  </div>-->
+
               </div>
 
-              <div class="block text-sm font-medium text-gray-900 pt-4">Subcategories</div>
+              <div class="block text-sm font-medium text-gray-900 ">Subcategories</div>
 
               <div class="" formArrayName="subCategories">
                 <div *ngFor="let subcategory of subCategories.controls; let i=index"

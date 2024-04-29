@@ -1,4 +1,4 @@
-<div class="relative h-full overflow-y-auto bg-gray-50 pt-16 ">
+<div class="relative h-full overflow-y-auto bg-gray-50 py-16 ">
 
 
   <div *ngIf="currentBudget().state === 'loading'"
@@ -128,7 +128,7 @@
                     </tr>
                     </thead>
                     <tbody class="bg-white">
-                    <tr *ngFor="let expense of currentBudget().data?.expenses">
+                    <tr *ngFor="let expense of currentBudget().data?.expenses?.reverse()?.slice(0,10)">
                       <td class="p-4 text-sm font-normal text-gray-900">
                         <span class="font-semibold"></span>
                       </td>
