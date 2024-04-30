@@ -4,25 +4,30 @@ import {
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
-  HttpRequest
-} from "@angular/common/http";
-import {Injectable} from "@angular/core";
-import {AuthService} from "../services/auth.service";
-import {catchError, Observable, throwError} from "rxjs";
-import {Router} from "@angular/router";
+  HttpRequest,
+} from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { AuthService } from '../services/auth.service';
+import { catchError, Observable, throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(
+    req: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
     req = req.clone({
       withCredentials: true,
     });
 
     return next.handle(req).pipe(
-      catchError((error) => {
-
+      catchError(error => {
         if (
           error instanceof HttpErrorResponse &&
           req.url.includes('api') &&
@@ -44,5 +49,5 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 }
 
 export const httpInterceptorProviders = [
-  {provide: HTTP_INTERCEPTORS, useClass: HttpRequestInterceptor, multi: true},
+  { provide: HTTP_INTERCEPTORS, useClass: HttpRequestInterceptor, multi: true },
 ];

@@ -1,5 +1,5 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {BudgetsStore} from "../../../stores/bugdets.store";
+import { Component, inject, Input, OnInit } from '@angular/core';
+import { BudgetsStore } from '../../../stores/bugdets.store';
 
 @Component({
   selector: 'app-budgets',

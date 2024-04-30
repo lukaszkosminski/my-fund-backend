@@ -1,11 +1,11 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {BudgetsStore} from "../../../stores/bugdets.store";
-import {ActivatedRoute} from "@angular/router";
+import { Component, inject, OnInit } from '@angular/core';
+import { BudgetsStore } from '../../../stores/bugdets.store';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-budget',
   templateUrl: './budget.component.html',
-  styleUrl: './budget.component.scss'
+  styleUrl: './budget.component.scss',
 })
 export class BudgetComponent implements OnInit {
   budgetStore = inject(BudgetsStore);
@@ -19,6 +19,6 @@ export class BudgetComponent implements OnInit {
   }
 
   deleteBudget() {
-    alert('not implemented yet!')
+    alert('not implemented yet!');
   }
 }

@@ -5,14 +5,14 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import {AppTopBarComponent} from "./components/topbar/app.topbar.component";
-import {LandingComponent} from "./pages/landing/landing.component";
-import {AppFooterComponent} from "./components/footer/app.footer.component";
-import {LoginPage} from "./pages/login/login.page";
-import {RegisterPage} from "./pages/register/register.page";
-import {httpInterceptorProviders} from "./helpers/auth.interceptor";
-import {HomeModule} from "./home/home.module";
-import {UiModule} from "./components/ui/ui.module";
+import { AppTopBarComponent } from './components/topbar/app.topbar.component';
+import { LandingComponent } from './pages/landing/landing.component';
+import { AppFooterComponent } from './components/footer/app.footer.component';
+import { LoginPage } from './pages/login/login.page';
+import { RegisterPage } from './pages/register/register.page';
+import { httpInterceptorProviders } from './helpers/auth.interceptor';
+import { HomeModule } from './home/home.module';
+import { UiModule } from './components/ui/ui.module';
 
 @NgModule({
   declarations: [
@@ -29,9 +29,9 @@ import {UiModule} from "./components/ui/ui.module";
     FormsModule,
     HttpClientModule,
     HomeModule,
-    UiModule
+    UiModule,
   ],
   providers: [httpInterceptorProviders],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

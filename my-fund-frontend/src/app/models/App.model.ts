@@ -1,6 +1,6 @@
 export interface AppState {
   version: {
-    buildDate: string,
-    version: number
+    buildDate: string;
+    version: number;
   };
 }

@@ -8,5 +8,5 @@ export interface BudgetState {
   currentBudget: {
     data?: Budget;
     state: 'loading' | 'success' | 'error';
-  }
+  };
 }

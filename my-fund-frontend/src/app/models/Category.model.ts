@@ -11,7 +11,7 @@ export interface SubCategory {
 export interface CategoryState {
   categories: Category[];
   form: {
-    status: 'idle' | "loading" | "success" | "error";
+    status: 'idle' | 'loading' | 'success' | 'error';
     message: string;
-  }
+  };
 }

@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-topbar',
-  templateUrl: './app.topbar.component.html'
+  templateUrl: './app.topbar.component.html',
 })
 export class AppTopBarComponent {
-  constructor() { }
+  constructor() {}
 }

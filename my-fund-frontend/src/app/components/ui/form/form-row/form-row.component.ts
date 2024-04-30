@@ -4,6 +4,4 @@ import { Component } from '@angular/core';
   selector: 'app-form-row',
   template: '<div class="mb-5"><ng-content></ng-content></div>',
 })
-export class FormRowComponent {
-
-}
+export class FormRowComponent {}
