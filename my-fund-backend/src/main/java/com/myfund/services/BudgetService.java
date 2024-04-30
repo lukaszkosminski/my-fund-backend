@@ -16,8 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -425,6 +428,37 @@ public class BudgetService {
             log.error("Error deleting income ID: {} for user ID: {}. Error: {}", incomeId, user.getId(), e.getMessage());
             throw new IncomeNotFoundException(e.getMessage());
         }
+    }
+
+    public ExpensesSummaryDTO calculateExpensesSummary(User user, Long budgetId) {
+
+        List<Expense> expenses = expenseRepository.findByBudgetIdAndUser(budgetId, user);
+        Map<Long, ExpensesSummaryDTO.CategoryExpenses> categoryMap = new HashMap<>();
+        BigDecimal totalExpenses = BigDecimal.ZERO;
+
+        for (Expense expense : expenses) {
+            totalExpenses = totalExpenses.add(expense.getAmount());
+            Long categoryId = expense.getIdCategory();
+            ExpensesSummaryDTO.CategoryExpenses categoryExpenses = categoryMap.computeIfAbsent(categoryId, k -> {
+                ExpensesSummaryDTO.CategoryExpenses newCategoryExpenses = new ExpensesSummaryDTO.CategoryExpenses();
+                newCategoryExpenses.setCategoryId(categoryId);
+                return newCategoryExpenses;
+            });
+            categoryExpenses.setTotalExpenses(categoryExpenses.getTotalExpenses().add(expense.getAmount()));
+            Long subcategoryId = expense.getIdSubCategory();
+            ExpensesSummaryDTO.CategoryExpenses.SubcategoryExpenses subcategoryExpenses = new ExpensesSummaryDTO.CategoryExpenses.SubcategoryExpenses();
+            subcategoryExpenses.setSubcategoryId(subcategoryId);
+            subcategoryExpenses.setExpenseAmount(expense.getAmount());
+            categoryExpenses.getSubcategories().add(subcategoryExpenses);
+        }
+
+        ExpensesSummaryDTO expensesSummaryDTO = new ExpensesSummaryDTO();
+        for (ExpensesSummaryDTO.CategoryExpenses categoryExpenses : categoryMap.values()) {
+            categoryExpenses.setPercentageOfTotal(categoryExpenses.getTotalExpenses().multiply(BigDecimal.valueOf(100)).divide(totalExpenses, 2, RoundingMode.HALF_UP));
+            expensesSummaryDTO.getExpensesSummary().add(categoryExpenses);
+        }
+
+        return expensesSummaryDTO;
     }
 }
 
