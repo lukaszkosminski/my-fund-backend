@@ -2,14 +2,19 @@ package com.myfund.services;
 
 import com.myfund.exceptions.BudgetNotFoundException;
 import com.myfund.exceptions.BudgetNotUniqueException;
+import com.myfund.exceptions.ExpenseNotFoundException;
 import com.myfund.exceptions.SubcategoryNotRelatedToCategoryException;
 import com.myfund.models.Budget;
 import com.myfund.models.DTOs.*;
 import com.myfund.models.DTOs.mappers.BudgetMapper;
+import com.myfund.models.DTOs.mappers.ExpenseMapper;
+import com.myfund.models.DTOs.mappers.IncomeMapper;
 import com.myfund.models.Expense;
+import com.myfund.models.Income;
 import com.myfund.models.User;
 import com.myfund.repositories.BudgetRepository;
 import com.myfund.repositories.ExpenseRepository;
+import com.myfund.repositories.IncomeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -38,6 +43,9 @@ class BudgetServiceTest {
 
     @Mock
     private ExpenseRepository expenseRepository;
+
+    @Mock
+    private IncomeRepository incomeRepository;
 
     @Captor
     private ArgumentCaptor<Budget> budgetArgumentCaptor;
@@ -202,4 +210,58 @@ class BudgetServiceTest {
         verify(expenseRepository, never()).save(any(Expense.class));
     }
 
+    @Test
+    void createIncome_WhenBudgetExistsAndCategoryIsValid() {
+        Budget budget = new Budget();
+        budget.setId(1L);
+        budget.setTotalIncome(new BigDecimal("100"));
+        budget.setTotalExpense(new BigDecimal("100"));
+        User user = new User();
+        CreateIncomeDTO createIncomeDTO = new CreateIncomeDTO();
+        createIncomeDTO.setIdCategory(1L);
+        createIncomeDTO.setIdSubCategory(2L);
+        createIncomeDTO.setAmount(new BigDecimal("100"));
+        createIncomeDTO.setName("Test Income");
+
+        when(budgetRepository.findByIdAndUser(anyLong(), any(User.class))).thenReturn(Optional.of(budget));
+        when(categoryService.isSubcategoryRelatedToCategory(anyLong(), anyLong(), any(User.class))).thenReturn(true);
+        when(incomeRepository.save(any(Income.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        IncomeDTO result = budgetService.createIncome(1L, createIncomeDTO, user);
+
+        assertNotNull(result);
+        verify(incomeRepository).save(any(Income.class));
+        verify(budgetRepository).findByIdAndUser(anyLong(), any(User.class));
+    }
+
+    @Test
+    void createIncome_WhenBudgetDoesNotExist() {
+        CreateIncomeDTO createIncomeDTO = new CreateIncomeDTO();
+        User user = new User();
+
+        when(budgetRepository.findByIdAndUser(anyLong(), any(User.class))).thenReturn(Optional.empty());
+
+        assertThrows(BudgetNotFoundException.class, () -> budgetService.createIncome(1L, createIncomeDTO, user));
+
+        verify(budgetRepository).findByIdAndUser(anyLong(), any(User.class));
+        verify(incomeRepository, never()).save(any(Income.class));
+    }
+
+    @Test
+    void createIncome_WhenBudgetExistsButCategoryIsInvalid() {
+        Budget budget = new Budget();
+        CreateIncomeDTO createIncomeDTO = new CreateIncomeDTO();
+        createIncomeDTO.setIdCategory(1L);
+        createIncomeDTO.setIdSubCategory(2L);
+        User user = new User();
+
+        when(budgetRepository.findByIdAndUser(anyLong(), any(User.class))).thenReturn(Optional.of(budget));
+        when(categoryService.isSubcategoryRelatedToCategory(anyLong(), anyLong(), any(User.class))).thenReturn(false);
+
+        assertThrows(SubcategoryNotRelatedToCategoryException.class, () -> budgetService.createIncome(1L, createIncomeDTO, user));
+
+        verify(budgetRepository).findByIdAndUser(anyLong(), any(User.class));
+        verify(incomeRepository, never()).save(any(Income.class));
+    }
+
+   
 }
