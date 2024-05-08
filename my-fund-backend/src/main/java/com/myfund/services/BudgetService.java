@@ -432,7 +432,15 @@ public class BudgetService {
 
     public ExpensesSummaryDTO calculateExpensesSummary(User user, Long budgetId) {
 
+        log.debug("Calculating expenses summary for user ID: {} and budget ID: {}", user.getId(), budgetId);
+
         List<Expense> expenses = expenseRepository.findByBudgetIdAndUser(budgetId, user);
+        if (expenses.isEmpty()) {
+            log.info("No expenses found for user ID: {} and budget ID: {}", user.getId(), budgetId);
+        } else {
+            log.info("Found {} expenses for user ID: {} and budget ID: {}", expenses.size(), user.getId(), budgetId);
+        }
+
         Map<Long, ExpensesSummaryDTO.CategoryExpenses> categoryMap = new HashMap<>();
         BigDecimal totalExpenses = BigDecimal.ZERO;
 
@@ -457,6 +465,8 @@ public class BudgetService {
             categoryExpenses.setPercentageOfTotal(categoryExpenses.getTotalExpenses().multiply(BigDecimal.valueOf(100)).divide(totalExpenses, 2, RoundingMode.HALF_UP));
             expensesSummaryDTO.getExpensesSummary().add(categoryExpenses);
         }
+
+        log.debug("Expenses summary calculated for user ID: {} and budget ID: {}. Total expenses: {}", user.getId(), budgetId, totalExpenses);
 
         return expensesSummaryDTO;
     }
