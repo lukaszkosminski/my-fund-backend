@@ -5,6 +5,7 @@ export interface Category {
 }
 
 export interface SubCategory {
+  id?: number;
   name: string;
 }
 

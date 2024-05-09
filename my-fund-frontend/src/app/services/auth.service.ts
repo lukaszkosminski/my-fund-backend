@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import { Observable, tap} from "rxjs";
 import {Router} from "@angular/router";
+import {CreateUserPayload, User} from "../models/User.model";
 
 
 const jsonPayloadHttpOptions = {
@@ -16,8 +17,8 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {
   }
 
-  register(username: string, email: string, password: string): Observable<any> {
-    return this.http.post(`/register`,
+  register(username: string, email: string, password: string) {
+    return this.http.post<User | {[K in keyof CreateUserPayload]: string}>(`/register`,
       {
         username,
         email,
@@ -27,7 +28,7 @@ export class AuthService {
     );
   }
 
-  login(email: string, password: string): Observable<any> {
+  login(email: string, password: string) {
     const formData = new FormData();
     formData.append('username', email);
     formData.append('password', password);

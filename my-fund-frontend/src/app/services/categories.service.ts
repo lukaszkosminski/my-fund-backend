@@ -21,8 +21,8 @@ export class CategoriesService {
     return this.http.get<Category[]>(`/api/categories`);
   }
 
-  create(budget: Budget): Observable<Category> {
-    return this.http.post<Category>(`/api/categories`, {...budget}, jsonPayloadHttpOptions);
+  create(category: Category): Observable<Category> {
+    return this.http.post<Category>(`/api/categories`, {...category}, jsonPayloadHttpOptions);
   }
 
   delete(category: Category): Observable<Category> {
