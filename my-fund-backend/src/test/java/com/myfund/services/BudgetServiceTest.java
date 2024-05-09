@@ -130,7 +130,7 @@ class BudgetServiceTest {
 
     @Test
     void findBudgetByIdAndUser_WhenBudgetExists() {
-        
+
         Budget budget = new Budget();
         User user = new User();
         when(budgetRepository.findByIdAndUser(any(Long.class), any(User.class))).thenReturn(Optional.of(budget));

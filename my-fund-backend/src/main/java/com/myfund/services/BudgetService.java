@@ -435,11 +435,6 @@ public class BudgetService {
         log.debug("Calculating expenses summary for user ID: {} and budget ID: {}", user.getId(), budgetId);
 
         List<Expense> expenses = expenseRepository.findByBudgetIdAndUser(budgetId, user);
-        if (expenses.isEmpty()) {
-            log.info("No expenses found for user ID: {} and budget ID: {}", user.getId(), budgetId);
-        } else {
-            log.info("Found {} expenses for user ID: {} and budget ID: {}", expenses.size(), user.getId(), budgetId);
-        }
 
         Map<Long, ExpensesSummaryDTO.CategoryExpenses> categoryMap = new HashMap<>();
         BigDecimal totalExpenses = BigDecimal.ZERO;
