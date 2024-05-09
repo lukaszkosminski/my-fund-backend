@@ -29,4 +29,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByBudgetId(Long budgetId);
 
     void deleteExpenseByIdAndUserAndBudgetId(Long expenseId, User user, Long budgetId);
+
+    List<Expense> findByBudgetIdAndUser(Long budgetId, User user);
 }

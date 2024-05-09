@@ -104,4 +104,10 @@ public class BudgetController {
         budgetService.deleteIncomeByIdAndUser(incomeId, user, budgetId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+    @GetMapping("/budgets/{budgetId}/expenses/summary")
+    public ResponseEntity<ExpensesSummaryDTO> calculateExpensesSummary(@PathVariable Long budgetId, @AuthenticationPrincipal User user) {
+        ExpensesSummaryDTO expensesSummaryDTO = budgetService.calculateExpensesSummary(user, budgetId);
+        return new ResponseEntity<>(expensesSummaryDTO,HttpStatus.OK);
+    }
 }
