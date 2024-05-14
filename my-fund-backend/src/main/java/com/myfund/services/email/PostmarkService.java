@@ -1,7 +1,7 @@
-package com.myfund.services;
+package com.myfund.services.email;
 
 
-import com.myfund.models.DTOs.CreateUserDTO;
+import com.myfund.models.DTOs.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -11,13 +11,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
 @Service
 @Slf4j
-public class PostmarkEmailSenderService {
+@Primary
+public class PostmarkService implements EmailSender {
 
     @Value("${postmark.apikey}")
     private String apiKey;
@@ -28,9 +30,10 @@ public class PostmarkEmailSenderService {
     @Value("${email.sender}")
     private String emailSender;
 
-    public void sendEmailUsingWelcomeTemplate(CreateUserDTO createUserDTO) throws IOException {
+    @Override
+    public void sendWelcomeEmail(UserDTO userDTO) throws IOException {
 
-        log.info("Starting to send email to: {}", createUserDTO.getEmail());
+        log.info("Starting to send email to: {}", userDTO.getEmail());
 
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(apiUrl);
@@ -38,7 +41,7 @@ public class PostmarkEmailSenderService {
             post.setHeader("Accept", "application/json");
             post.setHeader("Content-Type", "application/json");
             post.setHeader("X-Postmark-Server-Token", apiKey);
-            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35874742, \"TemplateModel\": {\"name\": \"%s\", \"product_name\": \"my fund\"}}", emailSender, createUserDTO.getEmail(), createUserDTO.getUsername());
+            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35874742, \"TemplateModel\": {\"name\": \"%s\", \"product_name\": \"my fund\"}}", emailSender, userDTO.getEmail(), userDTO.getUsername());
             post.setEntity(new StringEntity(json));
 
             HttpResponse response = client.execute(post);
@@ -50,7 +53,7 @@ public class PostmarkEmailSenderService {
                 log.error("Failed to send email. Server response: {}", responseString);
             }
         } catch (IOException e) {
-            log.error("Failed to send email to: {}", createUserDTO.getEmail(), e);
+            log.error("Failed to send email to: {}", userDTO.getEmail(), e);
             throw e;
         }
     }

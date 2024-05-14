@@ -28,12 +28,8 @@ public class AuthControler {
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody CreateUserDTO createUserDTO) throws IOException {
-        Optional<UserDTO> userOpt = userService.createUser(createUserDTO);
-        if (userOpt.isPresent()) {
-            return new ResponseEntity<>(userOpt.get(), HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        UserDTO userDTO = userService.createUser(createUserDTO);
+            return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
     //TODO: forgot password
