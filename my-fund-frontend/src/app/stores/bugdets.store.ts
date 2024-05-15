@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, switchMap, tap } from 'rxjs';
 import { tapResponse } from '@ngrx/operators';
-import { Budget, BudgetState } from '../models/Budget.model';
+import { Budget, BudgetState, Summary } from '../models/Budget.model';
 import { BudgetsService } from '../services/budgets.service';
 import { Router } from '@angular/router';
 
@@ -12,6 +12,9 @@ export const BudgetsStore = signalStore(
   withState<BudgetState>({
     budgets: [],
     currentBudget: {
+      state: 'loading',
+    },
+    summary: {
       state: 'loading',
     },
   }),
@@ -62,6 +65,23 @@ export const BudgetsStore = signalStore(
               tapResponse({
                 next: () => {
                   router.navigate(['/home/budgets']);
+                },
+                error: () => {
+                  console.log(33, 'error');
+                },
+              })
+            )
+          )
+        )
+      ),
+
+      getSummary: rxMethod<string>(
+        pipe(
+          switchMap(id =>
+            budgetsService.getSummary(id).pipe(
+              tapResponse({
+                next: (data: Summary) => {
+                  console.log(81, data);
                 },
                 error: () => {
                   console.log(33, 'error');

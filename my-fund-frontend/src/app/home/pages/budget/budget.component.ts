@@ -15,6 +15,8 @@ export class BudgetComponent implements OnInit {
 
   ngOnInit(): void {
     this.budgetStore.get(this.route.snapshot.paramMap.get('id')!);
+    console.log(18, 'asd');
+    this.budgetStore.getSummary(this.route.snapshot.paramMap.get('id')!);
   }
 
   deleteBudget() {

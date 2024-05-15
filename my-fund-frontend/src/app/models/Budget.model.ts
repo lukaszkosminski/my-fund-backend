@@ -1,4 +1,5 @@
 import { ILoadableState } from './App.model';
+import { SubCategory } from './Category.model';
 
 export interface Budget {
   id?: string;
@@ -29,4 +30,16 @@ export interface Income {
 export interface BudgetState {
   budgets: Budget[];
   currentBudget: ILoadableState<Budget>;
+  summary: ILoadableState<Summary>;
+}
+
+export interface ExpenseSummary {
+  categoryId: number;
+  totalExpenses: number;
+  subcategories: SubCategory[];
+  percentageOfTotal: number;
+}
+
+export interface Summary {
+  expensesSummary: ExpenseSummary[];
 }
