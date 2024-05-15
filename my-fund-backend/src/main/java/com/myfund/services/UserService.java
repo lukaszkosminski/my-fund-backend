@@ -1,18 +1,30 @@
 package com.myfund.services;
 
+import com.myfund.configs.CacheConfig;
+import com.myfund.exceptions.InvalidTokenException;
 import com.myfund.exceptions.UserAlreadyExistsException;
+import com.myfund.exceptions.UserNotFoundException;
 import com.myfund.models.DTOs.CreateUserDTO;
 import com.myfund.models.DTOs.UserDTO;
 import com.myfund.models.DTOs.mappers.UserMapper;
 import com.myfund.models.User;
 import com.myfund.repositories.UserRepository;
 import com.myfund.services.email.EmailSender;
+import com.myfund.services.email.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.CacheEvict;
+
 
 import java.io.IOException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -26,12 +38,20 @@ public class UserService {
 
     private final EmailSender emailSender;
 
+    private final TokenService tokenService;
+
+    private final CacheManager cacheManager;
+
+
+
     @Autowired
-    public UserService(UserRepository userRepository, BudgetService budgetService, PasswordEncoder passwordEncoder, EmailSender emailSender) {
+    public UserService(UserRepository userRepository, BudgetService budgetService, PasswordEncoder passwordEncoder, EmailSender emailSender, TokenService tokenService, CacheManager cacheManager) {
         this.userRepository = userRepository;
         this.budgetService = budgetService;
         this.passwordEncoder = passwordEncoder;
         this.emailSender = emailSender;
+        this.tokenService = tokenService;
+        this.cacheManager = cacheManager;
     }
 
     public UserDTO createUser(CreateUserDTO createUserDTO) throws IOException {
@@ -56,12 +76,54 @@ public class UserService {
 
     private void validateUniqueness(String username, String email) {
         if (userRepository.findByUsername(username).isPresent()) {
-            log.warn("Attempt to create a user with an existing username: {}", username);
+            log.info("Attempt to create a user with an existing username: {}", username);
             throw new UserAlreadyExistsException("Username is not unique");
         }
         if (userRepository.findByEmail(email).isPresent()) {
-            log.warn("Attempt to create a user with an existing email: {}", email);
+            log.info("Attempt to create a user with an existing email: {}", email);
             throw new UserAlreadyExistsException("Email is not unique");
+        }
+    }
+
+    public void requestPasswordReset(String email) {
+
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            log.warn("User not found with email: {}", email);
+            throw new UserNotFoundException( "User not found with email: " + email);
+        }
+
+        String passwordResetToken = tokenService.createPasswordResetToken(userOpt.get().getEmail());
+
+        try {
+            UserDTO userDTO = UserMapper.userMapToUserDTO(userOpt.get());
+            emailSender.sendPasswordResetEmail(userDTO, passwordResetToken);
+        } catch (IOException e) {
+            log.error("Failed to send password reset email", e);
+        }
+    }
+
+    public void resetPassword(String email, String token, String newPassword) {
+
+        log.info("Attempting to reset password for email: {}", email);
+        String cachedToken = tokenService.getPasswordResetToken(email);
+
+        if (cachedToken != null && cachedToken.equals(token)) {
+            log.debug("Token validation successful for email: {}", email);
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepository.save(user);
+                tokenService.invalidatePasswordResetToken(email);
+                log.info("Password reset successful for email: {}", email);
+            } else {
+                log.error("User not found for email: {}", email);
+                throw new UserNotFoundException("User not found");
+            }
+        } else {
+            log.error("Invalid or expired token for email: {}", email);
+            throw new InvalidTokenException("Invalid token");
         }
     }
 }
