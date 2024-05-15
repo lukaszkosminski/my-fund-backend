@@ -34,7 +34,7 @@ export class LoginPage {
       },
       error: () => {
         this.isLoading = false;
-        this.validationErrors = 'Credetials are invalid. Please try again.';
+        this.validationErrors = 'Credentials are invalid. Please try again.';
       },
     });
   }

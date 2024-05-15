@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
+import {CreateUserPayload, User} from "../../models/User.model";
 
 @Component({
   selector: 'register-page',
@@ -18,12 +19,12 @@ export class RegisterPage {
 
   isLoading = false;
   userCreated = false;
-
   noFormErrors = {
     email: '',
     username: '',
     password: '',
   };
+
   validationErrors = this.noFormErrors;
 
   constructor(private authService: AuthService) {}
@@ -39,13 +40,11 @@ export class RegisterPage {
           this.userCreated = true;
           this.isLoading = false;
         },
-        error: response => {
+        error: (response: {error: {[K in keyof CreateUserPayload]: string}}) => {
           this.isLoading = false;
-          console.log(37, response.error);
           this.validationErrors = response.error;
-          console.log(39, this.validationErrors);
-        },
-      });
-    console.log('Form submitted', this.form);
+        }
+      }
+    );
   }
 }

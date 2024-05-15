@@ -9,7 +9,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     }}</label>
     <input
       [id]="id"
-      type="text"
+     [placeholder]="placeholder || ''" type="text"
       [value]="value"
       (change)="onInputChange($event)"
       class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-cyan-600 focus:ring-cyan-600 sm:text-sm" />
@@ -25,6 +25,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export class FormFieldComponent implements ControlValueAccessor {
   @Input() id: string;
   @Input() label: string;
+  @Input() placeholder: string;
 
   private _value: any;
 

@@ -10,6 +10,7 @@ import { CategoriesComponent } from './pages/categories/categories.component';
 import { CategoryFormComponent } from './pages/category-form/category-form.component';
 import { UiModule } from '../components/ui/ui.module';
 import { BudgetComponent } from './pages/budget/budget.component';
+import { BudgetTransactionFormComponent } from './pages/budget-transaction-form/budget-transaction-form.component';
 
 @NgModule({
   declarations: [
@@ -20,37 +21,21 @@ import { BudgetComponent } from './pages/budget/budget.component';
     CategoriesComponent,
     CategoryFormComponent,
     BudgetComponent,
+    BudgetTransactionFormComponent
   ],
   imports: [
     ReactiveFormsModule,
     CommonModule,
     RouterModule.forChild([
       {
-        path: '',
-        component: HomeComponent,
-        children: [
-          { path: 'budgets', pathMatch: 'full', component: BudgetsComponent },
-          {
-            path: 'budgets/create',
-            pathMatch: 'full',
-            component: BudgetFormComponent,
-          },
-          {
-            path: 'categories',
-            pathMatch: 'full',
-            component: CategoriesComponent,
-          },
-          {
-            path: 'categories/create',
-            pathMatch: 'full',
-            component: CategoryFormComponent,
-          },
-          {
-            path: 'budgets/:id',
-            pathMatch: 'full',
-            component: BudgetComponent,
-          },
-        ],
+        path: '', component: HomeComponent, children: [
+          {path: 'budgets', pathMatch: 'full', component: BudgetsComponent},
+          {path: 'budgets/create', pathMatch: 'full', component: BudgetFormComponent},
+          {path: 'categories', pathMatch: 'full', component: CategoriesComponent},
+          {path: 'categories/create', pathMatch: 'full', component: CategoryFormComponent},
+          {path: 'budgets/:id', pathMatch: 'full', component: BudgetComponent},
+          {path: 'budgets/:id/:type/add', pathMatch: 'full', component: BudgetTransactionFormComponent},
+        ]
       },
     ]),
     UiModule,

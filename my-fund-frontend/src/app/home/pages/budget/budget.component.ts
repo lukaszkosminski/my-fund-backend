@@ -14,7 +14,6 @@ export class BudgetComponent implements OnInit {
   currentBudget = this.budgetStore.currentBudget;
 
   ngOnInit(): void {
-    console.log(16, this.route.snapshot.paramMap.get('id'));
     this.budgetStore.get(this.route.snapshot.paramMap.get('id')!);
   }
 

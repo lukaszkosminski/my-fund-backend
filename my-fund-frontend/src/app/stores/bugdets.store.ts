@@ -47,7 +47,7 @@ export const BudgetsStore = signalStore(
               tapResponse({
                 next: budgets => patchState(store, { budgets }),
                 error: ({ error }) => {
-                  console.log(33, 'error');
+                  console.log(33, 'error', error);
                 },
               })
             )

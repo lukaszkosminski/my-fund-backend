@@ -18,25 +18,29 @@
                   <app-form-field
                     label="Category name"
                     formControlName="name"></app-form-field>
+                  <app-form-field-error [show]="formStatus() === 'error'" [message]="formMessage()"/>
+                  <app-form-field-error
+                    [show]="categoryForm.get('name')!.invalid && (categoryForm.get('name')!.dirty || categoryForm.get('name')!.touched)"
+                    message="Please provide a name."/>
                 </app-form-row>
 
-                <div
-                  class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1"
-                  *ngIf="formStatus() === 'error'">
-                  {{ formMessage() }}
-                </div>
-                <div
-                  class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1"
-                  *ngIf="
-                    categoryForm.get('name')!.invalid &&
-                    (categoryForm.get('name')!.dirty ||
-                      categoryForm.get('name')!.touched)
-                  ">
-                  Please provide a name.
-                </div>
+
+                <!--                  <div-->
+                <!--                    class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1"-->
+                <!--                    *ngIf="formStatus() === 'error'"-->
+                <!--                  >-->
+                <!--                    {{ formMessage() }}-->
+                <!--                  </div>-->
+                <!--                  <div-->
+                <!--                    class="flex items-center font-normal text-red-500 text-xs mt-as1 ml-1"-->
+                <!--                    *ngIf="categoryForm.get('name')!.invalid && (categoryForm.get('name')!.dirty || categoryForm.get('name')!.touched)"-->
+                <!--                  >-->
+                <!--                    Please provide a name.-->
+                <!--                  </div>-->
+
               </div>
 
-              <div class="block text-sm font-medium text-gray-900 pt-4">
+              <div class="block text-sm font-medium text-gray-900 ">
                 Subcategories
               </div>
 

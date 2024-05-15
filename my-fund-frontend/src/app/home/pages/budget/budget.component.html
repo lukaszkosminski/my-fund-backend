@@ -1,4 +1,4 @@
-<div class="relative h-full overflow-y-auto bg-gray-50 pt-16">
+<div class="relative h-full overflow-y-auto bg-gray-50 py-16">
   <div
     *ngIf="currentBudget().state === 'loading'"
     class="absolute top-0 bg-white bg-opacity-60 z-10 h-full w-full flex items-center justify-center">
@@ -50,6 +50,183 @@
           </div>
         </div>
         <hr class="my-4" />
+      </div>
+
+      <div class="grid w-full grid-cols-1 gap-4 pb-4 xl:grid-cols-3 2xl:grid-cols-2">
+        <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">
+          <div class="flex items-center">
+            <div class="flex-shrink-0"><span class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">{{ currentBudget().data?.totalIncome | currency }}</span>
+              <h3 class="text-base font-normal text-gray-500">Total incomes</h3></div>
+          </div>
+        </div>
+        <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">
+          <div class="flex items-center">
+            <div class="flex-shrink-0"><span class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">{{ currentBudget().data?.totalExpense | currency }}</span>
+              <h3 class="text-base font-normal text-gray-500">Total outgoes</h3></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid w-full grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-2">
+        <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <h3 class="mb-2 text-xl font-bold text-gray-900">Income</h3>
+              <span
+                class="text-base font-normal text-gray-500">10 latest</span>
+            </div>
+            <div class="flex-shrink-0">
+              <a class="rounded-lg p-2 text-sm font-medium text-cyan-600 hover:bg-gray-100"
+                 [routerLink]="['/home/budgets', currentBudget().data!.id, 'incomes', 'add']">Add</a>
+<!--              <a-->
+<!--              class="rounded-lg p-2 text-sm font-medium text-cyan-600 hover:bg-gray-100"-->
+<!--              href="/budgets/cluh0nofr005208l9345qh5hc/transactions/Income">View all</a>-->
+            </div>
+          </div>
+          <div class="mt-8 flex flex-col">
+            <div class="overflow-x-auto rounded-lg">
+              <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden shadow sm:rounded-lg">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Title
+                      </th>
+                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Amount
+                      </th>
+                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Date
+                      </th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                    <tr *ngFor="let income of currentBudget().data?.incomes?.reverse()?.slice(0,10)">
+                      <td class="p-4 text-sm font-normal text-gray-900"><span class="font-semibold">{{income.name}}</span></td>
+                      <td class="whitespace-nowrap p-4 text-sm font-semibold text-gray-900">{{ income.amount | currency }}</td>
+<!--                      <td class="whitespace-nowrap p-4 text-sm font-normal text-gray-500">Apr 1, 2024</td>-->
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <h3 class="mb-2 text-xl font-bold text-gray-900">Expenses</h3>
+              <span
+                class="text-base font-normal text-gray-500">10 latest</span>
+            </div>
+            <div class="flex-shrink-0">
+              <a class="rounded-lg p-2 text-sm font-medium text-cyan-600 hover:bg-gray-100"
+                 [routerLink]="['/home/budgets', currentBudget().data!.id, 'expenses', 'add']">Add</a>
+              <!--              <a-->
+              <!--                class="rounded-lg p-2 text-sm font-medium text-cyan-600 hover:bg-gray-100"-->
+              <!--                href="#">View all</a>-->
+            </div>
+          </div>
+          <div class="mt-8 flex flex-col">
+            <div class="overflow-x-auto rounded-lg">
+              <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden shadow sm:rounded-lg">
+                  <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Title
+                      </th>
+                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Amount
+                      </th>
+                      <th scope="col" class="p-4 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Date
+                      </th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                    <tr *ngFor="let expense of currentBudget().data?.expenses?.reverse()?.slice(0,10)">
+
+                      <td class="whitespace-nowrap p-4 text-sm font-normal text-gray-500">{{expense.name}}</td>
+                      <td class="whitespace-nowrap p-4 text-sm font-semibold text-gray-900">{{ expense.amount | currency }}</td>
+                    </tr>
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+<!--        <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 "><h3-->
+<!--          class="mb-10 text-xl font-bold leading-none text-gray-900">Outgoes summary</h3>-->
+<!--          <div class="block w-full overflow-x-auto">-->
+<!--            <table class="w-full border-collapse items-center bg-transparent">-->
+<!--              <thead>-->
+<!--              <tr>-->
+<!--                <th-->
+<!--                  class="whitespace-nowrap border-l-0 border-r-0 bg-gray-50 px-4 py-3 text-left align-middle text-xs font-semibold uppercase text-gray-700">-->
+<!--                  Category-->
+<!--                </th>-->
+<!--                <th-->
+<!--                  class="whitespace-nowrap border-l-0 border-r-0 bg-gray-50 px-4 py-3 text-left align-middle text-xs font-semibold uppercase text-gray-700">-->
+<!--                  Amount-->
+<!--                </th>-->
+<!--                <th-->
+<!--                  class="min-w-140-px whitespace-nowrap border-l-0 border-r-0 bg-gray-50 px-4 py-3 text-left align-middle text-xs font-semibold uppercase text-gray-700">-->
+<!--                  Percentage-->
+<!--                </th>-->
+<!--              </tr>-->
+<!--              </thead>-->
+<!--              <tbody class="divide-y divide-gray-100">-->
+<!--              <tr class="text-gray-500">-->
+<!--                <th class="whitespace-nowrap border-t-0 p-4 px-4 text-left align-middle text-sm font-bold">Jedzenie</th>-->
+<!--                <td class="whitespace-nowrap border-t-0 p-4 px-4 align-middle text-xs font-medium text-gray-900">602,00&nbsp;zł</td>-->
+<!--                <td class="whitespace-nowrap border-t-0 p-4 px-4 align-middle text-xs">-->
+<!--                  <div class="flex items-center"><span class="mr-2 text-xs font-medium">40.08%</span>-->
+<!--                    <div class="relative w-full">-->
+<!--                      <div class="h-2 w-full rounded-sm bg-gray-200">-->
+<!--                        <div class="h-2 rounded-sm bg-cyan-600" style="width: 40.08%;"></div>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr class="text-gray-500">-->
+<!--                <th class="whitespace-nowrap border-t-0 p-4 px-4 pl-10 text-left align-middle text-sm font-normal">-->
+<!--                  Lidl-->
+<!--                </th>-->
+<!--                <td class="whitespace-nowrap border-t-0 p-4 px-4 align-middle text-xs font-medium text-gray-900">602,00&nbsp;zł</td>-->
+<!--                <td class="whitespace-nowrap border-t-0 p-4 px-4 align-middle text-xs"></td>-->
+<!--              </tr>-->
+<!--              <tr class="text-gray-500">-->
+<!--                <th class="whitespace-nowrap border-t-0 p-4 px-4 text-left align-middle text-sm font-bold">Mieszkanie-->
+<!--                </th>-->
+<!--                <td class="whitespace-nowrap border-t-0 p-4 px-4 align-middle text-xs font-medium text-gray-900">900,00&nbsp;zł</td>-->
+<!--                <td class="whitespace-nowrap border-t-0 p-4 px-4 align-middle text-xs">-->
+<!--                  <div class="flex items-center"><span class="mr-2 text-xs font-medium">59.92%</span>-->
+<!--                    <div class="relative w-full">-->
+<!--                      <div class="h-2 w-full rounded-sm bg-gray-200">-->
+<!--                        <div class="h-2 rounded-sm bg-cyan-600" style="width: 59.92%;"></div>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr class="text-gray-500">-->
+<!--                <th class="whitespace-nowrap border-t-0 p-4 px-4 pl-10 text-left align-middle text-sm font-normal">-->
+<!--                  Czynsz-->
+<!--                </th>-->
+<!--                <td class="whitespace-nowrap border-t-0 p-4 px-4 align-middle text-xs font-medium text-gray-900">900,00&nbsp;zł</td>-->
+<!--                <td class="whitespace-nowrap border-t-0 p-4 px-4 align-middle text-xs"></td>-->
+<!--              </tr>-->
+<!--              </tbody>-->
+<!--            </table>-->
+<!--          </div>-->
+<!--        </div>-->
       </div>
     </div>
   </main>

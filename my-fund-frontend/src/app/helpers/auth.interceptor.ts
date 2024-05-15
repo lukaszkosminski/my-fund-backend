@@ -16,7 +16,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+  }
 
   intercept(
     req: HttpRequest<any>,
@@ -42,8 +43,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   }
 
   private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
+    localStorage.removeItem('login-state')
     this.router.navigate(['/login']);
-
     return next.handle(request);
   }
 }
