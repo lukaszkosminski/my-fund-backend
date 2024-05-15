@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -26,13 +27,9 @@ public class AuthControler {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
-        Optional<UserDTO> userOpt = userService.createUser(createUserDTO);
-        if (userOpt.isPresent()) {
-            return new ResponseEntity<>(userOpt.get(), HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody CreateUserDTO createUserDTO) throws IOException {
+        UserDTO userDTO = userService.createUser(createUserDTO);
+            return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
     //TODO: forgot password
