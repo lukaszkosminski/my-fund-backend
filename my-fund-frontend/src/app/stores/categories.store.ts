@@ -24,7 +24,7 @@ export const CategoriesStore = signalStore(
     ) => ({
       getAll: rxMethod<void>(
         pipe(
-          switchMap((data: any) =>
+          switchMap(() =>
             categoriesService.getAll().pipe(
               tapResponse({
                 next: categories => {
@@ -34,7 +34,7 @@ export const CategoriesStore = signalStore(
                   });
                 },
                 error: ({ error }) => {
-                  console.log(33, 'error');
+                  console.log('Error', error);
                 },
               })
             )

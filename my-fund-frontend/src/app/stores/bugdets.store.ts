@@ -32,7 +32,7 @@ export const BudgetsStore = signalStore(
                     currentBudget: { data: budget, state: 'success' },
                   }),
                 error: ({ error }) => {
-                  console.log(33, 'error');
+                  console.log('Error', error);
                 },
               })
             )

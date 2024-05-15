@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-import { Router } from '@angular/router';import {CreateUserPayload, User} from "../models/User.model";
+import { tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { CreateUserPayload, User } from '../models/User.model';
 
 const jsonPayloadHttpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -17,7 +18,7 @@ export class AuthService {
   ) {}
 
   register(username: string, email: string, password: string) {
-    return this.http.post<User | {[K in keyof CreateUserPayload]: string}>(
+    return this.http.post<User | { [K in keyof CreateUserPayload]: string }>(
       `/register`,
       {
         username,

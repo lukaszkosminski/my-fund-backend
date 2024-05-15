@@ -21,21 +21,43 @@ import { BudgetTransactionFormComponent } from './pages/budget-transaction-form/
     CategoriesComponent,
     CategoryFormComponent,
     BudgetComponent,
-    BudgetTransactionFormComponent
+    BudgetTransactionFormComponent,
   ],
   imports: [
     ReactiveFormsModule,
     CommonModule,
     RouterModule.forChild([
       {
-        path: '', component: HomeComponent, children: [
-          {path: 'budgets', pathMatch: 'full', component: BudgetsComponent},
-          {path: 'budgets/create', pathMatch: 'full', component: BudgetFormComponent},
-          {path: 'categories', pathMatch: 'full', component: CategoriesComponent},
-          {path: 'categories/create', pathMatch: 'full', component: CategoryFormComponent},
-          {path: 'budgets/:id', pathMatch: 'full', component: BudgetComponent},
-          {path: 'budgets/:id/:type/add', pathMatch: 'full', component: BudgetTransactionFormComponent},
-        ]
+        path: '',
+        component: HomeComponent,
+        children: [
+          { path: 'budgets', pathMatch: 'full', component: BudgetsComponent },
+          {
+            path: 'budgets/create',
+            pathMatch: 'full',
+            component: BudgetFormComponent,
+          },
+          {
+            path: 'categories',
+            pathMatch: 'full',
+            component: CategoriesComponent,
+          },
+          {
+            path: 'categories/create',
+            pathMatch: 'full',
+            component: CategoryFormComponent,
+          },
+          {
+            path: 'budgets/:id',
+            pathMatch: 'full',
+            component: BudgetComponent,
+          },
+          {
+            path: 'budgets/:id/:type/add',
+            pathMatch: 'full',
+            component: BudgetTransactionFormComponent,
+          },
+        ],
       },
     ]),
     UiModule,

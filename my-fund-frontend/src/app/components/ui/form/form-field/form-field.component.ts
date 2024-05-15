@@ -9,7 +9,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     }}</label>
     <input
       [id]="id"
-     [placeholder]="placeholder || ''" type="text"
+      [placeholder]="placeholder || ''"
+      type="text"
       [value]="value"
       (change)="onInputChange($event)"
       class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-cyan-600 focus:ring-cyan-600 sm:text-sm" />
@@ -27,29 +28,29 @@ export class FormFieldComponent implements ControlValueAccessor {
   @Input() label: string;
   @Input() placeholder: string;
 
-  private _value: any;
+  private _value: string;
 
-  set value(value: any) {
+  set value(value: string) {
     this._value = value;
     this.onChange(value);
   }
 
-  get value(): any {
+  get value(): string {
     return this._value;
   }
 
-  onChange = (event: any) => {};
+  onChange = (value: string) => {};
 
   onInputChange = (event: any) => {
     this.value = event?.target?.value;
   };
   onTouched = () => {};
 
-  writeValue(value: any) {
+  writeValue(value: string) {
     this.value = value;
   }
 
-  registerOnChange(fn: any) {
+  registerOnChange(fn: () => void) {
     this.onChange = fn;
   }
 
