@@ -2,11 +2,9 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from './button/button.component';
 import { FormFieldComponent } from './form/form-field/form-field.component';
-import {FormsModule} from "@angular/forms";
-import {FormFieldErrorComponent} from "./form/form-field/form-field-error.component";
+import { FormsModule } from '@angular/forms';
+import { FormFieldErrorComponent } from './form/form-field/form-field-error.component';
 import { FormRowComponent } from './form/form-row/form-row.component';
-
-
 
 @NgModule({
   declarations: [
@@ -19,11 +17,8 @@ import { FormRowComponent } from './form/form-row/form-row.component';
     ButtonComponent,
     FormFieldComponent,
     FormFieldErrorComponent,
-    FormRowComponent
+    FormRowComponent,
   ],
-  imports: [
-    CommonModule,
-    FormsModule
-  ]
+  imports: [CommonModule, FormsModule],
 })
-export class UiModule { }
+export class UiModule {}

@@ -1,13 +1,16 @@
-<main class="w-full py-12 md:py-24 lg:py-32 relative ">
+<main class="w-full py-12 md:py-24 lg:py-32 relative">
   <form
     class="max-w-sm mx-auto"
     (ngSubmit)="f.form.valid && onSubmit()"
     #f="ngForm"
     novalidate
-    name="loginForm"
-  >
+    name="loginForm">
     <div class="mb-5">
-      <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+      <label
+        for="username"
+        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+        >Email</label
+      >
       <input
         #email="ngModel"
         [(ngModel)]="form.username"
@@ -16,17 +19,21 @@
         name="username"
         required
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        placeholder="name@flowbite.com"
-      />
+        placeholder="name@flowbite.com" />
       @if (email.errors && f.submitted) {
-        <span class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
-    			Email is required
-      	</span>
+      <span
+        class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+        Email is required
+      </span>
       }
     </div>
 
     <div class="">
-      <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+      <label
+        for="password"
+        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+        >Password</label
+      >
       <input
         #password="ngModel"
         [(ngModel)]="form.password"
@@ -34,33 +41,44 @@
         name="password"
         type="password"
         id="password"
-        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-      />
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
       @if (password.errors && f.submitted) {
-        <span class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
-    			Password is required
-      	</span>
+      <span
+        class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+        Password is required
+      </span>
       }
     </div>
 
-    <app-button text="Login" type="submit"/>
+    <app-button text="Login" type="submit" />
 
     @if (validationErrors) {
-      <span class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
-        {{ validationErrors }}
-      </span>
+    <span class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+      {{ validationErrors }}
+    </span>
     }
   </form>
 
-  <div *ngIf="isLoading"
-       class="absolute top-0 bg-white bg-opacity-60 z-10 h-full w-full flex items-center justify-center">
+  <div
+    *ngIf="isLoading"
+    class="absolute top-0 bg-white bg-opacity-60 z-10 h-full w-full flex items-center justify-center">
     <div class="flex items-center">
-      <svg class="animate-spin h-8 w-8 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none"
-           viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-        </path>
+      <svg
+        class="animate-spin h-8 w-8 text-gray-800"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24">
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
     </div>
   </div>

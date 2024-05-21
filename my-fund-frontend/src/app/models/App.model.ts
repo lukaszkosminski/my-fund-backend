@@ -3,12 +3,11 @@ export interface AppState {
 }
 
 export interface IAppVersion {
-  buildDate: string,
-  version: number
+  buildDate: string;
+  version: number;
 }
 
 export interface ILoadableState<T> {
-  data?: T,
+  data?: T;
   state: 'loading' | 'success' | 'error';
 }
-

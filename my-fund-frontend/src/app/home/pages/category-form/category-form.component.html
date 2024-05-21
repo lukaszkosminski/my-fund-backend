@@ -1,20 +1,34 @@
 <div class="relative h-full overflow-y-auto bg-gray-50">
   <main>
     <div class="px-4">
-      <div class="pt:mt-0 mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
-        <div class="w-full rounded-lg bg-white shadow sm:max-w-screen-sm md:mt-0 xl:p-0">
+      <div
+        class="pt:mt-0 mx-auto flex flex-col items-center justify-center px-6 pt-8 md:h-screen">
+        <div
+          class="w-full rounded-lg bg-white shadow sm:max-w-screen-sm md:mt-0 xl:p-0">
           <div class="space-y-8 p-6 sm:p-8 lg:p-16">
-            <h2 class="text-2xl font-bold text-gray-900 lg:text-3xl">Create category</h2>
-            <form [formGroup]="categoryForm" (submit)="onSubmit()" class="mt-8 spa2ce-y-2">
+            <h2 class="text-2xl font-bold text-gray-900 lg:text-3xl">
+              Create category
+            </h2>
+            <form
+              [formGroup]="categoryForm"
+              (submit)="onSubmit()"
+              class="mt-8 spa2ce-y-2">
               <div>
                 <app-form-row>
-                  <app-form-field label="Category name" formControlName="name"></app-form-field>
-                  <app-form-field-error [show]="formStatus() === 'error'" [message]="formMessage()"/>
+                  <app-form-field
+                    label="Category name"
+                    formControlName="name"></app-form-field>
                   <app-form-field-error
-                    [show]="categoryForm.get('name')!.invalid && (categoryForm.get('name')!.dirty || categoryForm.get('name')!.touched)"
-                    message="Please provide a name."/>
+                    [show]="formStatus() === 'error'"
+                    [message]="formMessage()" />
+                  <app-form-field-error
+                    [show]="
+                      categoryForm.get('name')!.invalid &&
+                      (categoryForm.get('name')!.dirty ||
+                        categoryForm.get('name')!.touched)
+                    "
+                    message="Please provide a name." />
                 </app-form-row>
-
 
                 <!--                  <div-->
                 <!--                    class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1"-->
@@ -28,43 +42,54 @@
                 <!--                  >-->
                 <!--                    Please provide a name.-->
                 <!--                  </div>-->
-
               </div>
 
-              <div class="block text-sm font-medium text-gray-900 ">Subcategories</div>
+              <div class="block text-sm font-medium text-gray-900">
+                Subcategories
+              </div>
 
               <div class="" formArrayName="subCategories">
-                <div *ngFor="let subcategory of subCategories.controls; let i=index"
-                     class="sub-category">
-
+                <div
+                  *ngFor="
+                    let subcategory of subCategories.controls;
+                    let i = index
+                  "
+                  class="sub-category">
                   <div class="flex items-center pt-2">
                     <ng-container [formGroupName]="i">
-
                       <input
                         type="text"
                         class="block flex-1 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-cyan-600 focus:ring-cyan-600 sm:text-sm"
-                        formControlName="name">
+                        formControlName="name" />
 
                       <ng-container *ngIf="subCategories.length > 1">
                         <div class="p-1" (click)="removeSubcategory(i)">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                               aria-hidden="true"
-                               class="h-5 w-5 cursor-pointer text-red-500">
-                            <path fill-rule="evenodd"
-                                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                  clip-rule="evenodd"></path>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                            class="h-5 w-5 cursor-pointer text-red-500">
+                            <path
+                              fill-rule="evenodd"
+                              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                              clip-rule="evenodd"></path>
                           </svg>
                         </div>
                       </ng-container>
 
-                      <ng-container *ngIf="subCategories.length === i+1">
+                      <ng-container *ngIf="subCategories.length === i + 1">
                         <div class="p-1" (click)="addSubCategory()">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                               aria-hidden="true"
-                               class="h-5 w-5 cursor-pointer text-green-500">
-                            <path fill-rule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
-                                  clip-rule="evenodd"></path>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                            class="h-5 w-5 cursor-pointer text-green-500">
+                            <path
+                              fill-rule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                              clip-rule="evenodd"></path>
                           </svg>
                         </div>
                       </ng-container>
@@ -73,8 +98,7 @@
                 </div>
               </div>
 
-              <app-button text="Create" type="submit"/>
-
+              <app-button text="Create" type="submit" />
             </form>
           </div>
         </div>
@@ -82,15 +106,26 @@
     </div>
   </main>
 
-  <div *ngIf="formStatus() === 'loading'"
-       class="absolute top-0 bg-white bg-opacity-60 z-10 h-full w-full flex items-center justify-center">
+  <div
+    *ngIf="formStatus() === 'loading'"
+    class="absolute top-0 bg-white bg-opacity-60 z-10 h-full w-full flex items-center justify-center">
     <div class="flex items-center">
-      <svg class="animate-spin h-8 w-8 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none"
-           viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-        </path>
+      <svg
+        class="animate-spin h-8 w-8 text-gray-800"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24">
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
     </div>
   </div>
