@@ -6,14 +6,10 @@ import com.myfund.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/")
@@ -29,11 +25,18 @@ public class AuthControler {
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody CreateUserDTO createUserDTO) throws IOException {
         UserDTO userDTO = userService.createUser(createUserDTO);
-            return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
-    //TODO: forgot password
-//    @PostMapping("/forgot-password")
-//    public void forgotPasswordUser() {
-//    }
+    @PostMapping("/request-reset-password")
+    public ResponseEntity<?> requestResetPassword(@RequestParam("email") String email) {
+        userService.requestPasswordReset(email);
+        return ResponseEntity.ok("Password reset email sent.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam("email") String email, @RequestParam("token") String token, @RequestParam("newPassword") String newPassword) {
+        userService.resetPassword(email, token, newPassword);
+        return ResponseEntity.ok("Password has been successfully reset.");
+    }
 }

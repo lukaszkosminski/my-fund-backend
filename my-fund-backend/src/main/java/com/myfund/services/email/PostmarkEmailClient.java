@@ -19,7 +19,7 @@ import java.io.IOException;
 @Service
 @Slf4j
 @Primary
-public class PostmarkService implements EmailSender {
+public class PostmarkEmailClient implements EmailSender {
 
     @Value("${postmark.apikey}")
     private String apiKey;
@@ -54,6 +54,35 @@ public class PostmarkService implements EmailSender {
             }
         } catch (IOException e) {
             log.error("Failed to send email to: {}", userDTO.getEmail(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void sendPasswordResetEmail(UserDTO userDTO, String resetToken) throws IOException {
+        log.info("Starting to send password reset email to: {}", userDTO.getEmail());
+
+        String resetPasswordUrl = "http://my-fund.online/reset-password?token=" + resetToken;
+
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            HttpPost post = new HttpPost(apiUrl);
+
+            post.setHeader("Accept", "application/json");
+            post.setHeader("Content-Type", "application/json");
+            post.setHeader("X-Postmark-Server-Token", apiKey);
+            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35917746, \"TemplateModel\": {\"name\": \"%s\", \"action_url\": \"%s\"}}", emailSender, userDTO.getEmail(), userDTO.getUsername(), resetPasswordUrl);
+            post.setEntity(new StringEntity(json));
+
+            HttpResponse response = client.execute(post);
+            String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                log.info("Password reset email sent successfully. Server response: {}", responseString);
+            } else {
+                log.error("Failed to send password reset email. Server response: {}", responseString);
+            }
+        } catch (IOException e) {
+            log.error("Failed to send password reset email to: {}", userDTO.getEmail(), e);
             throw e;
         }
     }
