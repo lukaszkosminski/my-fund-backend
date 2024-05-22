@@ -1,6 +1,5 @@
 package com.myfund.services;
 
-import com.myfund.configs.CacheConfig;
 import com.myfund.exceptions.InvalidTokenException;
 import com.myfund.exceptions.UserAlreadyExistsException;
 import com.myfund.exceptions.UserNotFoundException;
@@ -13,18 +12,12 @@ import com.myfund.services.email.EmailSender;
 import com.myfund.services.email.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.cache.annotation.CacheEvict;
-
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -41,7 +34,6 @@ public class UserService {
     private final TokenService tokenService;
 
     private final CacheManager cacheManager;
-
 
 
     @Autowired
@@ -86,20 +78,17 @@ public class UserService {
     }
 
     public void requestPasswordReset(String email) {
-
         Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) {
-            log.warn("User not found with email: {}", email);
-            throw new UserNotFoundException( "User not found with email: " + email);
-        }
-
-        String passwordResetToken = tokenService.createPasswordResetToken(userOpt.get().getEmail());
-
-        try {
-            UserDTO userDTO = UserMapper.userMapToUserDTO(userOpt.get());
-            emailSender.sendPasswordResetEmail(userDTO, passwordResetToken);
-        } catch (IOException e) {
-            log.error("Failed to send password reset email", e);
+        if (userOpt.isPresent()) {
+            String passwordResetToken = tokenService.createPasswordResetToken(userOpt.get().getEmail());
+            try {
+                UserDTO userDTO = UserMapper.userMapToUserDTO(userOpt.get());
+                emailSender.sendPasswordResetEmail(userDTO, passwordResetToken);
+            } catch (IOException e) {
+                log.error("Failed to send password reset email", e);
+            }
+        } else {
+            log.debug("Request for password reset received for email: {}, but no action taken.", email);
         }
     }
 

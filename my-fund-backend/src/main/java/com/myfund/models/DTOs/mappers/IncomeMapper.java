@@ -22,7 +22,7 @@ public class IncomeMapper {
         incomeDTO.setAmount(income.getAmount());
         incomeDTO.setIdCategory(income.getIdCategory());
         incomeDTO.setIdSubCategory(income.getIdSubCategory());
-        incomeDTO.setLocalDateTime(income.getLocalDateTime());
+        incomeDTO.setLocalDate(income.getLocalDate());
         return incomeDTO;
     }
 }

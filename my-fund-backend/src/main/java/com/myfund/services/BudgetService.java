@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +104,7 @@ public class BudgetService {
             }
             Expense expense = ExpenseMapper.createExpenseDTOtoExpense(createExpenseDTO);
             expense.setBudget(budgetOpt.get());
-            expense.setLocalDateTime(LocalDateTime.now());
+            expense.setLocalDate(LocalDate.now());
             expense.setUser(user);
             expenseRepository.save(expense);
             updateTotalExpense(budgetOpt.get());
@@ -125,7 +126,7 @@ public class BudgetService {
             }
             Income income = IncomeMapper.createIncomeDTOtoIncome(createIncomeDTO);
             income.setBudget(budgetOpt.get());
-            income.setLocalDateTime(LocalDateTime.now());
+            income.setLocalDate(LocalDate.now());
             income.setUser(user);
             incomeRepository.save(income);
             updateTotalIncome(budgetOpt.get());
@@ -150,7 +151,7 @@ public class BudgetService {
             expense.setIdSubCategory(createExpenseDTO.getIdSubCategory());
             expense.setAmount(createExpenseDTO.getAmount());
             expense.setName(createExpenseDTO.getName());
-            expense.setLocalDateTime(LocalDateTime.now());
+            expense.setLocalDate(LocalDate.now());
             expenseRepository.save(expense);
             log.info("Expense successfully updated. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
             return ExpenseMapper.expensetoExpenseDTO(expense);
@@ -173,7 +174,7 @@ public class BudgetService {
             income.setIdSubCategory(createIncomeDTO.getIdSubCategory());
             income.setAmount(createIncomeDTO.getAmount());
             income.setName(createIncomeDTO.getName());
-            income.setLocalDateTime(LocalDateTime.now());
+            income.setLocalDate(LocalDate.now());
             incomeRepository.save(income);
             log.info("Income successfully updated. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
             return IncomeMapper.incomeMapToIncomeDTO(income);
@@ -464,6 +465,18 @@ public class BudgetService {
         log.debug("Expenses summary calculated for user ID: {} and budget ID: {}. Total expenses: {}", user.getId(), budgetId, totalExpenses);
 
         return expensesSummaryDTO;
+    }
+
+    public void saveExpenseFromCsv(Expense expense) {
+        log.debug("Starting to save expense from CSV");
+        expenseRepository.save(expense);
+        log.debug("Expense from CSV successfully saved");
+    }
+
+    public void saveIncomeFromCsv(Income income) {
+        log.debug("Starting to save income from CSV");
+        incomeRepository.save(income);
+        log.debug("Income from CSV successfully saved");
     }
 }
 
