@@ -113,19 +113,22 @@ public class BudgetController {
     @GetMapping("/budgets/{budgetId}/expenses/summary")
     public ResponseEntity<ExpensesSummaryDTO> calculateExpensesSummary(@PathVariable Long budgetId, @AuthenticationPrincipal User user) {
         ExpensesSummaryDTO expensesSummaryDTO = budgetService.calculateExpensesSummary(user, budgetId);
-        return new ResponseEntity<>(expensesSummaryDTO,HttpStatus.OK);
+        return new ResponseEntity<>(expensesSummaryDTO, HttpStatus.OK);
     }
 
     @PostMapping("/budgets/{budgetId}/upload-csv/{bankName}")
-    public ResponseEntity<String> uploadCsv(@PathVariable String bankName, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadCsv(@PathVariable String bankName, @RequestParam("file") MultipartFile file, @AuthenticationPrincipal User user, @PathVariable Long budgetId) {
         if (file.isEmpty()) {
-            return new ResponseEntity<>("File is empty", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body("{\"message\": \"File is empty\"}");
         }
+
         try {
-            csvReaderService.processCsv(bankName, file);
-            return new ResponseEntity<>("Successfully uploaded '" + file.getOriginalFilename() + "' for " + bankName, HttpStatus.OK);
+            csvReaderService.processCsv(bankName, file, user, budgetId);
+            String successMessage = String.format("Successfully uploaded '%s' for %s", file.getOriginalFilename(), bankName);
+            return ResponseEntity.ok("{\"message\": \"" + successMessage + "\"}");
         } catch (Exception e) {
-            return new ResponseEntity<>("Error processing file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            String errorMessage = String.format("Error processing file: %s", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"" + errorMessage + "\"}");
         }
     }
 }

@@ -55,4 +55,14 @@ public class BudgetMapper {
         budgetSummaryDTO.setTotalIncome(budget.getTotalIncome());
         return budgetSummaryDTO;
     }
+
+    public static Budget budgetDTOMapToBudget(BudgetDTO budgetDTO) {
+        Budget budget = new Budget();
+        budget.setId(budgetDTO.getId());
+        budget.setName(budgetDTO.getName());
+        budget.setBalance(budgetDTO.getBalance());
+        budget.setTotalExpense(budgetDTO.getTotalExpense());
+        budget.setTotalIncome(budgetDTO.getTotalIncome());
+        return budget;
+    }
 }

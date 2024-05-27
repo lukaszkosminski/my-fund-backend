@@ -1,5 +1,6 @@
 package com.myfund.services.csv;
 
+import com.myfund.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,12 +17,12 @@ public class CsvReaderService {
         this.parserMap = parserMap;
     }
 
-    public void processCsv(String bankName, MultipartFile file) {
+    public void processCsv(String bankName, MultipartFile file, User user, Long budgetId) {
         CsvParser parser = parserMap.get(bankName);
         if (parser == null) {
             throw new IllegalArgumentException("Unsupported bank: " + bankName);
         }
-        parser.parseCsv(file);
+        parser.parseCsv(file, user , budgetId);
     }
 }
 
