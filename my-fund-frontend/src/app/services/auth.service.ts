@@ -41,6 +41,14 @@ export class AuthService {
     );
   }
 
+  forgotPassword(email: string) {
+    return this.http.post(`/request-reset-password?email=${email}`, {});
+  }
+
+  setNewPassword(token: string, password: string) {
+    return this.http.post(`/reset-password?token=${token}`, { password });
+  }
+
   isLoggedIn() {
     return localStorage.getItem('login-state') === 'authenticated';
   }

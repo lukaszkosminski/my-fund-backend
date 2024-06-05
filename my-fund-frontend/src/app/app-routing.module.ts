@@ -4,11 +4,22 @@ import { LandingComponent } from './pages/landing/landing.component';
 import { LoginPage } from './pages/login/login.page';
 import { RegisterComponent } from './pages/register/register.component';
 import { authGuard } from './guards/auth.guard';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: LandingComponent },
   { path: 'login', pathMatch: 'full', component: LoginPage },
   { path: 'join', pathMatch: 'full', component: RegisterComponent },
+  {
+    path: 'forgot-password',
+    pathMatch: 'full',
+    component: ForgotPasswordComponent,
+  },
+  {
+    path: 'reset-password',
+    component: ResetPasswordComponent,
+  },
   {
     path: 'home',
     canActivate: [authGuard],
