@@ -1,6 +1,7 @@
 package com.myfund.controllers;
 
 import com.myfund.models.DTOs.CreateUserDTO;
+import com.myfund.models.DTOs.PasswordChangeRequestDTO;
 import com.myfund.models.DTOs.UserDTO;
 import com.myfund.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +29,15 @@ public class AuthControler {
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
-    @PostMapping("/request-reset-password")
-    public ResponseEntity<?> requestResetPassword(@RequestParam("email") String email) {
-        userService.requestPasswordReset(email);
+    @PostMapping("/request-change-password")
+    public ResponseEntity<?> requestChangePassword(@Valid @RequestBody PasswordChangeRequestDTO passwordChangeRequestDTO) {
+        userService.requestPasswordChange(passwordChangeRequestDTO.getEmail());
         return ResponseEntity.ok("Password reset email sent.");
     }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam("email") String email, @RequestParam("token") String token, @RequestParam("newPassword") String newPassword) {
-        userService.resetPassword(email, token, newPassword);
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam("email") String email, @RequestParam("token") String token, @RequestParam("newPassword") String newPassword) {
+        userService.changePassword(email, token, newPassword);
         return ResponseEntity.ok("Password has been successfully reset.");
     }
 }
