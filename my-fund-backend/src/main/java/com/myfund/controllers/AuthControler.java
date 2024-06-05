@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/")
@@ -31,12 +33,16 @@ public class AuthControler {
     @PostMapping("/request-reset-password")
     public ResponseEntity<?> requestResetPassword(@RequestParam("email") String email) {
         userService.requestPasswordReset(email);
-        return ResponseEntity.ok("Password reset email sent.");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "If your email address exists in our database, you will receive a password reset email shortly.");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestParam("email") String email, @RequestParam("token") String token, @RequestParam("newPassword") String newPassword) {
         userService.resetPassword(email, token, newPassword);
-        return ResponseEntity.ok("Password has been successfully reset.");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Password has been successfully reset.");
+        return ResponseEntity.ok(response);
     }
 }

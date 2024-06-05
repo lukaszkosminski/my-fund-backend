@@ -30,6 +30,9 @@ public class PostmarkEmailClient implements EmailSender {
     @Value("${email.sender}")
     private String emailSender;
 
+    @Value("${reset.password.url}")
+    private String resetPasswordUrl;
+
     @Override
     public void sendWelcomeEmail(UserDTO userDTO) throws IOException {
 
@@ -62,7 +65,7 @@ public class PostmarkEmailClient implements EmailSender {
     public void sendPasswordResetEmail(UserDTO userDTO, String resetToken) throws IOException {
         log.info("Starting to send password reset email to: {}", userDTO.getEmail());
 
-        String resetPasswordUrl = "http://my-fund.online/reset-password?token=" + resetToken;
+        String resetPasswordUrlWithToken = resetPasswordUrl + resetToken;
 
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(apiUrl);
@@ -70,7 +73,7 @@ public class PostmarkEmailClient implements EmailSender {
             post.setHeader("Accept", "application/json");
             post.setHeader("Content-Type", "application/json");
             post.setHeader("X-Postmark-Server-Token", apiKey);
-            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35917746, \"TemplateModel\": {\"name\": \"%s\", \"action_url\": \"%s\"}}", emailSender, userDTO.getEmail(), userDTO.getUsername(), resetPasswordUrl);
+            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35917746, \"TemplateModel\": {\"name\": \"%s\", \"action_url\": \"%s\"}}", emailSender, userDTO.getEmail(), userDTO.getUsername(), resetPasswordUrlWithToken);
             post.setEntity(new StringEntity(json));
 
             HttpResponse response = client.execute(post);

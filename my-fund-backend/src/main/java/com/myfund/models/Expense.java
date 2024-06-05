@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Table(name = "expense")
 @Getter
@@ -24,7 +24,7 @@ public class Expense {
     @NotNull
     private BigDecimal amount;
 
-    private LocalDateTime localDateTime;
+    private LocalDate localDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budget_id")

@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,6 +23,6 @@ public class ExpenseDTO {
 
     private Long idSubCategory;
 
-    private LocalDateTime localDateTime;
+    private LocalDate localDate;
 
 }
