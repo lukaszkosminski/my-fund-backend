@@ -1,0 +1,142 @@
+<main class="w-full py-12 md:py-24 lg:py-32 relative">
+  @if (!userCreated) {
+    <form
+      class="max-w-sm mx-auto"
+      (ngSubmit)="f.form.valid && onSubmit()"
+      #f="ngForm"
+      novalidate
+      name="registerForm">
+      <div class="mb-5">
+        <label
+          for="username"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Username</label
+        >
+        <input
+          #username="ngModel"
+          [(ngModel)]="form.username"
+          type="text"
+          id="username"
+          name="username"
+          required
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="John" />
+        @if (username.errors && f.submitted) {
+          <span
+            class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+            Username is required
+          </span>
+        }
+        @if (validationErrors && validationErrors.username) {
+          <span
+            class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+            {{ validationErrors.username }}
+          </span>
+        }
+      </div>
+      <div class="mb-5">
+        <label
+          for="email"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Email</label
+        >
+        <input
+          #email="ngModel"
+          [(ngModel)]="form.email"
+          type="email"
+          id="email"
+          name="email"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          placeholder="name@flowbite.com" />
+        @if (email.errors && f.submitted) {
+          <span
+            class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+            Email is required
+          </span>
+        }
+        @if (validationErrors && validationErrors.email) {
+          <span
+            class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+            {{ validationErrors.email }}
+          </span>
+        }
+      </div>
+
+      <div class="mb-5">
+        <label
+          for="password"
+          class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >Password</label
+        >
+        <input
+          #password="ngModel"
+          [(ngModel)]="form.password"
+          required
+          name="password"
+          type="password"
+          id="password"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+        @if (password.errors && f.submitted) {
+          <span
+            class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+            Password is required
+          </span>
+        }
+        @if (validationErrors && validationErrors.password) {
+          <span
+            class="flex items-center font-normal text-red-500 text-xs mt-1 ml-1">
+            {{ validationErrors.password }}
+          </span>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="text-white w-full bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+        Submit
+      </button>
+    </form>
+  }
+  @if (userCreated) {
+    <div class="flex items-center flex-col">
+      <div class="flex items-center flex-col p-4 px-8">
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+          Success
+        </h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">
+          User has been created successfully
+        </p>
+        <a
+          type="button"
+          routerLink="/login"
+          class="mt-4 text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+          Log in
+        </a>
+      </div>
+    </div>
+  }
+
+  <div
+    *ngIf="isLoading"
+    class="absolute top-0 bg-white bg-opacity-60 z-10 h-full w-full flex items-center justify-center">
+    <div class="flex items-center">
+      <svg
+        class="animate-spin h-8 w-8 text-gray-800"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24">
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+  </div>
+</main>

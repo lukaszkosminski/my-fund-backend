@@ -1,13 +1,10 @@
-<div class="relative h-full overflow-y-auto bg-gray-50 py-16 ">
-
-
+<div class="relative h-full overflow-y-auto bg-gray-50 py-16">
   <main>
     <div class="px-4 pt-6">
-      <div class="w-full flex items-center  justify-between">
+      <div class="w-full flex items-center justify-between">
         <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl">Budgets</h1>
         <div>
-          <a
-            class="inline-flex w-1/2 items-center justify-center text-white w-full bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4
+          <a class="inline-flex w-1/2 items-center justify-center text-white w-full bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4
         focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700
         dark:focus:ring-gray-700 dark:border-gray-700"
             routerLink="/home/budgets/create">
@@ -21,33 +18,24 @@
           </a>
         </div>
       </div>
-      <div class="mt-4 grid w-full grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-
-
-        <div *ngFor="let budget of budgets() ">
-          <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">
+      <div
+        class="mt-4 grid w-full grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div *ngFor="let budget of budgets()">
+          <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8">
             <a [routerLink]="['/home/budgets/', budget.id]">
               <div class="flex items-center">
-                <div class="flex-shrink-0"><span
-                  class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl">{{ budget.name }}</span>
-                  <h3 class="text-base font-normal text-gray-500"></h3></div>
+                <div class="flex-shrink-0">
+                  <span
+                    class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl"
+                    >{{ budget.name }}</span
+                  >
+                  <h3 class="text-base font-normal text-gray-500"></h3>
+                </div>
               </div>
             </a>
           </div>
         </div>
-        <!--        <div class="rounded-lg bg-white p-4 shadow sm:p-6 xl:p-8 ">-->
-        <!--          <div class="flex items-center">-->
-
-        <!--            <div class="flex-shrink-0"><span class="text-2xl  text-gray-500 leading-none text-base font-normal   sm:text-3xl"></span>-->
-        <!--              <h3 class="text-base font-normal text-gray-500">-->
-        <!--                <a routerLink="/home/budgets/create">Create new budget</a>-->
-        <!--              </h3>-->
-        <!--            </div>-->
-        <!--          </div>-->
-        <!--        </div>-->
-
       </div>
-
     </div>
   </main>
 </div>

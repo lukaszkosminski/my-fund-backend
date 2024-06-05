@@ -8,9 +8,8 @@ describe('ExpenseFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [BudgetTransactionFormComponent]
-    })
-    .compileComponents();
+      declarations: [BudgetTransactionFormComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BudgetTransactionFormComponent);
     component = fixture.componentInstance;

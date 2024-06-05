@@ -1,6 +1,6 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {BudgetsStore} from "../../../stores/bugdets.store";
+import { Component, inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BudgetsStore } from '../../../stores/bugdets.store';
 
 @Component({
   selector: 'app-budget-form',
@@ -18,7 +18,7 @@ export class BudgetFormComponent implements OnInit {
   }
 
   onSubmit(form: FormGroup) {
-    if(form.valid) {
+    if (form.valid) {
       this.budgetStore.create(form.value);
     }
 
@@ -28,5 +28,3 @@ export class BudgetFormComponent implements OnInit {
     });
   }
 }
-
-

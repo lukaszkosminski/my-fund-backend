@@ -1,4 +1,4 @@
-import {ILoadableState} from "./App.model";
+import { ILoadableState } from './App.model';
 
 export interface Budget {
   id?: string;
