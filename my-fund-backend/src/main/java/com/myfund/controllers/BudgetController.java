@@ -123,7 +123,7 @@ public class BudgetController {
         }
 
         try {
-            csvReaderService.processCsv(bankName, file, user, budgetId);
+            csvReaderService.parseFile(bankName, file, user, budgetId);
             String successMessage = String.format("Successfully uploaded '%s' for %s", file.getOriginalFilename(), bankName);
             return ResponseEntity.ok("{\"message\": \"" + successMessage + "\"}");
         } catch (Exception e) {

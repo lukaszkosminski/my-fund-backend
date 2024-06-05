@@ -29,21 +29,23 @@ public class SantanderCsvParser implements CsvParser {
     }
 
     @Override
-    public void parseCsv(MultipartFile file, User user, Long budgetId) {
+    public void parse(MultipartFile file, User user, Long budgetId) {
         BudgetDTO budgetByIdAndUser = budgetService.findBudgetByIdAndUser(budgetId, user);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
             reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] values = line.split(";");
-                if (!values[11].isEmpty()) {
+                String incomeColumn = values[10];
+                String expenseColumn = values[11];
+                if (!expenseColumn.isEmpty()) {
                     Income income = mapToIncome(values);
                     income.setUser(user);
                     income.setBudget(BudgetMapper.budgetDTOMapToBudget(budgetByIdAndUser));
                     budgetService.saveIncomeFromCsv(income);
                     log.info("Income saved: {}", income);
 
-                } else if (!values[10].isEmpty()) {
+                } else if (!incomeColumn.isEmpty()) {
                     Expense expense = mapToExpense(values);
                     expense.setUser(user);
                     expense.setBudget(BudgetMapper.budgetDTOMapToBudget(budgetByIdAndUser));
@@ -57,19 +59,25 @@ public class SantanderCsvParser implements CsvParser {
     }
 
     private Income mapToIncome(String[] values) {
+        String dateColumn = values[2];
+        String expenseColumn = values[11];
+        String transactionNameColumn = values[4];
         Income income = new Income();
-        income.setLocalDate(LocalDate.parse(values[2], DATE_FORMATTER));
-        income.setName(values[3]);
-        income.setAmount(new BigDecimal(values[11].replace(',', '.')));
+        income.setLocalDate(LocalDate.parse(dateColumn, DATE_FORMATTER));
+        income.setName(transactionNameColumn);
+        income.setAmount(new BigDecimal(expenseColumn.replace(',', '.')));
 
         return income;
     }
 
     private Expense mapToExpense(String[] values) {
+        String dateColumn = values[2];
+        String incomeColumn = values[10];
+        String transactionNameColumn = values[4];
         Expense expense = new Expense();
-        expense.setLocalDate(LocalDate.parse(values[2], DATE_FORMATTER));
-        expense.setName(values[3]);
-        expense.setAmount(new BigDecimal(values[10].replace(',', '.')));
+        expense.setLocalDate(LocalDate.parse(dateColumn, DATE_FORMATTER));
+        expense.setName(transactionNameColumn);
+        expense.setAmount(new BigDecimal(incomeColumn.replace(',', '.')));
 
         return expense;
     }

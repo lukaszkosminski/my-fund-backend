@@ -17,12 +17,12 @@ public class CsvReaderService {
         this.parserMap = parserMap;
     }
 
-    public void processCsv(String bankName, MultipartFile file, User user, Long budgetId) {
+    public void parseFile(String bankName, MultipartFile file, User user, Long budgetId) {
         CsvParser parser = parserMap.get(bankName);
         if (parser == null) {
             throw new IllegalArgumentException("Unsupported bank: " + bankName);
         }
-        parser.parseCsv(file, user , budgetId);
+        parser.parse(file, user , budgetId);
     }
 }
 

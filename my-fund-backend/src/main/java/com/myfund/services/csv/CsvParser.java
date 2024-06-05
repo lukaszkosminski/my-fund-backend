@@ -5,5 +5,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface CsvParser {
 
-    void parseCsv(MultipartFile file, User user, Long budgetId);
+    void parse(MultipartFile file, User user, Long budgetId);
 }
