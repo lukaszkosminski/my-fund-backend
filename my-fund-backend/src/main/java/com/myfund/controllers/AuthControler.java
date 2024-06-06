@@ -1,6 +1,7 @@
 package com.myfund.controllers;
 
 import com.myfund.models.DTOs.CreateUserDTO;
+import com.myfund.models.DTOs.PasswordChangeDTO;
 import com.myfund.models.DTOs.PasswordChangeRequestDTO;
 import com.myfund.models.DTOs.UserDTO;
 import com.myfund.services.UserService;
@@ -31,13 +32,13 @@ public class AuthControler {
 
     @PostMapping("/request-change-password")
     public ResponseEntity<?> requestChangePassword(@Valid @RequestBody PasswordChangeRequestDTO passwordChangeRequestDTO) {
-        userService.requestPasswordChange(passwordChangeRequestDTO.getEmail());
+        userService.requestPasswordChange(passwordChangeRequestDTO);
         return ResponseEntity.ok("Password reset email sent.");
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestParam("email") String email, @RequestParam("token") String token, @RequestParam("newPassword") String newPassword) {
-        userService.changePassword(email, token, newPassword);
+    public ResponseEntity<?> changePassword(@Valid @RequestBody PasswordChangeDTO passwordChangeDTO) {
+        userService.changePassword(passwordChangeDTO);
         return ResponseEntity.ok("Password has been successfully reset.");
     }
 }
