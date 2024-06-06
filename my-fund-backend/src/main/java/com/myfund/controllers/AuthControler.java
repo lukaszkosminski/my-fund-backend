@@ -32,12 +32,12 @@ public class AuthControler {
     @PostMapping("/request-change-password")
     public ResponseEntity<?> requestChangePassword(@Valid @RequestBody PasswordChangeRequestDTO passwordChangeRequestDTO) {
         userService.requestPasswordChange(passwordChangeRequestDTO.getEmail());
-        return ResponseEntity.ok("Password reset email sent.");
+        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestParam("email") String email, @RequestParam("token") String token, @RequestParam("newPassword") String newPassword) {
         userService.changePassword(email, token, newPassword);
-        return ResponseEntity.ok("Password has been successfully reset.");
+        return ResponseEntity.ok(HttpStatus.ACCEPTED);
     }
 }

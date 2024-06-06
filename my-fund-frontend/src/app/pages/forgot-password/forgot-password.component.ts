@@ -14,6 +14,7 @@ export class ForgotPasswordComponent {
   };
 
   emailSent = false;
+  loading = false;
 
   constructor(
     private authService: AuthService,
@@ -22,13 +23,15 @@ export class ForgotPasswordComponent {
 
   onSubmit() {
     console.log('Form submitted', this.form);
+    this.loading = true;
     this.authService.forgotPassword(this.form.email).subscribe({
       next: () => {
-        // this.router.navigate(['/home']);
         this.emailSent = true;
+        this.loading = false;
       },
       error: () => {
         this.emailSent = false;
+        this.loading = false;
       },
     });
   }
