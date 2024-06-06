@@ -13,8 +13,11 @@ export class ResetPasswordComponent {
     password: '',
   };
 
-  isLoading = false;
+  formState: 'idle' | 'loading' | 'success' | 'error' = 'idle';
+
   token = '';
+  email = '';
+
   validationErrors = '';
 
   constructor(
@@ -23,23 +26,28 @@ export class ResetPasswordComponent {
     private route: ActivatedRoute
   ) {
     this.route.queryParams.subscribe(params => {
-      console.log(28, params['token']);
       this.token = params['token'];
+      this.email = params['email'];
     });
   }
 
   onSubmit() {
-    this.isLoading = true;
+    this.formState = 'loading';
     console.log('Form submitted', this.form);
-    this.authService.setNewPassword(this.token, this.form.password).subscribe({
-      next: () => {
-        this.router.navigate(['/home']);
-        this.validationErrors = '';
-      },
-      error: () => {
-        this.isLoading = false;
-        this.validationErrors = 'Credentials are invalid. Please try again.';
-      },
-    });
+    this.authService
+      .setNewPassword(this.token, this.email, this.form.password)
+      .subscribe({
+        next: () => {
+          this.formState = 'success';
+          // this.router.navigate(['/home']);
+          this.validationErrors = '';
+        },
+        error: e => {
+          console.log(45, e);
+          this.formState = 'error';
+          this.validationErrors =
+            e.error.message ?? 'Credentials are invalid. Please try again.';
+        },
+      });
   }
 }

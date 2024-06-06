@@ -32,6 +32,7 @@ public class AuthControler {
 
     @PostMapping("/request-change-password")
     public ResponseEntity<?> requestChangePassword(@Valid @RequestBody PasswordChangeRequestDTO passwordChangeRequestDTO) {
+<<<<<<< HEAD
         userService.requestPasswordChange(passwordChangeRequestDTO);
         return ResponseEntity.ok("Password reset email sent.");
     }
@@ -40,5 +41,15 @@ public class AuthControler {
     public ResponseEntity<?> changePassword(@Valid @RequestBody PasswordChangeDTO passwordChangeDTO) {
         userService.changePassword(passwordChangeDTO);
         return ResponseEntity.ok("Password has been successfully reset.");
+=======
+        userService.requestPasswordChange(passwordChangeRequestDTO.getEmail());
+        return ResponseEntity.ok(HttpStatus.ACCEPTED);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam("email") String email, @RequestParam("token") String token, @RequestParam("newPassword") String newPassword) {
+        userService.changePassword(email, token, newPassword);
+        return ResponseEntity.ok(HttpStatus.ACCEPTED);
+>>>>>>> ffc4dc9436a491c0ddb9df3bb8c3f16774b56e3d
     }
 }
