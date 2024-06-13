@@ -28,18 +28,21 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final SubCategoryRepository subCategoryRepository;
-
     private final BudgetService budgetService;
+    private final DataEncryptionService dataEncryptionService;
+
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository, @Lazy BudgetService budgetService) {
+    public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository, @Lazy BudgetService budgetService, DataEncryptionService dataEncryptionService) {
         this.categoryRepository = categoryRepository;
         this.subCategoryRepository = subCategoryRepository;
         this.budgetService = budgetService;
+        this.dataEncryptionService = dataEncryptionService;
     }
 
     public List<CategoryDTO> findAllCategoriesByUser(User user) {
         List<CategoryDTO> categoryDTOs = CategoryMapper.categoryListMapToCategoryListDTO(categoryRepository.findAllCategoriesByUser(user));
+        categoryDTOs.forEach(categoryDTO -> categoryDTO.setName(decryptCategoryName(categoryDTO.getName(), user)));
         log.info("Retrieved {} categories for user with ID: {}", categoryDTOs.size(), user.getId());
         return categoryDTOs;
     }
@@ -48,8 +51,10 @@ public class CategoryService {
         log.debug("Starting to find category by ID: {} for user ID: {}", categoryId, user.getId());
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
         if (existingCategoryOpt.isPresent()) {
+            Category category = existingCategoryOpt.get();
             log.info("Category found for user with ID: {} and category ID: {}", user.getId(), categoryId);
-            return CategoryMapper.categoryMapToCategoryDTO(existingCategoryOpt.get());
+            category.setName(decryptCategoryName(category.getName(), user));
+            return CategoryMapper.categoryMapToCategoryDTO(category);
         } else {
             log.warn("Category not found for user with ID: {} and category ID: {}", user.getId(), categoryId);
             throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
@@ -58,6 +63,7 @@ public class CategoryService {
 
     public CategoryDTO createCategory(CreateCategoryDTO createCategoryDTO, User user) {
         log.debug("Starting to create a new category with name: {} for user ID: {}", createCategoryDTO.getName(), user.getId());
+        String encryptedCategoryName = encryptCategoryName(createCategoryDTO.getName(), user);
         Optional<Category> existingCategory = categoryRepository.findByNameAndUser(createCategoryDTO.getName(), user);
         Category category;
         if (existingCategory.isPresent()) {
@@ -65,11 +71,12 @@ public class CategoryService {
             throw new CategoryNotUniqueException("Category with name: " + existingCategory.get().getName() + " is not unique");
         } else {
             category = CategoryMapper.createCategoryDTOMapToCategory(createCategoryDTO);
+            category.setName(encryptedCategoryName);
             category.setUser(user);
             Category savedCategory = categoryRepository.save(category);
             ArrayList<SubCategory> subCategoryList = new ArrayList<>();
             for (SubCategory subCategory : category.getSubCategories()) {
-
+                subCategory.setName(encryptSubcategoryName(subCategory.getName(), user));
                 subCategory.setCategory(savedCategory);
                 subCategoryList.add(subCategory);
             }
@@ -77,6 +84,8 @@ public class CategoryService {
             category.getSubCategories().addAll(subCategoryList);
             categoryRepository.save(category);
             log.info("New category created with name: {} for user ID: {}", createCategoryDTO.getName(), user.getId());
+            category.setName(decryptCategoryName(category.getName(), user));
+            category.getSubCategories().forEach(subCategory -> subCategory.setName(decryptSubcategoryName(subCategory.getName(), user)));
             return CategoryMapper.categoryMapToCategoryDTO(category);
         }
     }
@@ -86,19 +95,25 @@ public class CategoryService {
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
         if (existingCategoryOpt.isPresent()) {
             Category category = existingCategoryOpt.get();
-            category.setName(createCategoryDTO.getName());
+            String encryptedCategoryName = encryptCategoryName(createCategoryDTO.getName(), user);
+            category.setName(encryptedCategoryName);
 
             List<SubCategory> existingSubCategories = category.getSubCategories();
             createCategoryDTO.getSubCategories().forEach(createSubCategoryDTO -> {
                 Optional<SubCategory> existingSubCategory = existingSubCategories.stream().filter(subCategory -> subCategory.getName().equals(createSubCategoryDTO.getName())).findFirst();
                 if (!existingSubCategory.isPresent()) {
                     SubCategory newSubCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
+                    newSubCategory.setName(encryptSubcategoryName(newSubCategory.getName(), user));
                     newSubCategory.setCategory(category);
                     existingSubCategories.add(newSubCategory);
+                } else {
+                    existingSubCategory.get().setName(encryptSubcategoryName(createSubCategoryDTO.getName(), user));
                 }
             });
 
             categoryRepository.save(category);
+            category.setName(decryptCategoryName(category.getName(), user));
+            category.getSubCategories().forEach(subCategory -> subCategory.setName(decryptSubcategoryName(subCategory.getName(), user)));
             CategoryDTO categoryDTO = CategoryMapper.categoryMapToCategoryDTO(category);
             log.info("Category with ID: {} updated for user ID: {}", categoryId, user.getId());
             return categoryDTO;
@@ -167,6 +182,42 @@ public class CategoryService {
         } else {
             log.warn("Category not found for user with ID: {} and category ID: {}. Unable to delete subcategory with ID: {}", user.getId(), categoryId, subcategoryId);
             throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
+        }
+    }
+
+    private String encryptCategoryName(String categoryName, User user) {
+        try {
+            return dataEncryptionService.encryptData(categoryName, user.getId());
+        } catch (Exception e) {
+            log.error("Failed to encrypt category name: {}", categoryName, e);
+            throw new RuntimeException("Failed to encrypt category name", e);
+        }
+    }
+
+    private String decryptCategoryName(String encryptedCategoryName, User user) {
+        try {
+            return dataEncryptionService.decryptData(encryptedCategoryName, user.getId());
+        } catch (Exception e) {
+            log.error("Failed to decrypt category name: {}", encryptedCategoryName, e);
+            throw new RuntimeException("Failed to decrypt category name", e);
+        }
+    }
+
+    private String encryptSubcategoryName(String subcategoryName, User user) {
+        try {
+            return dataEncryptionService.encryptData(subcategoryName, user.getId());
+        } catch (Exception e) {
+            log.error("Failed to encrypt subcategory name: {}", subcategoryName, e);
+            throw new RuntimeException("Failed to encrypt subcategory name", e);
+        }
+    }
+
+    private String decryptSubcategoryName(String encryptedSubcategoryName, User user) {
+        try {
+            return dataEncryptionService.decryptData(encryptedSubcategoryName, user.getId());
+        } catch (Exception e) {
+            log.error("Failed to decrypt subcategory name: {}", encryptedSubcategoryName, e);
+            throw new RuntimeException("Failed to decrypt subcategory name", e);
         }
     }
 }
