@@ -1,5 +1,8 @@
 package com.myfund.models;
 
+import com.myfund.services.encryption.BigDecimalEncryptor;
+import com.myfund.services.encryption.LocalDateTimeEncryptor;
+import com.myfund.services.encryption.StringEncryptor;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,11 +21,14 @@ public class Income {
     private Long id;
 
     @NotNull
+    @Convert(converter = StringEncryptor.class)
     private String name;
 
     @NotNull
+    @Convert(converter = BigDecimalEncryptor.class)
     private BigDecimal amount;
 
+    @Convert(converter = LocalDateTimeEncryptor.class)
     private LocalDateTime localDateTime;
 
     @ManyToOne(fetch = FetchType.LAZY)

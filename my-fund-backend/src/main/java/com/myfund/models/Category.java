@@ -1,5 +1,6 @@
 package com.myfund.models;
 
+import com.myfund.services.encryption.StringEncryptor;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,7 @@ public class Category {
     private Long id;
 
     @NotNull
+    @Convert(converter = StringEncryptor.class)
     private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true,  fetch = FetchType.LAZY)
