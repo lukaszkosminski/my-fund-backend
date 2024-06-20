@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Budget, Expense, Income } from '../models/Budget.model';
+import { Budget, Expense, Income, Summary } from '../models/Budget.model';
 
 const jsonPayloadHttpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -43,5 +43,9 @@ export class BudgetsService {
       { ...income },
       jsonPayloadHttpOptions
     );
+  }
+
+  getSummary(budgetId: string): Observable<Summary> {
+    return this.http.get<Summary>(`/api/budgets/${budgetId}/expenses/summary`);
   }
 }
