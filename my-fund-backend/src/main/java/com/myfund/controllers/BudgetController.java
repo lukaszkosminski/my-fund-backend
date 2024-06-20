@@ -3,11 +3,13 @@ package com.myfund.controllers;
 import com.myfund.models.DTOs.*;
 import com.myfund.models.User;
 import com.myfund.services.BudgetService;
+import com.myfund.services.csv.CsvReaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,9 +19,12 @@ public class BudgetController {
 
     private final BudgetService budgetService;
 
+    private final CsvReaderService csvReaderService;
+
     @Autowired
-    public BudgetController(BudgetService budgetService) {
+    public BudgetController(BudgetService budgetService, CsvReaderService csvReaderService) {
         this.budgetService = budgetService;
+        this.csvReaderService = csvReaderService;
     }
 
     @PostMapping("/budgets")
@@ -108,6 +113,22 @@ public class BudgetController {
     @GetMapping("/budgets/{budgetId}/expenses/summary")
     public ResponseEntity<ExpensesSummaryDTO> calculateExpensesSummary(@PathVariable Long budgetId, @AuthenticationPrincipal User user) {
         ExpensesSummaryDTO expensesSummaryDTO = budgetService.calculateExpensesSummary(user, budgetId);
-        return new ResponseEntity<>(expensesSummaryDTO,HttpStatus.OK);
+        return new ResponseEntity<>(expensesSummaryDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/budgets/{budgetId}/upload-csv/{bankName}")
+    public ResponseEntity<String> uploadCsv(@PathVariable String bankName, @RequestParam("file") MultipartFile file, @AuthenticationPrincipal User user, @PathVariable Long budgetId) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("{\"message\": \"File is empty\"}");
+        }
+
+        try {
+            csvReaderService.parseFile(bankName, file, user, budgetId);
+            String successMessage = String.format("Successfully uploaded '%s' for %s", file.getOriginalFilename(), bankName);
+            return ResponseEntity.ok("{\"message\": \"" + successMessage + "\"}");
+        } catch (Exception e) {
+            String errorMessage = String.format("Error processing file: %s", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"" + errorMessage + "\"}");
+        }
     }
 }
