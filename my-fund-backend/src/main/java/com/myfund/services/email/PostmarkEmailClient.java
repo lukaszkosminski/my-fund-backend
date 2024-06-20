@@ -30,7 +30,7 @@ public class PostmarkEmailClient implements EmailSender {
     @Value("${email.sender}")
     private String emailSender;
 
-    @Value("${reset.password.url}")
+    @Value("${change.password.url}")
     private String resetPasswordUrl;
 
     @Override
