@@ -1,6 +1,7 @@
 package com.myfund.services.email;
 
 
+import com.myfund.exceptions.EmailThrottleException;
 import com.myfund.models.DTOs.UserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
@@ -31,7 +32,13 @@ public class PostmarkEmailClient implements EmailSender {
     private String emailSender;
 
     @Value("${change.password.url}")
-    private String resetPasswordUrl;
+    private String changePasswordUrl;
+
+    private final EmailThrottleService emailThrottleService;
+
+    public PostmarkEmailClient(EmailThrottleService emailThrottleService) {
+        this.emailThrottleService = emailThrottleService;
+    }
 
     @Override
     public void sendWelcomeEmail(UserDTO userDTO) throws IOException {
@@ -65,7 +72,12 @@ public class PostmarkEmailClient implements EmailSender {
     public void sendPasswordResetEmail(UserDTO userDTO, String resetToken) throws IOException {
         log.info("Starting to send password reset email to: {}", userDTO.getEmail());
 
-        String resetPasswordUrlWithToken = resetPasswordUrl + resetToken;
+        if (!emailThrottleService.canSendEmail(userDTO.getEmail())) {
+            log.error("Email limit exceeded for: {}", userDTO.getEmail());
+            throw new EmailThrottleException("Email limit exceeded");
+        }
+
+        String changePasswordUrlWithParams = changePasswordUrl + resetToken + "&email=" + userDTO.getEmail();
 
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(apiUrl);
@@ -73,11 +85,12 @@ public class PostmarkEmailClient implements EmailSender {
             post.setHeader("Accept", "application/json");
             post.setHeader("Content-Type", "application/json");
             post.setHeader("X-Postmark-Server-Token", apiKey);
-            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35917746, \"TemplateModel\": {\"name\": \"%s\", \"action_url\": \"%s\"}}", emailSender, userDTO.getEmail(), userDTO.getUsername(), resetPasswordUrlWithToken);
+            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35917746, \"TemplateModel\": {\"name\": \"%s\", \"action_url\": \"%s\"}}", emailSender, userDTO.getEmail(), userDTO.getUsername(), changePasswordUrlWithParams);
             post.setEntity(new StringEntity(json));
 
             HttpResponse response = client.execute(post);
             String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            emailThrottleService.incrementEmailCount(userDTO.getEmail());
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 log.info("Password reset email sent successfully. Server response: {}", responseString);

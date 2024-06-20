@@ -1,5 +1,6 @@
 package com.myfund.models;
 
+import com.myfund.services.encryption.StringEncryptor;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,10 +27,13 @@ public class User implements UserDetails {
 
     private String password;
 
+    @Convert(converter = StringEncryptor.class)
     private String email;
 
+    @Convert(converter = StringEncryptor.class)
     private String username;
 
+    @Convert(converter = StringEncryptor.class)
     private String role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

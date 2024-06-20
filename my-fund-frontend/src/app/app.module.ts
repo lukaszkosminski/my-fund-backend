@@ -14,6 +14,8 @@ import { httpInterceptorProviders } from './helpers/auth.interceptor';
 import { HomeModule } from './home/home.module';
 import { UiModule } from './components/ui/ui.module';
 import '@angular/common/locales/global/pl';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import '@angular/common/locales/global/pl';
     AppFooterComponent,
     LoginPage,
     RegisterComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
   ],
   imports: [
     BrowserModule,

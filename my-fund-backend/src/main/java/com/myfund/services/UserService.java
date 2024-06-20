@@ -4,6 +4,8 @@ import com.myfund.exceptions.InvalidTokenException;
 import com.myfund.exceptions.UserAlreadyExistsException;
 import com.myfund.exceptions.UserNotFoundException;
 import com.myfund.models.DTOs.CreateUserDTO;
+import com.myfund.models.DTOs.PasswordChangeDTO;
+import com.myfund.models.DTOs.PasswordChangeRequestDTO;
 import com.myfund.models.DTOs.UserDTO;
 import com.myfund.models.DTOs.mappers.UserMapper;
 import com.myfund.models.User;
@@ -77,8 +79,8 @@ public class UserService {
         }
     }
 
-    public void requestPasswordReset(String email) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
+    public void requestPasswordChange(PasswordChangeRequestDTO passwordChangeRequestDTO) {
+        Optional<User> userOpt = userRepository.findByEmail(passwordChangeRequestDTO.getEmail());
         if (userOpt.isPresent()) {
             String passwordResetToken = tokenService.createPasswordResetToken(userOpt.get().getEmail());
             try {
@@ -88,30 +90,30 @@ public class UserService {
                 log.error("Failed to send password reset email", e);
             }
         } else {
-            log.debug("Request for password reset received for email: {}, but no action taken.", email);
+            log.debug("Request for password reset received for email: {}, but no action taken.", passwordChangeRequestDTO.getEmail());
         }
     }
 
-    public void resetPassword(String email, String token, String newPassword) {
+    public void changePassword(PasswordChangeDTO passwordChangeDTO) {
 
-        log.info("Attempting to reset password for email: {}", email);
-        String cachedToken = tokenService.getPasswordResetToken(email);
+        log.info("Attempting to reset password for email: {}", passwordChangeDTO.getEmail());
+        String cachedToken = tokenService.getPasswordResetToken(passwordChangeDTO.getEmail());
 
-        if (cachedToken != null && cachedToken.equals(token)) {
-            log.debug("Token validation successful for email: {}", email);
-            Optional<User> userOptional = userRepository.findByEmail(email);
+        if (cachedToken != null && cachedToken.equals(passwordChangeDTO.getToken())) {
+            log.debug("Token validation successful for email: {}", passwordChangeDTO.getEmail());
+            Optional<User> userOptional = userRepository.findByEmail(passwordChangeDTO.getEmail());
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
-                user.setPassword(passwordEncoder.encode(newPassword));
+                user.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
                 userRepository.save(user);
-                tokenService.invalidatePasswordResetToken(email);
-                log.info("Password reset successful for email: {}", email);
+                tokenService.invalidatePasswordResetToken(passwordChangeDTO.getEmail());
+                log.info("Password reset successful for email: {}", passwordChangeDTO.getEmail());
             } else {
-                log.error("User not found for email: {}", email);
+                log.error("User not found for email: {}", passwordChangeDTO.getEmail());
                 throw new UserNotFoundException("User not found");
             }
         } else {
-            log.error("Invalid or expired token for email: {}", email);
+            log.error("Invalid or expired token for email: {}", passwordChangeDTO.getEmail());
             throw new InvalidTokenException("Invalid token");
         }
     }

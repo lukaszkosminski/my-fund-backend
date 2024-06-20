@@ -41,6 +41,21 @@ export class AuthService {
     );
   }
 
+  forgotPassword(email: string) {
+    return this.http.post(
+      `/request-change-password`,
+      { email },
+      jsonPayloadHttpOptions
+    );
+  }
+
+  setNewPassword(token: string, email: string, password: string) {
+    return this.http.post(
+      `/change-password?email=${email}&token=${token}&newPassword=${password}`,
+      {}
+    );
+  }
+
   isLoggedIn() {
     return localStorage.getItem('login-state') === 'authenticated';
   }

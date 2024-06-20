@@ -1,5 +1,6 @@
 package com.myfund.models;
 
+import com.myfund.services.encryption.StringEncryptor;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,7 @@ public class SubCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Convert(converter = StringEncryptor.class)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
