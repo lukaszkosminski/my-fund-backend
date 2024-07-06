@@ -9,7 +9,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Table(name = "expense")
 @Getter
@@ -30,7 +30,7 @@ public class Expense {
     private BigDecimal amount;
 
     @Convert(converter = LocalDateTimeEncryptor.class)
-    private LocalDateTime localDateTime;
+    private LocalDate localDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "budget_id")
