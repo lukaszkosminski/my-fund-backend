@@ -104,7 +104,7 @@ public class BudgetService {
             }
             Expense expense = ExpenseMapper.createExpenseDTOtoExpense(createExpenseDTO);
             expense.setBudget(budgetOpt.get());
-            expense.setLocalDate(LocalDate.now());
+            expense.setLocalDateTime(LocalDate.now().atStartOfDay());
             expense.setUser(user);
             expenseRepository.save(expense);
             updateTotalExpense(budgetOpt.get());
@@ -126,7 +126,7 @@ public class BudgetService {
             }
             Income income = IncomeMapper.createIncomeDTOtoIncome(createIncomeDTO);
             income.setBudget(budgetOpt.get());
-            income.setLocalDate(LocalDate.now());
+            income.setLocalDateTime(LocalDate.now().atStartOfDay());
             income.setUser(user);
             incomeRepository.save(income);
             updateTotalIncome(budgetOpt.get());
@@ -151,7 +151,7 @@ public class BudgetService {
             expense.setIdSubCategory(createExpenseDTO.getIdSubCategory());
             expense.setAmount(createExpenseDTO.getAmount());
             expense.setName(createExpenseDTO.getName());
-            expense.setLocalDate(LocalDate.now());
+            expense.setLocalDateTime(LocalDate.now().atStartOfDay());
             expenseRepository.save(expense);
             log.info("Expense successfully updated. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
             return ExpenseMapper.expensetoExpenseDTO(expense);
@@ -174,7 +174,7 @@ public class BudgetService {
             income.setIdSubCategory(createIncomeDTO.getIdSubCategory());
             income.setAmount(createIncomeDTO.getAmount());
             income.setName(createIncomeDTO.getName());
-            income.setLocalDate(LocalDate.now());
+            income.setLocalDateTime(LocalDate.now().atStartOfDay());
             incomeRepository.save(income);
             log.info("Income successfully updated. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
             return IncomeMapper.incomeMapToIncomeDTO(income);

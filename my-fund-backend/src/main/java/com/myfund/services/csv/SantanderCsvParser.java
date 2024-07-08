@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 @Slf4j
 public class SantanderCsvParser implements CsvParser {
@@ -63,7 +64,7 @@ public class SantanderCsvParser implements CsvParser {
         String expenseColumn = values[11];
         String transactionNameColumn = values[4];
         Income income = new Income();
-        income.setLocalDate(LocalDate.parse(dateColumn, DATE_FORMATTER));
+        income.setLocalDateTime(LocalDate.parse(dateColumn, DATE_FORMATTER).atStartOfDay());
         income.setName(transactionNameColumn);
         income.setAmount(new BigDecimal(expenseColumn.replace(',', '.')));
 
@@ -75,7 +76,7 @@ public class SantanderCsvParser implements CsvParser {
         String incomeColumn = values[10];
         String transactionNameColumn = values[4];
         Expense expense = new Expense();
-        expense.setLocalDate(LocalDate.parse(dateColumn, DATE_FORMATTER));
+        expense.setLocalDateTime(LocalDateTime.from(LocalDate.parse(dateColumn, DATE_FORMATTER)));
         expense.setName(transactionNameColumn);
         expense.setAmount(new BigDecimal(incomeColumn.replace(',', '.')));
 

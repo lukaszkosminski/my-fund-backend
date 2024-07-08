@@ -22,7 +22,7 @@ public class ExpenseMapper {
         expenseDTO.setAmount(expense.getAmount());
         expenseDTO.setIdCategory(expense.getIdCategory());
         expenseDTO.setIdSubCategory(expense.getIdSubCategory());
-        expenseDTO.setLocalDate(expense.getLocalDate());
+        expenseDTO.setLocalDate(expense.getLocalDateTime().toLocalDate());
         return expenseDTO;
     }
 

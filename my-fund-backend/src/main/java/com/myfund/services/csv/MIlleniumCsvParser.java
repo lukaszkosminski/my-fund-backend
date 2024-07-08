@@ -61,7 +61,7 @@ public class MIlleniumCsvParser implements CsvParser {
         String incomeColumn = values[8];
         String transactionNameColumn = values[6];
         Income income = new Income();
-        income.setLocalDate(LocalDate.parse(dateColumn, DATE_FORMATTER));
+        income.setLocalDateTime(LocalDate.parse(dateColumn, DATE_FORMATTER).atStartOfDay());
         income.setName(transactionNameColumn);
         income.setAmount(stringToBigDecimal(incomeColumn));
 
@@ -73,7 +73,7 @@ public class MIlleniumCsvParser implements CsvParser {
         String expenseColumn = values[7].substring(1);
         String transactionNameColumn = values[6];
         Expense expense = new Expense();
-        expense.setLocalDate(LocalDate.parse(dateColumn, DATE_FORMATTER));
+        expense.setLocalDateTime(LocalDate.parse(dateColumn, DATE_FORMATTER).atStartOfDay());
         expense.setName(transactionNameColumn);
         expense.setAmount(stringToBigDecimal(expenseColumn));
 
