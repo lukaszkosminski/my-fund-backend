@@ -59,9 +59,10 @@ public class PostmarkEmailClient implements EmailSender {
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 log.info("Email sent successfully. Server response: {}", responseString);
-            } else {
-                log.error("Failed to send email. Server response: {}", responseString);
+                return;
             }
+            log.error("Failed to send email. Server response: {}", responseString);
+
         } catch (IOException e) {
             log.error("Failed to send email to: {}", userDTO.getEmail(), e);
             throw e;
@@ -94,9 +95,10 @@ public class PostmarkEmailClient implements EmailSender {
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 log.info("Password reset email sent successfully. Server response: {}", responseString);
-            } else {
-                log.error("Failed to send password reset email. Server response: {}", responseString);
+                return;
             }
+            log.error("Failed to send password reset email. Server response: {}", responseString);
+
         } catch (IOException e) {
             log.error("Failed to send password reset email to: {}", userDTO.getEmail(), e);
             throw e;
