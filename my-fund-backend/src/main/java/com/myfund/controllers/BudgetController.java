@@ -1,5 +1,6 @@
 package com.myfund.controllers;
 
+import com.myfund.models.BankName;
 import com.myfund.models.DTOs.*;
 import com.myfund.models.User;
 import com.myfund.services.BudgetService;
@@ -117,7 +118,7 @@ public class BudgetController {
     }
 
     @PostMapping("/budgets/{budgetId}/upload-csv/{bankName}")
-    public ResponseEntity<String> uploadCsv(@PathVariable String bankName, @RequestParam("file") MultipartFile file, @AuthenticationPrincipal User user, @PathVariable Long budgetId) {
+    public ResponseEntity<String> uploadCsv(@PathVariable(value = "bankName") BankName bankName, @RequestParam("file") MultipartFile file, @AuthenticationPrincipal User user, @PathVariable Long budgetId) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("{\"message\": \"File is empty\"}");
         }
