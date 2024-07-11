@@ -1,5 +1,6 @@
 package com.myfund.configs;
 
+import com.myfund.models.BankName;
 import com.myfund.services.BudgetService;
 import com.myfund.services.csv.CsvParser;
 import com.myfund.services.csv.MIlleniumCsvParser;
@@ -20,9 +21,9 @@ public class CsvParserConfig {
     }
 
     @Bean
-    public Map<String, CsvParser> parserMap() {
-        return Map.of("Santander", new SantanderCsvParser(budgetService),
-                "Millenium", new MIlleniumCsvParser(budgetService));
+    public Map<BankName, CsvParser> parserMap() {
+        return Map.of(BankName.SANTANDER, new SantanderCsvParser(budgetService),
+                BankName.MILLENIUM, new MIlleniumCsvParser(budgetService));
     }
 }
 
