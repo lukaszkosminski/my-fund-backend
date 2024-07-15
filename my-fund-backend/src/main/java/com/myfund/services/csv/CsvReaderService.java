@@ -11,19 +11,19 @@ import java.util.Map;
 @Service
 public class CsvReaderService {
 
-    private final Map<BankName, CsvParser> parserMap;
+    private final Map<BankName, AbstractCsvParser> parserMap;
 
     @Autowired
-    public CsvReaderService(Map<BankName, CsvParser> parserMap) {
+    public CsvReaderService(Map<BankName, AbstractCsvParser> parserMap) {
         this.parserMap = parserMap;
     }
 
     public void parseFile(BankName bankName, MultipartFile file, User user, Long budgetId) {
-        CsvParser parser = parserMap.get(bankName);
+        AbstractCsvParser parser = parserMap.get(bankName);
         if (parser == null) {
             throw new IllegalArgumentException("Unsupported bank: " + bankName);
         }
-        parser.parse(file, user , budgetId);
+        parser.parse(file, user, budgetId);
     }
 }
 
