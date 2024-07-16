@@ -46,14 +46,15 @@ public class CategoryService {
 
     public CategoryDTO findCategoryByIdAndUser(Long categoryId, User user) {
         log.debug("Starting to find category by ID: {} for user ID: {}", categoryId, user.getId());
+
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
-        if (existingCategoryOpt.isPresent()) {
-            log.info("Category found for user with ID: {} and category ID: {}", user.getId(), categoryId);
-            return CategoryMapper.categoryMapToCategoryDTO(existingCategoryOpt.get());
-        } else {
+        if (!existingCategoryOpt.isPresent()) {
             log.warn("Category not found for user with ID: {} and category ID: {}", user.getId(), categoryId);
             throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
         }
+
+        log.info("Category found for user with ID: {} and category ID: {}", user.getId(), categoryId);
+        return CategoryMapper.categoryMapToCategoryDTO(existingCategoryOpt.get());
     }
 
     public CategoryDTO createCategory(CreateCategoryDTO createCategoryDTO, User user) {
@@ -63,22 +64,21 @@ public class CategoryService {
         if (existingCategory.isPresent()) {
             log.warn("Category creation attempt failed. Category with name: {} already exists for user ID: {}", createCategoryDTO.getName(), user.getId());
             throw new CategoryNotUniqueException("Category with name: " + existingCategory.get().getName() + " is not unique");
-        } else {
-            category = CategoryMapper.createCategoryDTOMapToCategory(createCategoryDTO);
-            category.setUser(user);
-            Category savedCategory = categoryRepository.save(category);
-            ArrayList<SubCategory> subCategoryList = new ArrayList<>();
-            for (SubCategory subCategory : category.getSubCategories()) {
-
-                subCategory.setCategory(savedCategory);
-                subCategoryList.add(subCategory);
-            }
-            category.getSubCategories().clear();
-            category.getSubCategories().addAll(subCategoryList);
-            categoryRepository.save(category);
-            log.info("New category created with name: {} for user ID: {}", createCategoryDTO.getName(), user.getId());
-            return CategoryMapper.categoryMapToCategoryDTO(category);
         }
+        category = CategoryMapper.createCategoryDTOMapToCategory(createCategoryDTO);
+        category.setUser(user);
+        Category savedCategory = categoryRepository.save(category);
+        ArrayList<SubCategory> subCategoryList = new ArrayList<>();
+        for (SubCategory subCategory : category.getSubCategories()) {
+
+            subCategory.setCategory(savedCategory);
+            subCategoryList.add(subCategory);
+        }
+        category.getSubCategories().clear();
+        category.getSubCategories().addAll(subCategoryList);
+        categoryRepository.save(category);
+        log.info("New category created with name: {} for user ID: {}", createCategoryDTO.getName(), user.getId());
+        return CategoryMapper.categoryMapToCategoryDTO(category);
     }
 
     public CategoryDTO updateCategory(Long categoryId, CreateCategoryDTO createCategoryDTO, User user) {
@@ -111,29 +111,30 @@ public class CategoryService {
     @Transactional
     public void deleteCategoryByIdAndUser(Long categoryId, User user) {
         log.debug("Starting to delete category with ID: {} for user ID: {}", categoryId, user.getId());
+
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
-        if (existingCategoryOpt.isPresent()) {
-            Category category = existingCategoryOpt.get();
-            budgetService.updateExpensesCategoryIdToNull(category.getId());
-            budgetService.updateIncomesCategoryIdToNull(category.getId());
-            categoryRepository.delete(category);
-            log.info("Category with ID: {} deleted for user ID: {}", categoryId, user.getId());
-        } else {
+        if (!existingCategoryOpt.isPresent()) {
             log.warn("Failed to delete category. Category not found for user ID: {} and category ID: {}", user.getId(), categoryId);
             throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
         }
+
+        Category category = existingCategoryOpt.get();
+        budgetService.updateExpensesCategoryIdToNull(category.getId());
+        budgetService.updateIncomesCategoryIdToNull(category.getId());
+        categoryRepository.delete(category);
+
+        log.info("Category with ID: {} deleted for user ID: {}", categoryId, user.getId());
     }
 
     private Optional<Category> getCategoryByIdAndUser(Long categoryId, User user) {
         log.debug("Starting to find category with ID: {} for user ID: {}", categoryId, user.getId());
         Optional<Category> categoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
-        if (categoryOpt.isPresent()) {
-            log.info("Category with ID: {} found for user ID: {}", categoryId, user.getId());
-            return categoryOpt;
-        } else {
+
+        if (!categoryOpt.isPresent()) {
             log.info("Category with ID: {} not found for user ID: {}", categoryId, user.getId());
-            return Optional.empty();
         }
+
+        return categoryOpt;
     }
 
     public boolean isSubcategoryRelatedToCategory(Long subcategoryId, Long categoryId, User user) {
@@ -151,22 +152,30 @@ public class CategoryService {
 
     public void deleteSubcategoryByIdsAndUser(Long categoryId, Long subcategoryId, User user) {
         log.debug("Starting to delete subcategory with ID: {} from category ID: {} for user ID: {}", subcategoryId, categoryId, user.getId());
+
         Optional<Category> categoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
-        if (categoryOpt.isPresent()) {
-            Category category = categoryOpt.get();
-            log.debug("Category found. Proceeding with subcategory removal.");
-            SubCategory subCategoryToRemove = category.getSubCategories().stream().filter(subCategory -> subCategory.getId().equals(subcategoryId)).findFirst().orElseThrow(() -> {
-                log.warn("Subcategory not found for user with ID: {}, category ID: {}, and subcategory ID: {}", user.getId(), categoryId, subcategoryId);
-                return new SubcategoryNotFoundException("Subcategory not found for user with ID: " + user.getId() + ", category ID: " + categoryId + " and subcategory ID: " + subcategoryId);
-            });
-            budgetService.updateExpensesSubcategoryIdToNull(subcategoryId);
-            budgetService.updateIncomesSubcategoryIdToNull(subcategoryId);
-            category.getSubCategories().remove(subCategoryToRemove);
-            subCategoryRepository.delete(subCategoryToRemove);
-            log.info("Subcategory with ID: {} removed from category ID: {} for user ID: {}", subcategoryId, categoryId, user.getId());
-        } else {
+        if (!categoryOpt.isPresent()) {
             log.warn("Category not found for user with ID: {} and category ID: {}. Unable to delete subcategory with ID: {}", user.getId(), categoryId, subcategoryId);
             throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
         }
+
+        Category category = categoryOpt.get();
+        log.debug("Category found. Proceeding with subcategory removal.");
+
+        SubCategory subCategoryToRemove = category.getSubCategories().stream()
+                .filter(subCategory -> subCategory.getId().equals(subcategoryId))
+                .findFirst()
+                .orElseThrow(() -> {
+                    log.warn("Subcategory not found for user with ID: {}, category ID: {}, and subcategory ID: {}", user.getId(), categoryId, subcategoryId);
+                    return new SubcategoryNotFoundException("Subcategory not found for user with ID: " + user.getId() + ", category ID: " + categoryId + " and subcategory ID: " + subcategoryId);
+                });
+
+        budgetService.updateExpensesSubcategoryIdToNull(subcategoryId);
+        budgetService.updateIncomesSubcategoryIdToNull(subcategoryId);
+
+        category.getSubCategories().remove(subCategoryToRemove);
+        subCategoryRepository.delete(subCategoryToRemove);
+
+        log.info("Subcategory with ID: {} removed from category ID: {} for user ID: {}", subcategoryId, categoryId, user.getId());
     }
 }

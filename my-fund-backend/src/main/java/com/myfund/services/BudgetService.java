@@ -62,17 +62,18 @@ public class BudgetService {
             String errorMessage = String.format("Attempt to create a duplicate budget. User Email: %s, Budget Name: %s", user.getEmail(), budgetOpt.get().getName());
             log.warn(errorMessage);
             throw new BudgetNotUniqueException(errorMessage);
-        } else {
-            Budget budget = BudgetMapper.createBudgetDTOMapToBudget(createBudgetDTO);
-            budget.setUser(user);
-            budget.setLocalDateTime(LocalDateTime.now());
-            budget.setBalance(BigDecimal.ZERO);
-            budget.setTotalExpense(BigDecimal.ZERO);
-            budget.setTotalIncome(BigDecimal.ZERO);
-            budgetRepository.save(budget);
-            log.info("New budget saved for user. Email: {}. Name: {}", user.getEmail(), budget.getName());
-            return BudgetMapper.budgetMapToBudgetDTO(budget);
         }
+
+        Budget budget = BudgetMapper.createBudgetDTOMapToBudget(createBudgetDTO);
+        budget.setUser(user);
+        budget.setLocalDateTime(LocalDateTime.now());
+        budget.setBalance(BigDecimal.ZERO);
+        budget.setTotalExpense(BigDecimal.ZERO);
+        budget.setTotalIncome(BigDecimal.ZERO);
+        budgetRepository.save(budget);
+
+        log.info("New budget saved for user. Email: {}. Name: {}", user.getEmail(), budget.getName());
+        return BudgetMapper.budgetMapToBudgetDTO(budget);
     }
 
     public List<BudgetSummaryDTO> findAllBudgetsByUser(User user) {
@@ -83,104 +84,127 @@ public class BudgetService {
 
     public BudgetDTO findBudgetByIdAndUser(Long budgetId, User user) {
         log.debug("Starting to find budget by ID: {} for user ID: {}", budgetId, user.getId());
+
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
-        if (budgetOpt.isPresent()) {
-            log.info("Budget found for user with ID: {} and budget ID: {}", user.getId(), budgetId);
-            return BudgetMapper.budgetMapToBudgetDTO(budgetOpt.get());
-        } else {
+        if (!budgetOpt.isPresent()) {
             log.warn("Budget not found for user with ID: {} and budget ID: {}", user.getId(), budgetId);
             throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
         }
+
+        log.info("Budget found for user with ID: {} and budget ID: {}", user.getId(), budgetId);
+        return BudgetMapper.budgetMapToBudgetDTO(budgetOpt.get());
     }
 
     public ExpenseDTO createExpense(Long budgetId, CreateExpenseDTO createExpenseDTO, User user) {
         log.debug("Starting to create expense for budget ID: {} and user ID: {}", budgetId, user.getId());
+
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
-        if (budgetOpt.isPresent()) {
-            log.debug("Budget found for budget ID: {} and user ID: {}. Proceeding with expense creation.", budgetId, user.getId());
-            if (!validateCategoryAndSubCategory(createExpenseDTO.getIdCategory(), createExpenseDTO.getIdSubCategory(), user)) {
-                log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}", createExpenseDTO.getIdSubCategory(), createExpenseDTO.getIdCategory(), user.getId());
-                throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createExpenseDTO.getIdSubCategory() + " is not related to category with ID: " + createExpenseDTO.getIdCategory());
-            }
-            Expense expense = ExpenseMapper.createExpenseDTOtoExpense(createExpenseDTO);
-            expense.setBudget(budgetOpt.get());
-            expense.setLocalDateTime(LocalDate.now().atStartOfDay());
-            expense.setUser(user);
-            expenseRepository.save(expense);
-            updateTotalExpense(budgetOpt.get());
-            log.info("Expense created for budget ID: {} and user ID: {}", budgetId, user.getId());
-            return ExpenseMapper.expensetoExpenseDTO(expense);
+        if (!budgetOpt.isPresent()) {
+            log.warn("Budget not found for user ID: {} and budget ID: {}", user.getId(), budgetId);
+            throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
         }
-        log.warn("Budget not found for user ID: {} and budget ID: {}", user.getId(), budgetId);
-        throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
+
+        log.debug("Budget found for budget ID: {} and user ID: {}. Proceeding with expense creation.", budgetId, user.getId());
+
+        if (!validateCategoryAndSubCategory(createExpenseDTO.getIdCategory(), createExpenseDTO.getIdSubCategory(), user)) {
+            log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}", createExpenseDTO.getIdSubCategory(), createExpenseDTO.getIdCategory(), user.getId());
+            throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createExpenseDTO.getIdSubCategory() + " is not related to category with ID: " + createExpenseDTO.getIdCategory());
+        }
+
+        Expense expense = ExpenseMapper.createExpenseDTOtoExpense(createExpenseDTO);
+        Budget budget = budgetOpt.get();
+        expense.setBudget(budget);
+        expense.setLocalDateTime(LocalDate.now().atStartOfDay());
+        expense.setUser(user);
+        expenseRepository.save(expense);
+        updateTotalExpense(budget);
+
+        log.info("Expense created for budget ID: {} and user ID: {}", budgetId, user.getId());
+        return ExpenseMapper.expensetoExpenseDTO(expense);
     }
 
     public IncomeDTO createIncome(Long budgetId, CreateIncomeDTO createIncomeDTO, User user) {
         log.debug("Starting to create income for budget ID: {} and user ID: {}", budgetId, user.getId());
+
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
-        if (budgetOpt.isPresent()) {
-            log.debug("Budget found for budget ID: {} and user ID: {}. Proceeding with income creation.", budgetId, user.getId());
-            if (!validateCategoryAndSubCategory(createIncomeDTO.getIdCategory(), createIncomeDTO.getIdSubCategory(), user)) {
-                log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}", createIncomeDTO.getIdSubCategory(), createIncomeDTO.getIdCategory(), user.getId());
-                throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createIncomeDTO.getIdSubCategory() + " is not related to category with ID: " + createIncomeDTO.getIdCategory());
-            }
-            Income income = IncomeMapper.createIncomeDTOtoIncome(createIncomeDTO);
-            income.setBudget(budgetOpt.get());
-            income.setLocalDateTime(LocalDate.now().atStartOfDay());
-            income.setUser(user);
-            incomeRepository.save(income);
-            updateTotalIncome(budgetOpt.get());
-            log.info("Income created for budget ID: {} and user ID: {}", budgetId, user.getId());
-            return IncomeMapper.incomeMapToIncomeDTO(income);
+        if (!budgetOpt.isPresent()) {
+            log.warn("Budget not found for user ID: {} and budget ID: {}", user.getId(), budgetId);
+            throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
         }
-        log.warn("Budget not found for user ID: {} and budget ID: {}", user.getId(), budgetId);
-        throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
+
+        log.debug("Budget found for budget ID: {} and user ID: {}. Proceeding with income creation.", budgetId, user.getId());
+
+        if (!validateCategoryAndSubCategory(createIncomeDTO.getIdCategory(), createIncomeDTO.getIdSubCategory(), user)) {
+            log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}", createIncomeDTO.getIdSubCategory(), createIncomeDTO.getIdCategory(), user.getId());
+            throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createIncomeDTO.getIdSubCategory() + " is not related to category with ID: " + createIncomeDTO.getIdCategory());
+        }
+
+        Income income = IncomeMapper.createIncomeDTOtoIncome(createIncomeDTO);
+        Budget budget = budgetOpt.get();
+        income.setBudget(budget);
+        income.setLocalDateTime(LocalDate.now().atStartOfDay());
+        income.setUser(user);
+        incomeRepository.save(income);
+        updateTotalIncome(budget);
+
+        log.info("Income created for budget ID: {} and user ID: {}", budgetId, user.getId());
+        return IncomeMapper.incomeMapToIncomeDTO(income);
     }
 
     public ExpenseDTO updateExpense(Long budgetId, Long expenseId, CreateExpenseDTO createExpenseDTO, User user) {
         log.debug("Starting to update expense. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
+
         Optional<Expense> expenseOpt = expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId);
-        if (expenseOpt.isPresent()) {
-            log.debug("Expense found for update. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
-            Expense expense = expenseOpt.get();
-            if (!validateCategoryAndSubCategory(createExpenseDTO.getIdCategory(), createExpenseDTO.getIdSubCategory(), user)) {
-                log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}. Update failed.", createExpenseDTO.getIdSubCategory(), createExpenseDTO.getIdCategory(), user.getId());
-                throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createExpenseDTO.getIdSubCategory() + " is not related to category with ID: " + createExpenseDTO.getIdCategory());
-            }
-            expense.setIdCategory(createExpenseDTO.getIdCategory());
-            expense.setIdSubCategory(createExpenseDTO.getIdSubCategory());
-            expense.setAmount(createExpenseDTO.getAmount());
-            expense.setName(createExpenseDTO.getName());
-            expense.setLocalDateTime(LocalDate.now().atStartOfDay());
-            expenseRepository.save(expense);
-            log.info("Expense successfully updated. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
-            return ExpenseMapper.expensetoExpenseDTO(expense);
+        if (!expenseOpt.isPresent()) {
+            log.warn("Expense not found for update. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
+            throw new ExpenseNotFoundException("Expense not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and expense ID: " + expenseId);
         }
-        log.warn("Expense not found for update. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
-        throw new ExpenseNotFoundException("Expense not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and expense ID: " + expenseId);
+
+        log.debug("Expense found for update. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
+        Expense expense = expenseOpt.get();
+
+        if (!validateCategoryAndSubCategory(createExpenseDTO.getIdCategory(), createExpenseDTO.getIdSubCategory(), user)) {
+            log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}. Update failed.", createExpenseDTO.getIdSubCategory(), createExpenseDTO.getIdCategory(), user.getId());
+            throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createExpenseDTO.getIdSubCategory() + " is not related to category with ID: " + createExpenseDTO.getIdCategory());
+        }
+
+        expense.setIdCategory(createExpenseDTO.getIdCategory());
+        expense.setIdSubCategory(createExpenseDTO.getIdSubCategory());
+        expense.setAmount(createExpenseDTO.getAmount());
+        expense.setName(createExpenseDTO.getName());
+        expense.setLocalDateTime(LocalDate.now().atStartOfDay());
+        expenseRepository.save(expense);
+
+        log.info("Expense successfully updated. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
+        return ExpenseMapper.expensetoExpenseDTO(expense);
     }
 
     public IncomeDTO updateIncome(Long budgetId, Long incomeId, CreateIncomeDTO createIncomeDTO, User user) {
         log.debug("Starting to update income. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
+
         Optional<Income> incomeOpt = incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId);
-        if (incomeOpt.isPresent()) {
-            log.debug("Income found for update. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
-            Income income = incomeOpt.get();
-            if (!validateCategoryAndSubCategory(createIncomeDTO.getIdCategory(), createIncomeDTO.getIdSubCategory(), user)) {
-                log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}. Update failed.", createIncomeDTO.getIdSubCategory(), createIncomeDTO.getIdCategory(), user.getId());
-                throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createIncomeDTO.getIdSubCategory() + " is not related to category with ID: " + createIncomeDTO.getIdCategory());
-            }
-            income.setIdCategory(createIncomeDTO.getIdCategory());
-            income.setIdSubCategory(createIncomeDTO.getIdSubCategory());
-            income.setAmount(createIncomeDTO.getAmount());
-            income.setName(createIncomeDTO.getName());
-            income.setLocalDateTime(LocalDate.now().atStartOfDay());
-            incomeRepository.save(income);
-            log.info("Income successfully updated. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
-            return IncomeMapper.incomeMapToIncomeDTO(income);
+        if (!incomeOpt.isPresent()) {
+            log.warn("Income not found for update. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
+            throw new IncomeNotFoundException("Income not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and income ID: " + incomeId);
         }
-        log.warn("Income not found for update. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
-        throw new IncomeNotFoundException("Income not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and expense ID: " + incomeId);
+
+        log.debug("Income found for update. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
+        Income income = incomeOpt.get();
+
+        if (!validateCategoryAndSubCategory(createIncomeDTO.getIdCategory(), createIncomeDTO.getIdSubCategory(), user)) {
+            log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}. Update failed.", createIncomeDTO.getIdSubCategory(), createIncomeDTO.getIdCategory(), user.getId());
+            throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createIncomeDTO.getIdSubCategory() + " is not related to category with ID: " + createIncomeDTO.getIdCategory());
+        }
+
+        income.setIdCategory(createIncomeDTO.getIdCategory());
+        income.setIdSubCategory(createIncomeDTO.getIdSubCategory());
+        income.setAmount(createIncomeDTO.getAmount());
+        income.setName(createIncomeDTO.getName());
+        income.setLocalDateTime(LocalDate.now().atStartOfDay());
+        incomeRepository.save(income);
+
+        log.info("Income successfully updated. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
+        return IncomeMapper.incomeMapToIncomeDTO(income);
     }
 
     public boolean validateCategoryAndSubCategory(Long categoryId, Long subCategoryId, User user) {
