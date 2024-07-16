@@ -45,7 +45,6 @@ public class SantanderCsvParser extends AbstractCsvParser {
     @Override
     protected Income mapToIncome(String[] values) {
         String dateColumn = values[2];
-
         String incomeColumn = values[10];
         String transactionNameColumn = values[4];
         Income income = new Income();

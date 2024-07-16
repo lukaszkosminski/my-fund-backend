@@ -34,12 +34,8 @@ public abstract class AbstractCsvParser {
         }
     }
 
-    private void processLine(String line, User user, BudgetDTO budgetByIdAndUser) {
-        System.out.println(line);
+    protected void processLine(String line, User user, BudgetDTO budgetByIdAndUser) {
         String[] values = line.split(getDelimiter());
-        for (String value : values) {
-            System.out.println(value);
-        }
         if (isIncome(values)) {
             processIncome(values, user, budgetByIdAndUser);
         } else if (isExpense(values)) {
@@ -47,7 +43,7 @@ public abstract class AbstractCsvParser {
         }
     }
 
-    private void processIncome(String[] values, User user, BudgetDTO budgetByIdAndUser) {
+    protected void processIncome(String[] values, User user, BudgetDTO budgetByIdAndUser) {
         Income income = mapToIncome(values);
         income.setUser(user);
         income.setBudget(BudgetMapper.budgetDTOMapToBudget(budgetByIdAndUser));
@@ -55,7 +51,7 @@ public abstract class AbstractCsvParser {
         log.info("Income saved: {}", income);
     }
 
-    private void processExpense(String[] values, User user, BudgetDTO budgetByIdAndUser) {
+    protected void processExpense(String[] values, User user, BudgetDTO budgetByIdAndUser) {
         Expense expense = mapToExpense(values);
         expense.setUser(user);
         expense.setBudget(BudgetMapper.budgetDTOMapToBudget(budgetByIdAndUser));
