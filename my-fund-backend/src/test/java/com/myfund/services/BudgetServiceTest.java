@@ -882,4 +882,18 @@ class BudgetServiceTest {
 
         verify(expenseRepository).findByBudgetIdAndUser(budget.getId(), user);
     }
+
+    @Test
+    void saveExpenseFromCsv_ShouldCallRepositorySaveMethod() {
+        Expense expense = mock(Expense.class);
+        budgetService.saveExpenseFromCsv(expense);
+        verify(expenseRepository).save(expense);
+    }
+
+    @Test
+    void saveIncomeFromCsv_ShouldCallRepositorySaveMethod() {
+        Income income = mock(Income.class);
+        budgetService.saveIncomeFromCsv(income);
+        verify(incomeRepository).save(income);
+    }
 }

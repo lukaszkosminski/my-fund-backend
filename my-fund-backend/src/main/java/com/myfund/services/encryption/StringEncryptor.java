@@ -15,6 +15,9 @@ public class StringEncryptor implements AttributeConverter<String, String> {
 
     @Override
     public String convertToDatabaseColumn(String attribute) {
+        if (attribute == null) {
+            return null;
+        }
         try {
             return EncryptionUtil.encrypt(attribute, encryptionKey);
         } catch (Exception e) {
@@ -24,6 +27,9 @@ public class StringEncryptor implements AttributeConverter<String, String> {
 
     @Override
     public String convertToEntityAttribute(String dbData) {
+        if (dbData == null) {
+            return null;
+        }
         try {
             return EncryptionUtil.decrypt(dbData, encryptionKey);
         } catch (Exception e) {

@@ -138,6 +138,10 @@ public class CategoryService {
     }
 
     public boolean isSubcategoryRelatedToCategory(Long subcategoryId, Long categoryId, User user) {
+        if (user == null) {
+            log.warn("User is null. Subcategory relation cannot be established.");
+            return false;
+        }
         log.debug("Checking if subcategory with ID: {} is related to category ID: {} for user ID: {}", subcategoryId, categoryId, user.getId());
         Optional<Category> categoryOpt = getCategoryByIdAndUser(categoryId, user);
         if (categoryOpt.isEmpty()) {

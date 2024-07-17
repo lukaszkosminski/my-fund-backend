@@ -2,6 +2,7 @@ package com.myfund.services;
 
 import com.myfund.exceptions.CategoryNotFoundException;
 import com.myfund.exceptions.CategoryNotUniqueException;
+import com.myfund.exceptions.SubcategoryNotFoundException;
 import com.myfund.models.Category;
 import com.myfund.models.DTOs.CategoryDTO;
 import com.myfund.models.DTOs.CreateCategoryDTO;
@@ -10,6 +11,7 @@ import com.myfund.models.DTOs.SubCategoryDTO;
 import com.myfund.models.SubCategory;
 import com.myfund.models.User;
 import com.myfund.repositories.CategoryRepository;
+import com.myfund.repositories.SubCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -28,6 +30,9 @@ class CategoryServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private SubCategoryRepository subCategoryRepository;
 
     @Mock
     private BudgetService budgetService;
@@ -252,4 +257,214 @@ class CategoryServiceTest {
 
         verify(categoryRepository, never()).delete(any(Category.class));
     }
+
+    @Test
+    void isSubcategoryRelatedToCategory_WhenCategoryExistsAndSubcategoryIsRelated() {
+        Long categoryId = 1L;
+        Long subcategoryId = 1L;
+        User user = new User();
+        user.setId(1L);
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setUser(user);
+
+        SubCategory subCategory = new SubCategory();
+        subCategory.setId(subcategoryId);
+        category.setSubCategories(List.of(subCategory));
+
+        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
+
+        boolean result = categoryService.isSubcategoryRelatedToCategory(subcategoryId, categoryId, user);
+
+        assertTrue(result, "Subcategory should be related to the category");
+        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
+    }
+
+    @Test
+    void isSubcategoryRelatedToCategory_WhenCategoryExistsAndSubcategoryIsNotRelated() {
+        Long categoryId = 1L;
+        Long subcategoryId = 2L;
+        User user = new User();
+        user.setId(1L);
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setUser(user);
+
+        SubCategory subCategory = new SubCategory();
+        subCategory.setId(1L);
+        category.setSubCategories(List.of(subCategory));
+
+        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
+
+        boolean result = categoryService.isSubcategoryRelatedToCategory(subcategoryId, categoryId, user);
+
+        assertFalse(result, "Subcategory should not be related to the category");
+        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
+    }
+
+    @Test
+    void isSubcategoryRelatedToCategory_WhenCategoryDoesNotExist() {
+        Long categoryId = 1L;
+        Long subcategoryId = 1L;
+        User user = new User();
+        user.setId(1L);
+
+        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
+
+        boolean result = categoryService.isSubcategoryRelatedToCategory(subcategoryId, categoryId, user);
+
+        assertFalse(result, "Subcategory relation cannot be established if category does not exist");
+        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
+    }
+
+    @Test
+    void isSubcategoryRelatedToCategory_WhenUserIsNull() {
+        Long categoryId = 1L;
+        Long subcategoryId = 1L;
+
+        boolean result = categoryService.isSubcategoryRelatedToCategory(subcategoryId, categoryId, null);
+
+        assertFalse(result, "Subcategory relation cannot be established if user is null");
+        verify(categoryRepository, never()).findByIdAndUser(anyLong(), isNull());
+    }
+
+    @Test
+    void isSubcategoryRelatedToCategory_WhenSubcategoryListIsEmpty() {
+        Long categoryId = 1L;
+        Long subcategoryId = 1L;
+        User user = new User();
+        user.setId(1L);
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setUser(user);
+        category.setSubCategories(new ArrayList<>());
+
+        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
+
+        boolean result = categoryService.isSubcategoryRelatedToCategory(subcategoryId, categoryId, user);
+
+        assertFalse(result, "Subcategory relation cannot be established if subcategory list is empty");
+        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
+    }
+
+    @Test
+    void deleteSubcategoryByIdsAndUser_Success() {
+        Long categoryId = 1L;
+        Long subcategoryId = 1L;
+        User user = new User();
+        user.setId(1L);
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setUser(user);
+        category.setSubCategories(new ArrayList<>());
+
+        SubCategory subCategory = new SubCategory();
+        subCategory.setId(subcategoryId);
+        category.getSubCategories().add(subCategory);
+
+        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
+
+        categoryService.deleteSubcategoryByIdsAndUser(categoryId, subcategoryId, user);
+
+        verify(budgetService, times(1)).updateExpensesSubcategoryIdToNull(subcategoryId);
+        verify(budgetService, times(1)).updateIncomesSubcategoryIdToNull(subcategoryId);
+        verify(subCategoryRepository, times(1)).delete(subCategory);
+        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
+    }
+
+    @Test
+    void deleteSubcategoryByIdsAndUser_CategoryNotFound() {
+        Long categoryId = 1L;
+        Long subcategoryId = 1L;
+        User user = new User();
+        user.setId(1L);
+
+        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
+
+        assertThrows(CategoryNotFoundException.class, () -> {
+            categoryService.deleteSubcategoryByIdsAndUser(categoryId, subcategoryId, user);
+        });
+
+        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
+        verify(subCategoryRepository, never()).delete(any(SubCategory.class));
+    }
+
+    @Test
+    void deleteSubcategoryByIdsAndUser_SubcategoryNotFound() {
+        Long categoryId = 1L;
+        Long subcategoryId = 1L;
+        User user = new User();
+        user.setId(1L);
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setUser(user);
+        category.setSubCategories(new ArrayList<>());
+
+        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
+
+        assertThrows(SubcategoryNotFoundException.class, () -> categoryService.deleteSubcategoryByIdsAndUser(categoryId, subcategoryId, user));
+
+        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
+        verify(subCategoryRepository, never()).delete(any(SubCategory.class));
+    }
+
+    @Test
+    void deleteSubcategoryByIdsAndUser_MultipleSubcategories() {
+        Long categoryId = 1L;
+        Long subcategoryId = 1L;
+        User user = new User();
+        user.setId(1L);
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setUser(user);
+        category.setSubCategories(new ArrayList<>());
+
+        SubCategory subCategory1 = new SubCategory();
+        subCategory1.setId(subcategoryId);
+        SubCategory subCategory2 = new SubCategory();
+        subCategory2.setId(2L);
+        category.getSubCategories().add(subCategory1);
+        category.getSubCategories().add(subCategory2);
+
+        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
+
+        categoryService.deleteSubcategoryByIdsAndUser(categoryId, subcategoryId, user);
+
+        verify(budgetService, times(1)).updateExpensesSubcategoryIdToNull(subcategoryId);
+        verify(budgetService, times(1)).updateIncomesSubcategoryIdToNull(subcategoryId);
+        verify(subCategoryRepository, times(1)).delete(subCategory1);
+        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
+    }
+
+    @Test
+    void deleteSubcategoryByIdsAndUser_SubcategoryNotBelongToCategory() {
+        Long categoryId = 1L;
+        Long subcategoryId = 1L;
+        User user = new User();
+        user.setId(1L);
+
+        Category category = new Category();
+        category.setId(categoryId);
+        category.setUser(user);
+        category.setSubCategories(new ArrayList<>());
+
+        SubCategory subCategory = new SubCategory();
+        subCategory.setId(2L); // Different ID
+        category.getSubCategories().add(subCategory);
+
+        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
+
+        assertThrows(SubcategoryNotFoundException.class, () -> categoryService.deleteSubcategoryByIdsAndUser(categoryId, subcategoryId, user));
+
+        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
+        verify(subCategoryRepository, never()).delete(any(SubCategory.class));
+    }
+
+
 }
