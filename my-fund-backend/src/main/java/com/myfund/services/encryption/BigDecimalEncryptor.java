@@ -14,6 +14,9 @@ public class BigDecimalEncryptor implements AttributeConverter<BigDecimal, Strin
 
     @Override
     public String convertToDatabaseColumn(BigDecimal attribute) {
+        if (attribute == null) {
+            return null;
+        }
         try {
             return EncryptionUtil.encrypt(attribute.toString(), encryptionKey);
         } catch (Exception e) {
@@ -23,6 +26,9 @@ public class BigDecimalEncryptor implements AttributeConverter<BigDecimal, Strin
 
     @Override
     public BigDecimal convertToEntityAttribute(String dbData) {
+        if (dbData == null) {
+            return null;
+        }
         try {
             return new BigDecimal(EncryptionUtil.decrypt(dbData, encryptionKey));
         } catch (Exception e) {
