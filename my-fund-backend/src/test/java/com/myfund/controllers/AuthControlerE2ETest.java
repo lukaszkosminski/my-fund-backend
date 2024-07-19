@@ -19,11 +19,14 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,10 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AuthControlerE2ETest {
 
     @Container
-    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:8.0.26")
-            .withDatabaseName("testdb")
-            .withUsername("testuser")
-            .withPassword("testpass");
+    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:8.0.26").withDatabaseName("testdb").withUsername("testuser").withPassword("testpass");
 
     @LocalServerPort
     private int port;
@@ -56,6 +56,9 @@ class AuthControlerE2ETest {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @BeforeAll
     public void setUp() throws IOException {
         mysqlContainer.start();
@@ -70,7 +73,6 @@ class AuthControlerE2ETest {
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 
-
     @Test
     public void testRegisterUser() {
         CreateUserDTO createUserDTO = new CreateUserDTO();
@@ -83,10 +85,13 @@ class AuthControlerE2ETest {
         HttpEntity<CreateUserDTO> request = new HttpEntity<>(createUserDTO, headers);
 
         ResponseEntity<UserDTO> response = restTemplate.postForEntity("http://localhost:" + port + "/register", request, UserDTO.class);
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getUsername()).isEqualTo("testuser");
+        assertThat(response.getBody().getEmail()).isEqualTo("test@test.com");
+        assertThat(count).isEqualTo(1);
     }
 
     @Test
@@ -115,7 +120,106 @@ class AuthControlerE2ETest {
         passwordChangeDTO.setNewPassword("newPassword");
 
         ResponseEntity<?> response = restTemplate.postForEntity("http://localhost:" + port + "/change-password", passwordChangeDTO, Void.class);
+        String newPassword = jdbcTemplate.queryForObject("SELECT password FROM users WHERE id = 1", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
+        assertThat(newPassword).isNotEqualTo(createUserDTO.getPassword());
+    }
+
+    @Test
+    public void testRegisterUserWithExistingUsername() {
+        CreateUserDTO createUserDTO = new CreateUserDTO();
+        createUserDTO.setUsername("testuser");
+        createUserDTO.setPassword("password");
+        createUserDTO.setEmail("test@test.com");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<CreateUserDTO> request = new HttpEntity<>(createUserDTO, headers);
+
+        ResponseEntity<UserDTO> initialResponse = restTemplate.postForEntity("http://localhost:" + port + "/register", request, UserDTO.class);
+        ResponseEntity<Map> duplicateResponse = restTemplate.postForEntity("http://localhost:" + port + "/register", request, Map.class);
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
+        Map<String, String> errorResponse = (Map<String, String>) duplicateResponse.getBody();
+
+        assertThat(initialResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(duplicateResponse.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(errorResponse).isNotNull();
+        assertThat(errorResponse.get("message")).isEqualTo("Username is not unique");
+        assertThat(count).isEqualTo(1);
+    }
+
+    @Test
+    public void testRequestChangePasswordWithInvalidEmail() throws IOException {
+        PasswordChangeRequestDTO passwordChangeRequestDTO = new PasswordChangeRequestDTO();
+        passwordChangeRequestDTO.setEmail("invalid#example.com");
+
+        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/request-change-password", passwordChangeRequestDTO, Map.class);
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+
+        assertThat(errorResponse.get("email")).isEqualTo("Invalid email format");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void testChangePasswordWithInvalidToken() throws IOException {
+        CreateUserDTO createUserDTO = new CreateUserDTO();
+        createUserDTO.setUsername("testuser");
+        createUserDTO.setPassword("oldPassword");
+        createUserDTO.setEmail("test@example.com");
+        userService.createUser(createUserDTO);
+
+        PasswordChangeDTO passwordChangeDTO = new PasswordChangeDTO();
+        passwordChangeDTO.setEmail("test@example.com");
+        passwordChangeDTO.setToken("invalidToken");
+        passwordChangeDTO.setNewPassword("newPassword");
+
+        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/change-password", passwordChangeDTO, Map.class);
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        String currentPassword = jdbcTemplate.queryForObject("SELECT password FROM users WHERE id = 1", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(passwordEncoder.matches(createUserDTO.getPassword(), currentPassword)).isTrue();
+        assertThat(errorResponse.get("message")).isEqualTo("Invalid token");
+    }
+
+    @Test
+    public void testRegisterUserWithInvalidUsername() {
+        CreateUserDTO createUserDTO = new CreateUserDTO();
+        createUserDTO.setUsername("us");
+        createUserDTO.setPassword("password");
+        createUserDTO.setEmail("test@test.com");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<CreateUserDTO> request = new HttpEntity<>(createUserDTO, headers);
+
+        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/register", request, Map.class);
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(count).isEqualTo(0);
+        assertThat(errorResponse.get("username")).isEqualTo("User name must be at least 4 characters long");
+    }
+
+    @Test
+    public void testRegisterUserWithInvalidPassword() {
+        CreateUserDTO createUserDTO = new CreateUserDTO();
+        createUserDTO.setUsername("testuser");
+        createUserDTO.setPassword("pwd");
+        createUserDTO.setEmail("test@test.com");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<CreateUserDTO> request = new HttpEntity<>(createUserDTO, headers);
+
+        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/register", request, Map.class);
+        Map<String, String> errorResponse = (Map<String, String>) response.getBody();
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(count).isEqualTo(0);
+        assertThat(errorResponse.get("password")).isEqualTo("Password must be at least 4 characters long");
     }
 }
