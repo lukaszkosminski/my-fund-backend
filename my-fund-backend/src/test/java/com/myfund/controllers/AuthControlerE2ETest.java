@@ -123,7 +123,7 @@ class AuthControlerE2ETest {
         String newPassword = jdbcTemplate.queryForObject("SELECT password FROM users WHERE id = 1", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
-        assertThat(newPassword).isNotEqualTo(createUserDTO.getPassword());
+        assertThat(passwordEncoder.matches(passwordChangeDTO.getNewPassword(), newPassword)).isTrue();
     }
 
     @Test
