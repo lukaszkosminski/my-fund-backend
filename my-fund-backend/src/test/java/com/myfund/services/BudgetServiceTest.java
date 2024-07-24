@@ -68,7 +68,7 @@ class BudgetServiceTest {
     }
 
     @Test
-    void createBudget_NewBudget_Success() {
+    void createBudget_NewBudget_Success() throws InvalidInputException {
 
         CreateBudgetDTO createBudgetDTO = new CreateBudgetDTO();
         createBudgetDTO.setName("Test Budget");
@@ -154,7 +154,7 @@ class BudgetServiceTest {
     }
 
     @Test
-    void createExpenseWhenBudgetExistsAndCategoryIsValid() {
+    void createExpenseWhenBudgetExistsAndCategoryIsValid() throws InvalidInputException {
 
         Budget budget = new Budget();
         budget.setId(1L);
@@ -209,7 +209,7 @@ class BudgetServiceTest {
     }
 
     @Test
-    void createIncome_WhenBudgetExistsAndCategoryIsValid() {
+    void createIncome_WhenBudgetExistsAndCategoryIsValid() throws InvalidInputException {
 
         Budget budget = new Budget();
         budget.setId(1L);

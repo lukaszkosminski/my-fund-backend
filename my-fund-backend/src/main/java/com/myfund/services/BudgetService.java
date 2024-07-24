@@ -10,8 +10,10 @@ import com.myfund.models.DTOs.mappers.IncomeMapper;
 import com.myfund.repositories.BudgetRepository;
 import com.myfund.repositories.ExpenseRepository;
 import com.myfund.repositories.IncomeRepository;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +58,11 @@ public class BudgetService {
         log.info("Default empty budget saved for user. Email: {}", user.getEmail());
     }
 
-    public BudgetDTO createBudget(CreateBudgetDTO createBudgetDTO, User user) {
+    public BudgetDTO createBudget(@Valid CreateBudgetDTO createBudgetDTO, User user) throws InvalidInputException {
+        if (createBudgetDTO == null || createBudgetDTO.getName() == null || createBudgetDTO.getName().isEmpty()) {
+            throw new InvalidInputException("Budget name is required");
+        }
+
         Optional<Budget> budgetOpt = budgetRepository.findByNameAndUser(createBudgetDTO.getName(), user);
         if (budgetOpt.isPresent()) {
             String errorMessage = String.format("Attempt to create a duplicate budget. User Email: %s, Budget Name: %s", user.getEmail(), budgetOpt.get().getName());
@@ -95,8 +101,18 @@ public class BudgetService {
         return BudgetMapper.budgetMapToBudgetDTO(budgetOpt.get());
     }
 
-    public ExpenseDTO createExpense(Long budgetId, CreateExpenseDTO createExpenseDTO, User user) {
+    public ExpenseDTO createExpense(Long budgetId, CreateExpenseDTO createExpenseDTO, User user) throws InvalidInputException {
         log.debug("Starting to create expense for budget ID: {} and user ID: {}", budgetId, user.getId());
+
+        if (createExpenseDTO.getName() == null || createExpenseDTO.getName().isEmpty() || createExpenseDTO.getAmount() == null) {
+            log.warn("Expense name is required. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Expense name is required");
+        }
+
+        if (createExpenseDTO.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            log.warn("Amount cannot be negative for expense creation. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Amount cannot be negative");
+        }
 
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
         if (!budgetOpt.isPresent()) {
@@ -123,8 +139,18 @@ public class BudgetService {
         return ExpenseMapper.expensetoExpenseDTO(expense);
     }
 
-    public IncomeDTO createIncome(Long budgetId, CreateIncomeDTO createIncomeDTO, User user) {
+    public IncomeDTO createIncome(Long budgetId, CreateIncomeDTO createIncomeDTO, User user) throws InvalidInputException {
         log.debug("Starting to create income for budget ID: {} and user ID: {}", budgetId, user.getId());
+
+        if (createIncomeDTO.getName() == null || createIncomeDTO.getName().isEmpty() || createIncomeDTO.getAmount() == null) {
+            log.warn("Expense name is required. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Expense name is required");
+        }
+
+        if (createIncomeDTO.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            log.warn("Amount cannot be negative for expense creation. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Amount cannot be negative");
+        }
 
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
         if (!budgetOpt.isPresent()) {
