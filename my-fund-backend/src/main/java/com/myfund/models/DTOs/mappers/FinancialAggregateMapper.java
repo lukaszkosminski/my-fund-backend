@@ -12,7 +12,6 @@ public class FinancialAggregateMapper {
         financialAggregateCategoryDTO.setTypeAggregate(financialAggregate.getTypeAggregate());
         financialAggregateCategoryDTO.setBudgetId(financialAggregate.getBudgetId());
         financialAggregateCategoryDTO.setUserId(financialAggregate.getUserId());
-        financialAggregateCategoryDTO.setValue(financialAggregate.getValue());
         return financialAggregateCategoryDTO;
     }
 
@@ -23,7 +22,6 @@ public class FinancialAggregateMapper {
         financialAggregateSubcategoryDTO.setTypeAggregate(financialAggregate.getTypeAggregate());
         financialAggregateSubcategoryDTO.setBudgetId(financialAggregate.getBudgetId());
         financialAggregateSubcategoryDTO.setUserId(financialAggregate.getUserId());
-        financialAggregateSubcategoryDTO.setValue(financialAggregate.getValue());
         return financialAggregateSubcategoryDTO;
     }
 }

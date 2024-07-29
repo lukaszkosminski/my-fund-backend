@@ -1,5 +1,6 @@
 package com.myfund.services.csv;
 
+import com.myfund.exceptions.InvalidInputException;
 import com.myfund.models.Expense;
 import com.myfund.models.Income;
 import com.myfund.services.BudgetService;
@@ -45,7 +46,7 @@ class MIlleniumCsvParserTest {
     }
 
     @Test
-    void testMapToIncome() {
+    void testMapToIncome() throws InvalidInputException {
         String[] values = {"", "2023-10-01", "", "", "", "", "Salary", "", "1000.00"};
         Income income = parser.mapToIncome(values);
         assertNotNull(income, "Income should not be null");
@@ -55,7 +56,7 @@ class MIlleniumCsvParserTest {
     }
 
     @Test
-    void testMapToExpense() {
+    void testMapToExpense() throws InvalidInputException {
         String[] values = {"", "2023-10-01", "", "", "", "", "Groceries", "50.00", ""};
         Expense expense = parser.mapToExpense(values);
         assertNotNull(expense, "Expense should not be null");

@@ -2,6 +2,7 @@ package com.myfund.services;
 
 import com.myfund.exceptions.CategoryNotFoundException;
 import com.myfund.exceptions.CategoryNotUniqueException;
+import com.myfund.exceptions.InvalidInputException;
 import com.myfund.exceptions.SubcategoryNotFoundException;
 import com.myfund.models.Category;
 import com.myfund.models.DTOs.CategoryDTO;
@@ -57,8 +58,12 @@ public class CategoryService {
         return CategoryMapper.categoryMapToCategoryDTO(existingCategoryOpt.get());
     }
 
-    public CategoryDTO createCategory(CreateCategoryDTO createCategoryDTO, User user) {
+    public CategoryDTO createCategory(CreateCategoryDTO createCategoryDTO, User user) throws InvalidInputException {
         log.debug("Starting to create a new category with name: {} for user ID: {}", createCategoryDTO.getName(), user.getId());
+        if (createCategoryDTO.getName() == null || createCategoryDTO.getName().isEmpty()) {
+            log.warn("Category name is required.");
+            throw new InvalidInputException("Category name is required");
+        }
         Optional<Category> existingCategory = categoryRepository.findByNameAndUser(createCategoryDTO.getName(), user);
         Category category;
         if (existingCategory.isPresent()) {

@@ -10,8 +10,10 @@ import com.myfund.models.DTOs.mappers.IncomeMapper;
 import com.myfund.repositories.BudgetRepository;
 import com.myfund.repositories.ExpenseRepository;
 import com.myfund.repositories.IncomeRepository;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +58,11 @@ public class BudgetService {
         log.info("Default empty budget saved for user. Email: {}", user.getEmail());
     }
 
-    public BudgetDTO createBudget(CreateBudgetDTO createBudgetDTO, User user) {
+    public BudgetDTO createBudget(@Valid CreateBudgetDTO createBudgetDTO, User user) throws InvalidInputException {
+        if (createBudgetDTO == null || createBudgetDTO.getName() == null || createBudgetDTO.getName().isEmpty()) {
+            throw new InvalidInputException("Budget name is required");
+        }
+
         Optional<Budget> budgetOpt = budgetRepository.findByNameAndUser(createBudgetDTO.getName(), user);
         if (budgetOpt.isPresent()) {
             String errorMessage = String.format("Attempt to create a duplicate budget. User Email: %s, Budget Name: %s", user.getEmail(), budgetOpt.get().getName());
@@ -95,8 +101,18 @@ public class BudgetService {
         return BudgetMapper.budgetMapToBudgetDTO(budgetOpt.get());
     }
 
-    public ExpenseDTO createExpense(Long budgetId, CreateExpenseDTO createExpenseDTO, User user) {
+    public ExpenseDTO createExpense(Long budgetId, CreateExpenseDTO createExpenseDTO, User user) throws InvalidInputException {
         log.debug("Starting to create expense for budget ID: {} and user ID: {}", budgetId, user.getId());
+
+        if (createExpenseDTO.getName() == null || createExpenseDTO.getName().isEmpty() || createExpenseDTO.getAmount() == null) {
+            log.warn("Expense name is required. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Expense name is required");
+        }
+
+        if (createExpenseDTO.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            log.warn("Amount cannot be negative for expense creation. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Amount cannot be negative");
+        }
 
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
         if (!budgetOpt.isPresent()) {
@@ -123,8 +139,18 @@ public class BudgetService {
         return ExpenseMapper.expensetoExpenseDTO(expense);
     }
 
-    public IncomeDTO createIncome(Long budgetId, CreateIncomeDTO createIncomeDTO, User user) {
+    public IncomeDTO createIncome(Long budgetId, CreateIncomeDTO createIncomeDTO, User user) throws InvalidInputException {
         log.debug("Starting to create income for budget ID: {} and user ID: {}", budgetId, user.getId());
+
+        if (createIncomeDTO.getName() == null || createIncomeDTO.getName().isEmpty() || createIncomeDTO.getAmount() == null) {
+            log.warn("Expense name is required. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Expense name is required");
+        }
+
+        if (createIncomeDTO.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            log.warn("Amount cannot be negative for expense creation. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Amount cannot be negative");
+        }
 
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
         if (!budgetOpt.isPresent()) {
@@ -151,8 +177,18 @@ public class BudgetService {
         return IncomeMapper.incomeMapToIncomeDTO(income);
     }
 
-    public ExpenseDTO updateExpense(Long budgetId, Long expenseId, CreateExpenseDTO createExpenseDTO, User user) {
+    public ExpenseDTO updateExpense(Long budgetId, Long expenseId, CreateExpenseDTO createExpenseDTO, User user) throws InvalidInputException {
         log.debug("Starting to update expense. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
+
+        if (createExpenseDTO.getName() == null || createExpenseDTO.getName().isEmpty() || createExpenseDTO.getAmount() == null) {
+            log.warn("Expense name is required. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Expense name is required");
+        }
+
+        if (createExpenseDTO.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            log.warn("Amount cannot be negative for expense creation. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Amount cannot be negative");
+        }
 
         Optional<Expense> expenseOpt = expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId);
         if (!expenseOpt.isPresent()) {
@@ -179,8 +215,18 @@ public class BudgetService {
         return ExpenseMapper.expensetoExpenseDTO(expense);
     }
 
-    public IncomeDTO updateIncome(Long budgetId, Long incomeId, CreateIncomeDTO createIncomeDTO, User user) {
+    public IncomeDTO updateIncome(Long budgetId, Long incomeId, CreateIncomeDTO createIncomeDTO, User user) throws InvalidInputException {
         log.debug("Starting to update income. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
+
+        if (createIncomeDTO.getName() == null || createIncomeDTO.getName().isEmpty() || createIncomeDTO.getAmount() == null) {
+            log.warn("Expense name is required. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Expense name is required");
+        }
+
+        if (createIncomeDTO.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            log.warn("Amount cannot be negative for expense creation. User ID: {}, Budget ID: {}", user.getId(), budgetId);
+            throw new InvalidInputException("Amount cannot be negative");
+        }
 
         Optional<Income> incomeOpt = incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId);
         if (!incomeOpt.isPresent()) {
@@ -297,16 +343,17 @@ public class BudgetService {
         log.debug("Starting to get total expenses for budget ID: {}, category ID: {}, and user ID: {}", budgetId, categoryId, user.getId());
         FinancialAggregate financialAggregate = new FinancialAggregate();
         try {
-            BigDecimal totalExpenses = expenseRepository.sumExpensesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId());
+            List<Expense> expenses = expenseRepository.findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId());
+//            BigDecimal totalExpenses = expenses.stream()
+//                    .map(Expense::getAmount)
+//                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalExpenses = expenses != null ? expenses.stream()
+                    .map(Expense::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
             financialAggregate.setBudgetId(budgetId);
             financialAggregate.setCategoryId(categoryId);
             financialAggregate.setTypeAggregate(TypeAggregate.EXPENSES_BY_CATEGORY);
             financialAggregate.setUserId(user.getId());
-            if (totalExpenses == null) {
-                log.info("No expenses found for budget ID: {}, category ID: {}, and user ID: {}. Returning ZERO.", budgetId, categoryId, user.getId());
-                financialAggregate.setValue(BigDecimal.ZERO);
-                return FinancialAggregateMapper.toFinancialAggregateCategoryDTO(financialAggregate);
-            }
             financialAggregate.setValue(totalExpenses);
             log.info("Total expenses retrieved for budget ID: {}, category ID: {}, and user ID: {}. Total: {}", budgetId, categoryId, user.getId(), totalExpenses);
             return FinancialAggregateMapper.toFinancialAggregateCategoryDTO(financialAggregate);
@@ -320,7 +367,10 @@ public class BudgetService {
         log.debug("Starting to get total expenses for budget ID: {}, subcategory ID: {}, and user ID: {}", budgetId, subcategoryId, user.getId());
         FinancialAggregate financialAggregate = new FinancialAggregate();
         try {
-            BigDecimal totalExpenses = expenseRepository.sumExpensesByBudgetIdAndSubcategoryIdAndUserId(budgetId, subcategoryId, user.getId());
+            List<Expense> expenses = expenseRepository.findByIdSubCategoryAndUserIdAndBudgetId(budgetId, subcategoryId, user.getId());
+            BigDecimal totalExpenses = expenses != null ? expenses.stream()
+                    .map(Expense::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
             financialAggregate.setBudgetId(budgetId);
             financialAggregate.setSubcategoryId(subcategoryId);
             financialAggregate.setTypeAggregate(TypeAggregate.EXPENSES_BY_SUBCATEGORY);
@@ -343,7 +393,10 @@ public class BudgetService {
         log.debug("Starting to get total incomes for budget ID: {}, category ID: {}, and user ID: {}", budgetId, categoryId, user.getId());
         FinancialAggregate financialAggregate = new FinancialAggregate();
         try {
-            BigDecimal totalIncomes = incomeRepository.sumIncomesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId());
+            List<Income> incomes = incomeRepository.findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId());
+            BigDecimal totalIncomes = incomes != null ? incomes.stream()
+                    .map(Income::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
             financialAggregate.setBudgetId(budgetId);
             financialAggregate.setCategoryId(categoryId);
             financialAggregate.setTypeAggregate(TypeAggregate.INCOMES_BY_CATEGORY);
@@ -366,7 +419,10 @@ public class BudgetService {
         log.debug("Starting to get total incomes for budget ID: {}, subcategory ID: {}, and user ID: {}", budgetId, subcategoryId, user.getId());
         FinancialAggregate financialAggregate = new FinancialAggregate();
         try {
-            BigDecimal totalIncomes = incomeRepository.sumIncomesByBudgetIdAndSubcategoryIdAndUserId(budgetId, subcategoryId, user.getId());
+            List<Income> incomes = incomeRepository.findByIdSubCategoryAndUserIdAndBudgetId(budgetId, subcategoryId, user.getId());
+            BigDecimal totalIncomes = incomes != null ? incomes.stream()
+                    .map(Income::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
             financialAggregate.setBudgetId(budgetId);
             financialAggregate.setSubcategoryId(subcategoryId);
             financialAggregate.setTypeAggregate(TypeAggregate.INCOMES_BY_SUBCATEGORY);

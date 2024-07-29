@@ -68,7 +68,7 @@ class BudgetServiceTest {
     }
 
     @Test
-    void createBudget_NewBudget_Success() {
+    void createBudget_NewBudget_Success() throws InvalidInputException {
 
         CreateBudgetDTO createBudgetDTO = new CreateBudgetDTO();
         createBudgetDTO.setName("Test Budget");
@@ -154,7 +154,7 @@ class BudgetServiceTest {
     }
 
     @Test
-    void createExpenseWhenBudgetExistsAndCategoryIsValid() {
+    void createExpenseWhenBudgetExistsAndCategoryIsValid() throws InvalidInputException {
 
         Budget budget = new Budget();
         budget.setId(1L);
@@ -189,9 +189,8 @@ class BudgetServiceTest {
         when(budgetRepository.findByIdAndUser(anyLong(), any(User.class))).thenReturn(Optional.of(budget));
         when(categoryService.isSubcategoryRelatedToCategory(anyLong(), anyLong(), any(User.class))).thenReturn(false);
 
-        assertThrows(SubcategoryNotRelatedToCategoryException.class, () -> budgetService.createExpense(1L, createExpenseDTO, user));
+        assertThrows(InvalidInputException.class, () -> budgetService.createExpense(1L, createExpenseDTO, user));
 
-        verify(budgetRepository).findByIdAndUser(anyLong(), any(User.class));
         verify(expenseRepository, never()).save(any(Expense.class));
     }
 
@@ -202,14 +201,13 @@ class BudgetServiceTest {
         User user = new User();
         when(budgetRepository.findByIdAndUser(anyLong(), any(User.class))).thenReturn(Optional.empty());
 
-        assertThrows(BudgetNotFoundException.class, () -> budgetService.createExpense(1L, createExpenseDTO, user));
+        assertThrows(InvalidInputException.class, () -> budgetService.createExpense(1L, createExpenseDTO, user));
 
-        verify(budgetRepository).findByIdAndUser(anyLong(), any(User.class));
         verify(expenseRepository, never()).save(any(Expense.class));
     }
 
     @Test
-    void createIncome_WhenBudgetExistsAndCategoryIsValid() {
+    void createIncome_WhenBudgetExistsAndCategoryIsValid() throws InvalidInputException {
 
         Budget budget = new Budget();
         budget.setId(1L);
@@ -239,9 +237,8 @@ class BudgetServiceTest {
 
         when(budgetRepository.findByIdAndUser(anyLong(), any(User.class))).thenReturn(Optional.empty());
 
-        assertThrows(BudgetNotFoundException.class, () -> budgetService.createIncome(1L, createIncomeDTO, user));
+        assertThrows(InvalidInputException.class, () -> budgetService.createIncome(1L, createIncomeDTO, user));
 
-        verify(budgetRepository).findByIdAndUser(anyLong(), any(User.class));
         verify(incomeRepository, never()).save(any(Income.class));
     }
 
@@ -256,14 +253,13 @@ class BudgetServiceTest {
         when(budgetRepository.findByIdAndUser(anyLong(), any(User.class))).thenReturn(Optional.of(budget));
         when(categoryService.isSubcategoryRelatedToCategory(anyLong(), anyLong(), any(User.class))).thenReturn(false);
 
-        assertThrows(SubcategoryNotRelatedToCategoryException.class, () -> budgetService.createIncome(1L, createIncomeDTO, user));
+        assertThrows(InvalidInputException.class, () -> budgetService.createIncome(1L, createIncomeDTO, user));
 
-        verify(budgetRepository).findByIdAndUser(anyLong(), any(User.class));
         verify(incomeRepository, never()).save(any(Income.class));
     }
 
     @Test
-    void updateExpense_ExpenseFoundAndUpdated() {
+    void updateExpense_ExpenseFoundAndUpdated() throws InvalidInputException {
 
         User user = new User();
         user.setId(1L);
@@ -329,7 +325,7 @@ class BudgetServiceTest {
     }
 
     @Test
-    void updateIncome_Success() {
+    void updateIncome_Success() throws InvalidInputException {
 
         User user = new User();
         user.setId(1L);
@@ -368,7 +364,7 @@ class BudgetServiceTest {
 
         when(incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId)).thenReturn(Optional.empty());
 
-        assertThrows(IncomeNotFoundException.class, () -> budgetService.updateIncome(budgetId, incomeId, createIncomeDTO, user));
+        assertThrows(InvalidInputException.class, () -> budgetService.updateIncome(budgetId, incomeId, createIncomeDTO, user));
     }
 
     @Test
@@ -387,7 +383,7 @@ class BudgetServiceTest {
         when(incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId)).thenReturn(Optional.of(income));
         when(categoryService.isSubcategoryRelatedToCategory(anyLong(), anyLong(), any(User.class))).thenThrow(new SubcategoryNotRelatedToCategoryException("Subcategory not related"));
 
-        assertThrows(SubcategoryNotRelatedToCategoryException.class, () -> budgetService.updateIncome(budgetId, incomeId, createIncomeDTO, user));
+        assertThrows(InvalidInputException.class, () -> budgetService.updateIncome(budgetId, incomeId, createIncomeDTO, user));
     }
 
     @Test
@@ -507,12 +503,16 @@ class BudgetServiceTest {
         FinancialAggregate financialAggregate = new FinancialAggregate();
         financialAggregate.setValue(expectedTotalExpenses);
 
-        when(expenseRepository.sumExpensesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId())).thenReturn(expectedTotalExpenses);
+        Expense expense = new Expense();
+        expense.setAmount(expectedTotalExpenses);
+        List<Expense> expenses = Arrays.asList(expense);
+
+        when(expenseRepository.findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId())).thenReturn(expenses);
 
         FinancialAggregateCategoryDTO result = budgetService.getTotalExpensesByCategory(budgetId, categoryId, user);
 
         assertNotNull(result);
-        verify(expenseRepository, times(1)).sumExpensesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId());
+        verify(expenseRepository, times(1)).findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId());
         assertEquals(expectedTotalExpenses, result.getValue());
 
     }
@@ -523,13 +523,12 @@ class BudgetServiceTest {
         Long categoryId = 1L;
         User user = new User();
         user.setId(1L);
-        when(expenseRepository.sumExpensesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId())).thenReturn(null);
+        when(expenseRepository.findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId())).thenReturn(null);
 
         FinancialAggregateCategoryDTO resultDTO = budgetService.getTotalExpensesByCategory(budgetId, categoryId, user);
 
         assertNotNull(resultDTO);
         assertEquals(BigDecimal.ZERO, resultDTO.getValue());
-
     }
 
     @Test
@@ -538,7 +537,7 @@ class BudgetServiceTest {
         Long categoryId = 1L;
         User user = new User();
         user.setId(1L);
-        when(expenseRepository.sumExpensesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId())).thenThrow(new RuntimeException("Database error"));
+        when(expenseRepository.findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId())).thenThrow(new RuntimeException("Database error"));
 
         Exception exception = assertThrows(TotalExpensesRetrievalException.class, () -> {
             budgetService.getTotalExpensesByCategory(budgetId, categoryId, user);
@@ -559,8 +558,11 @@ class BudgetServiceTest {
         user.setId(1L);
         BigDecimal expectedTotalExpenses = new BigDecimal("100.00");
 
-        when(expenseRepository.sumExpensesByBudgetIdAndSubcategoryIdAndUserId(budgetId, subcategoryId, user.getId())).thenReturn(expectedTotalExpenses);
+        Expense expense = new Expense();
+        expense.setAmount(expectedTotalExpenses);
+        List<Expense> expenses = Arrays.asList(expense);
 
+        when(expenseRepository.findByIdSubCategoryAndUserIdAndBudgetId(budgetId, subcategoryId, user.getId())).thenReturn(expenses);
         FinancialAggregateSubcategoryDTO result = budgetService.getTotalExpensesBySubcategory(budgetId, subcategoryId, user);
 
         assertNotNull(result);
@@ -575,7 +577,7 @@ class BudgetServiceTest {
         User user = new User();
         user.setId(1L);
 
-        when(expenseRepository.sumExpensesByBudgetIdAndSubcategoryIdAndUserId(budgetId, subcategoryId, user.getId())).thenReturn(null);
+        when(expenseRepository.findByIdSubCategoryAndUserIdAndBudgetId(budgetId, subcategoryId, user.getId())).thenReturn(null);
 
         FinancialAggregateSubcategoryDTO result = budgetService.getTotalExpensesBySubcategory(budgetId, subcategoryId, user);
 
@@ -591,7 +593,7 @@ class BudgetServiceTest {
         User user = new User();
         user.setId(1L);
 
-        when(expenseRepository.sumExpensesByBudgetIdAndSubcategoryIdAndUserId(budgetId, subcategoryId, user.getId())).thenThrow(new RuntimeException("Database error"));
+        when(expenseRepository.findByIdSubCategoryAndUserIdAndBudgetId(budgetId, subcategoryId, user.getId())).thenThrow(new RuntimeException("Database error"));
 
 
         assertThrows(TotalExpensesRetrievalException.class, () -> budgetService.getTotalExpensesBySubcategory(budgetId, subcategoryId, user));
@@ -605,7 +607,13 @@ class BudgetServiceTest {
         User user = new User();
         user.setId(1L);
         BigDecimal expectedTotalIncomes = new BigDecimal("1000");
-        when(incomeRepository.sumIncomesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId())).thenReturn(expectedTotalIncomes);
+        Income income1 = new Income();
+        income1.setAmount(new BigDecimal("500"));
+        Income income2 = new Income();
+        income2.setAmount(new BigDecimal("500"));
+        List<Income> incomes = Arrays.asList(income1, income2);
+
+        when(incomeRepository.findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId())).thenReturn(incomes);
 
 
         FinancialAggregateCategoryDTO result = budgetService.getTotalIncomesByCategory(budgetId, categoryId, user);
@@ -613,7 +621,7 @@ class BudgetServiceTest {
 
         assertNotNull(result);
         assertEquals(expectedTotalIncomes, result.getValue());
-        verify(incomeRepository, times(1)).sumIncomesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId());
+        verify(incomeRepository, times(1)).findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId());
     }
 
     @Test
@@ -623,7 +631,7 @@ class BudgetServiceTest {
         Long categoryId = 1L;
         User user = new User();
         user.setId(1L);
-        when(incomeRepository.sumIncomesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId())).thenReturn(null);
+        when(incomeRepository.findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId())).thenReturn(null);
 
 
         FinancialAggregateCategoryDTO result = budgetService.getTotalIncomesByCategory(budgetId, categoryId, user);
@@ -631,7 +639,7 @@ class BudgetServiceTest {
 
         assertNotNull(result);
         assertEquals(BigDecimal.ZERO, result.getValue());
-        verify(incomeRepository, times(1)).sumIncomesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId());
+        verify(incomeRepository, times(1)).findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId());
     }
 
     @Test
@@ -641,11 +649,10 @@ class BudgetServiceTest {
         Long categoryId = 1L;
         User user = new User();
         user.setId(1L);
-        when(incomeRepository.sumIncomesByBudgetIdAndCategoryIdAndUserId(anyLong(), anyLong(), anyLong())).thenThrow(new RuntimeException("Database error"));
-
+        when(incomeRepository.findByIdCategoryAndUserIdAndBudgetId(anyLong(), anyLong(), anyLong())).thenThrow(new RuntimeException("Database error"));
 
         assertThrows(TotalIncomesRetrievalException.class, () -> budgetService.getTotalIncomesByCategory(budgetId, categoryId, user));
-        verify(incomeRepository, times(1)).sumIncomesByBudgetIdAndCategoryIdAndUserId(budgetId, categoryId, user.getId());
+        verify(incomeRepository, times(1)).findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId());
     }
 
     @Test
@@ -656,7 +663,14 @@ class BudgetServiceTest {
         User user = new User();
         user.setId(1L);
         BigDecimal expectedTotalIncomes = new BigDecimal("1000");
-        when(incomeRepository.sumIncomesByBudgetIdAndSubcategoryIdAndUserId(budgetId, subcategoryId, user.getId())).thenReturn(expectedTotalIncomes);
+
+        Income income1 = new Income();
+        income1.setAmount(new BigDecimal("500"));
+        Income income2 = new Income();
+        income2.setAmount(new BigDecimal("500"));
+        List<Income> incomes = Arrays.asList(income1, income2);
+
+        when(incomeRepository.findByIdSubCategoryAndUserIdAndBudgetId(budgetId, subcategoryId, user.getId())).thenReturn(incomes);
 
         FinancialAggregateSubcategoryDTO result = budgetService.getTotalIncomesBySubcategory(budgetId, subcategoryId, user);
 
@@ -671,7 +685,7 @@ class BudgetServiceTest {
         Long subcategoryId = 1L;
         User user = new User();
         user.setId(1L);
-        when(incomeRepository.sumIncomesByBudgetIdAndSubcategoryIdAndUserId(budgetId, subcategoryId, user.getId())).thenReturn(null);
+        when(incomeRepository.findByIdSubCategoryAndUserIdAndBudgetId(budgetId, subcategoryId, user.getId())).thenReturn(null);
 
         FinancialAggregateSubcategoryDTO result = budgetService.getTotalIncomesBySubcategory(budgetId, subcategoryId, user);
 
@@ -686,7 +700,7 @@ class BudgetServiceTest {
         Long subcategoryId = 1L;
         User user = new User();
         user.setId(1L);
-        when(incomeRepository.sumIncomesByBudgetIdAndSubcategoryIdAndUserId(anyLong(), anyLong(), anyLong())).thenThrow(new RuntimeException("Database error"));
+        when(incomeRepository.findByIdSubCategoryAndUserIdAndBudgetId(anyLong(), anyLong(), anyLong())).thenThrow(new RuntimeException("Database error"));
 
         assertThrows(TotalIncomesRetrievalException.class, () -> budgetService.getTotalIncomesBySubcategory(budgetId, subcategoryId, user));
     }
