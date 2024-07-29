@@ -34,22 +34,24 @@ public class SantanderCsvParser extends AbstractCsvParser {
 
     @Override
     protected boolean isIncome(String[] values) {
-        return !values[10].isBlank() && values[11].isBlank();
+        return !values[11].isEmpty() && values[10].isEmpty() && values[9].isEmpty();
     }
 
     @Override
     protected boolean isExpense(String[] values) {
-        return !values[11].isBlank() && values[10].isBlank();
+        return !values[10].isEmpty() && values[11].isEmpty() && values[9].isEmpty();
     }
 
     @Override
     protected Income mapToIncome(String[] values) {
+        System.out.println(values[3]);
         String dateColumn = values[2];
-        String incomeColumn = values[10];
-        String transactionNameColumn = values[4];
+        String incomeColumn = values[11];
+        String transactionNameColumn = values[3];
         Income income = new Income();
         income.setLocalDateTime(LocalDate.parse(dateColumn, DATE_FORMATTER).atStartOfDay());
         income.setName(transactionNameColumn);
+        System.out.println(incomeColumn);
         income.setAmount(new BigDecimal(incomeColumn.replace(',', '.')));
 
         return income;
@@ -57,9 +59,10 @@ public class SantanderCsvParser extends AbstractCsvParser {
 
     @Override
     protected Expense mapToExpense(String[] values) {
+        System.out.println(values[3]);
         String dateColumn = values[2];
-        String expenseColumn = values[11];
-        String transactionNameColumn = values[4];
+        String expenseColumn = values[10];
+        String transactionNameColumn = values[3];
         Expense expense = new Expense();
         expense.setLocalDateTime(LocalDate.parse(dateColumn, DATE_FORMATTER).atStartOfDay());
         expense.setName(transactionNameColumn);

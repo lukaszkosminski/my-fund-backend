@@ -1,5 +1,6 @@
 package com.myfund.controllers;
 
+import com.myfund.exceptions.InvalidInputException;
 import com.myfund.models.DTOs.CategoryDTO;
 import com.myfund.models.DTOs.CreateCategoryDTO;
 import com.myfund.models.User;
@@ -37,7 +38,7 @@ public class CategoryController {
     }
 
     @PostMapping("/categories")
-    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) {
+    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
         CategoryDTO categoryDTO = categoryService.createCategory(createCategoryDTO, user);
         return new ResponseEntity<>(categoryDTO, HttpStatus.CREATED);
     }
@@ -56,7 +57,7 @@ public class CategoryController {
 
     @DeleteMapping("/categories/{categoryId}/subcategories/{subcategoryId}")
     public ResponseEntity<?> deleteSubcategory(@PathVariable("categoryId") Long categoryId, @PathVariable("subcategoryId") Long subcategoryId, @AuthenticationPrincipal User user) {
-        categoryService.deleteSubcategoryByIdsAndUser(categoryId,subcategoryId, user);
+        categoryService.deleteSubcategoryByIdsAndUser(categoryId, subcategoryId, user);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

@@ -2,6 +2,7 @@ package com.myfund.services;
 
 import com.myfund.exceptions.CategoryNotFoundException;
 import com.myfund.exceptions.CategoryNotUniqueException;
+import com.myfund.exceptions.InvalidInputException;
 import com.myfund.exceptions.SubcategoryNotFoundException;
 import com.myfund.models.Category;
 import com.myfund.models.DTOs.CategoryDTO;
@@ -126,7 +127,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void createCategory_NewCategory() {
+    void createCategory_NewCategory() throws InvalidInputException {
 
         User user = new User();
         user.setId(1L);

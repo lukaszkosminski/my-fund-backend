@@ -59,13 +59,13 @@ public class BudgetController {
     }
 
     @PatchMapping("/budgets/{budgetId}/expenses/{expenseId}")
-    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable("budgetId") Long budgetId, @PathVariable("expenseId") Long expenseId, @RequestBody CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) {
+    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable("budgetId") Long budgetId, @PathVariable("expenseId") Long expenseId, @RequestBody CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
         ExpenseDTO expenseDTO = budgetService.updateExpense(budgetId, expenseId, createExpenseDTO, user);
         return new ResponseEntity<>(expenseDTO, HttpStatus.OK);
     }
 
     @PatchMapping("/budgets/{budgetId}/incomes/{incomeId}")
-    public ResponseEntity<IncomeDTO> updateIncome(@PathVariable("budgetId") Long budgetId, @PathVariable("incomeId") Long incomeId, @RequestBody CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) {
+    public ResponseEntity<IncomeDTO> updateIncome(@PathVariable("budgetId") Long budgetId, @PathVariable("incomeId") Long incomeId, @RequestBody CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
         IncomeDTO incomeDTO = budgetService.updateIncome(budgetId, incomeId, createIncomeDTO, user);
         return new ResponseEntity<>(incomeDTO, HttpStatus.OK);
     }
@@ -123,7 +123,6 @@ public class BudgetController {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("{\"message\": \"File is empty\"}");
         }
-
         try {
             csvReaderService.parseFile(bankName, file, user, budgetId);
             String successMessage = String.format("Successfully uploaded '%s' for %s", file.getOriginalFilename(), bankName);

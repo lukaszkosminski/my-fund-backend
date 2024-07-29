@@ -1,5 +1,6 @@
 package com.myfund.services.csv;
 
+import com.myfund.exceptions.InvalidInputException;
 import com.myfund.models.DTOs.BudgetDTO;
 import com.myfund.models.DTOs.mappers.BudgetMapper;
 import com.myfund.models.Expense;
@@ -159,7 +160,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processLine_ShouldProcessIncome() {
+    void processLine_ShouldProcessIncome() throws InvalidInputException {
 
         User user = new User();
         BudgetDTO budgetDTO = new BudgetDTO();
@@ -176,7 +177,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processLine_ShouldProcessExpense() {
+    void processLine_ShouldProcessExpense() throws InvalidInputException {
 
         User user = new User();
         BudgetDTO budgetDTO = new BudgetDTO();
@@ -193,7 +194,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processLine_ShouldNotProcessInvalidLine() {
+    void processLine_ShouldNotProcessInvalidLine() throws InvalidInputException {
 
         User user = new User();
         BudgetDTO budgetDTO = new BudgetDTO();
@@ -206,7 +207,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processLine_ShouldHandleEmptyLine() {
+    void processLine_ShouldHandleEmptyLine() throws InvalidInputException {
 
         User user = new User();
         BudgetDTO budgetDTO = new BudgetDTO();
@@ -219,7 +220,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processIncome_ShouldMapValuesCorrectly() {
+    void processIncome_ShouldMapValuesCorrectly() throws InvalidInputException {
 
         String[] values = {"income", "1000"};
         User user = new User();
@@ -236,7 +237,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processIncome_ShouldCallSaveIncomeFromCsv() {
+    void processIncome_ShouldCallSaveIncomeFromCsv() throws InvalidInputException {
 
         String[] values = {"income", "2000"};
         User user = new User();
@@ -248,7 +249,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processIncome_ShouldSetUserCorrectly() {
+    void processIncome_ShouldSetUserCorrectly() throws InvalidInputException {
 
         String[] values = {"income", "4000"};
         User user = new User();
@@ -263,7 +264,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processIncome_ShouldSetBudgetCorrectly() {
+    void processIncome_ShouldSetBudgetCorrectly() throws InvalidInputException {
 
         String[] values = {"income", "5000"};
         User user = new User();
@@ -278,7 +279,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processExpense_ShouldMapValuesToExpense() {
+    void processExpense_ShouldMapValuesToExpense() throws InvalidInputException {
 
         String[] values = {"Expense", "100.00"};
         User user = new User();
@@ -296,7 +297,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processExpense_ShouldSetUser() {
+    void processExpense_ShouldSetUser() throws InvalidInputException {
 
         String[] values = {"Expense", "100.00"};
         User user = new User();
@@ -312,7 +313,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processExpense_ShouldSetBudget() {
+    void processExpense_ShouldSetBudget() throws InvalidInputException {
 
         String[] values = {"Expense", "100.00"};
         User user = new User();
@@ -328,7 +329,7 @@ class AbstractCsvParserTest {
     }
 
     @Test
-    void processExpense_ShouldCallSaveExpenseFromCsv() {
+    void processExpense_ShouldCallSaveExpenseFromCsv() throws InvalidInputException {
         String[] values = {"Expense", "100.00"};
         User user = new User();
         BudgetDTO budgetDTO = new BudgetDTO();
