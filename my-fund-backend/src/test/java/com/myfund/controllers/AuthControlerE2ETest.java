@@ -71,6 +71,10 @@ class AuthControlerE2ETest {
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
         jdbcTemplate.execute("TRUNCATE TABLE users");
         jdbcTemplate.execute("TRUNCATE TABLE budget");
+        jdbcTemplate.execute("TRUNCATE TABLE expense");
+        jdbcTemplate.execute("TRUNCATE TABLE income");
+        jdbcTemplate.execute("TRUNCATE TABLE category");
+        jdbcTemplate.execute("TRUNCATE TABLE subcategory");
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 

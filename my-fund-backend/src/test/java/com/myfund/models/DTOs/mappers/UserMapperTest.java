@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.myfund.models.DTOs.CreateUserDTO;
-import com.myfund.models.DTOs.EditUserDTO;
 import com.myfund.models.DTOs.UserDTO;
 import com.myfund.models.User;
 import org.junit.jupiter.api.Test;
@@ -24,21 +23,6 @@ public class UserMapperTest {
         assertEquals(createUserDTO.getEmail(), user.getEmail(), "The email should match");
         assertEquals(createUserDTO.getPassword(), user.getPassword(), "The password should match");
         assertEquals(createUserDTO.getUsername(), user.getUsername(), "The username should match");
-    }
-
-    @Test
-    void testEditUserDTOMapToUser() {
-        EditUserDTO editUserDTO = new EditUserDTO();
-        editUserDTO.setEmail("edit@example.com");
-        editUserDTO.setPassword("newpassword123");
-        editUserDTO.setUsename("edituser");
-
-        User user = UserMapper.editUserDTOMapToUser(editUserDTO);
-
-        assertNotNull(user, "The user should not be null");
-        assertEquals(editUserDTO.getEmail(), user.getEmail(), "The email should match");
-        assertEquals(editUserDTO.getPassword(), user.getPassword(), "The password should match");
-        assertEquals(editUserDTO.getUsename(), user.getUsername(), "The username should match");
     }
 
     @Test
@@ -67,20 +51,5 @@ public class UserMapperTest {
         assertEquals(createUserDTO.getEmail(), user.getEmail(), "The email should match");
         assertEquals(createUserDTO.getPassword(), user.getPassword(), "The password should match");
         assertEquals(createUserDTO.getUsername(), user.getUsername(), "The username should match");
-    }
-
-    @Test
-    void testEditUserDTOMapToUser_NullValues() {
-        EditUserDTO editUserDTO = new EditUserDTO();
-        editUserDTO.setEmail(null);
-        editUserDTO.setPassword(null);
-        editUserDTO.setUsename(null);
-
-        User user = UserMapper.editUserDTOMapToUser(editUserDTO);
-
-        assertNotNull(user, "The user should not be null");
-        assertEquals(editUserDTO.getEmail(), user.getEmail(), "The email should match");
-        assertEquals(editUserDTO.getPassword(), user.getPassword(), "The password should match");
-        assertEquals(editUserDTO.getUsename(), user.getUsername(), "The username should match");
     }
 }

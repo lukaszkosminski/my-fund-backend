@@ -2,6 +2,8 @@ package com.myfund.controllers;
 
 import com.myfund.models.User;
 import com.myfund.repositories.UserRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -38,6 +40,21 @@ class UserControllerE2ETest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @AfterEach
+    public void cleanUp() {
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
+        jdbcTemplate.execute("TRUNCATE TABLE users");
+        jdbcTemplate.execute("TRUNCATE TABLE budget");
+        jdbcTemplate.execute("TRUNCATE TABLE expense");
+        jdbcTemplate.execute("TRUNCATE TABLE income");
+        jdbcTemplate.execute("TRUNCATE TABLE category");
+        jdbcTemplate.execute("TRUNCATE TABLE subcategory");
+        jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
+    }
 
     @BeforeEach
     public void setUp(){

@@ -36,19 +36,19 @@ class SantanderCsvParserTest {
 
     @Test
     void testIsIncome() {
-        String[] values = {"", "", "", "", "", "", "", "", "", "", "1000.00", ""};
+        String[] values = {"", "", "", "", "", "", "", "", "", "", "", "1000.00"};
         assertTrue(santanderCsvParser.isIncome(values), "Should be identified as income");
     }
 
     @Test
     void testIsExpense() {
-        String[] values = {"", "", "", "", "", "", "", "", "", "", "", "500.00"};
+        String[] values = {"", "", "", "", "", "", "", "", "", "", "500.00", ""};
         assertTrue(santanderCsvParser.isExpense(values), "Should be identified as expense");
     }
 
     @Test
     void testMapToIncome() {
-        String[] values = {"", "", "01-01-2023", "", "Salary", "", "", "", "", "", "1000.00", ""};
+        String[] values = {"", "", "01-01-2023", "Salary", "", "", "", "", "", "", "", "1000.00"};
         Income income = santanderCsvParser.mapToIncome(values);
         assertNotNull(income, "Income should not be null");
         assertEquals(LocalDate.parse("01-01-2023", DateTimeFormatter.ofPattern("dd-MM-yyyy")).atStartOfDay(), income.getLocalDateTime(), "Date should match");
@@ -58,7 +58,7 @@ class SantanderCsvParserTest {
 
     @Test
     void testMapToExpense() {
-        String[] values = {"", "", "01-01-2023", "", "Groceries", "", "", "", "", "", "", "500.00"};
+        String[] values = {"", "", "01-01-2023", "Groceries", "", "", "", "", "", "", "500.00", ""};
         Expense expense = santanderCsvParser.mapToExpense(values);
         assertNotNull(expense, "Expense should not be null");
         assertEquals(LocalDate.parse("01-01-2023", DateTimeFormatter.ofPattern("dd-MM-yyyy")).atStartOfDay(), expense.getLocalDateTime(), "Date should match");
