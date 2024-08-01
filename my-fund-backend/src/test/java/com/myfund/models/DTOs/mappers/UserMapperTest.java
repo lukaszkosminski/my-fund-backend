@@ -17,7 +17,7 @@ public class UserMapperTest {
         createUserDTO.setPassword("password123");
         createUserDTO.setUsername("testuser");
 
-        User user = UserMapper.createUserDTOMapToUser(createUserDTO);
+        User user = UserMapper.toUser(createUserDTO);
 
         assertNotNull(user, "The user should not be null");
         assertEquals(createUserDTO.getEmail(), user.getEmail(), "The email should match");
@@ -31,7 +31,7 @@ public class UserMapperTest {
         user.setEmail("user@example.com");
         user.setUsername("user123");
 
-        UserDTO userDTO = UserMapper.userMapToUserDTO(user);
+        UserDTO userDTO = UserMapper.toUserDTO(user);
 
         assertNotNull(userDTO, "The userDTO should not be null");
         assertEquals(user.getEmail(), userDTO.getEmail(), "The email should match");
@@ -45,7 +45,7 @@ public class UserMapperTest {
         createUserDTO.setPassword(null);
         createUserDTO.setUsername(null);
 
-        User user = UserMapper.createUserDTOMapToUser(createUserDTO);
+        User user = UserMapper.toUser(createUserDTO);
 
         assertNotNull(user, "The user should not be null");
         assertEquals(createUserDTO.getEmail(), user.getEmail(), "The email should match");

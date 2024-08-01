@@ -7,7 +7,7 @@ import com.myfund.models.User;
 
 public class UserMapper {
 
-    public static User createUserDTOMapToUser(CreateUserDTO createUserDTO) {
+    public static User toUser(CreateUserDTO createUserDTO) {
         User user = new User();
         user.setEmail(createUserDTO.getEmail());
         user.setPassword(createUserDTO.getPassword());
@@ -15,15 +15,7 @@ public class UserMapper {
         return user;
     }
 
-//    public static User editUserDTOMapToUser(EditUserDTO editUserDTO) {
-//        User user = new User();
-//        user.setEmail(editUserDTO.getEmail());
-//        user.setPassword(editUserDTO.getPassword());
-//        user.setUsername(editUserDTO.getUsename());
-//        return user;
-//    }
-
-    public static UserDTO userMapToUserDTO(User user) {
+    public static UserDTO toUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setEmail(user.getEmail());
         userDTO.setUsername(user.getUsername());

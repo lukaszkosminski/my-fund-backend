@@ -4,6 +4,7 @@ import com.myfund.models.DTOs.CreateUserDTO;
 import com.myfund.models.DTOs.PasswordChangeDTO;
 import com.myfund.models.DTOs.PasswordChangeRequestDTO;
 import com.myfund.models.DTOs.UserDTO;
+import com.myfund.models.User;
 import com.myfund.services.UserService;
 import com.myfund.services.email.EmailSender;
 import com.myfund.services.email.TokenService;
@@ -111,11 +112,11 @@ class AuthControlerE2ETest {
 
     @Test
     public void testChangePassword() throws IOException {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("testuser");
-        createUserDTO.setPassword("oldPassword");
-        createUserDTO.setEmail("test@example.com");
-        userService.createUser(createUserDTO);
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("test@example.com");
+        user.setPassword("password");
+        userService.createUser(user);
 
         String passwordResetToken = tokenService.createPasswordResetToken("test@example.com");
 
@@ -168,11 +169,11 @@ class AuthControlerE2ETest {
 
     @Test
     public void testChangePasswordWithInvalidToken() throws IOException {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("testuser");
-        createUserDTO.setPassword("oldPassword");
-        createUserDTO.setEmail("test@example.com");
-        userService.createUser(createUserDTO);
+        User user = new User();
+        user.setUsername("testuser");
+        user.setEmail("test@example.com");
+        user.setPassword("password");
+        userService.createUser(user);
 
         PasswordChangeDTO passwordChangeDTO = new PasswordChangeDTO();
         passwordChangeDTO.setEmail("test@example.com");
@@ -183,8 +184,12 @@ class AuthControlerE2ETest {
         Map<String, String> errorResponse = (Map<String, String>) response.getBody();
         String currentPassword = jdbcTemplate.queryForObject("SELECT password FROM users WHERE id = 1", String.class);
 
+        System.out.println(user.getPassword());
+        System.out.println(currentPassword);
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        assertThat(passwordEncoder.matches(createUserDTO.getPassword(), currentPassword)).isTrue();
+        assertThat(user.getPassword()).isEqualTo(currentPassword);
+
         assertThat(errorResponse.get("message")).isEqualTo("Invalid token");
     }
 
