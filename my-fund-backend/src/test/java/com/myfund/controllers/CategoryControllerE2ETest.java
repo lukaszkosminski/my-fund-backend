@@ -59,7 +59,7 @@ public class CategoryControllerE2ETest {
     private SubCategoryRepository subCategoryRepository;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         mysqlContainer.start();
 
         org.springframework.security.core.userdetails.User springUser =

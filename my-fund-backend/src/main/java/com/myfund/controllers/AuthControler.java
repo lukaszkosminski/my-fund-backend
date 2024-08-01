@@ -33,7 +33,7 @@ public class AuthControler {
     @PostMapping("/request-change-password")
     public ResponseEntity<?> requestChangePassword(@Valid @RequestBody PasswordChangeRequestDTO passwordChangeRequestDTO) {
         userService.requestPasswordChange(passwordChangeRequestDTO);
-        return new ResponseEntity<>(passwordChangeRequestDTO,HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(passwordChangeRequestDTO, HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/change-password")
