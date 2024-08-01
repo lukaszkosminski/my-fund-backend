@@ -764,18 +764,18 @@ public class BudgetControllerE2ETest {
         Budget savedBudget = budgetRepository.save(budget1);
 
 
-        CreateExpenseDTO createExpenseDTO = new CreateExpenseDTO();
-        createExpenseDTO.setName("Test Expense");
-        createExpenseDTO.setAmount(BigDecimal.valueOf(100.0));
-        createExpenseDTO.setIdCategory(1L);
+        Expense expense1 = new Expense();
+        expense1.setName("Test Expense");
+        expense1.setAmount(BigDecimal.valueOf(100.0));
+        expense1.setIdCategory(1L);
 
-        CreateExpenseDTO createExpenseDTO1 = new CreateExpenseDTO();
-        createExpenseDTO1.setName("Test Expense 1");
-        createExpenseDTO1.setAmount(BigDecimal.valueOf(50.0));
-        createExpenseDTO1.setIdCategory(1L);
+        Expense expense2 = new Expense();
+        expense2.setName("Test Expense 1");
+        expense2.setAmount(BigDecimal.valueOf(50.0));
+        expense2.setIdCategory(1L);
 
-        budgetService.createExpense(budget1.getId(), createExpenseDTO1, user );
-        budgetService.createExpense(budget1.getId(),createExpenseDTO,user );
+        budgetService.createExpense(budget1.getId(), expense1, user );
+        budgetService.createExpense(budget1.getId(),expense2,user );
 
         Long budgetId = savedBudget.getId();
         Long categoryId = 1L;
@@ -851,18 +851,18 @@ public class BudgetControllerE2ETest {
         category.setUser(user);
         Category savedCategory = categoryRepository.save(category);
 
-        CreateIncomeDTO createIncomeDTO = new CreateIncomeDTO();
-        createIncomeDTO.setName("Test Income");
-        createIncomeDTO.setAmount(BigDecimal.valueOf(500.0));
-        createIncomeDTO.setIdCategory(savedCategory.getId());
+        Income income1 = new Income();
+        income1.setName("Test Income");
+        income1.setAmount(BigDecimal.valueOf(500.0));
+        income1.setIdCategory(savedCategory.getId());
 
-        CreateIncomeDTO createIncomeDTO1 = new CreateIncomeDTO();
-        createIncomeDTO1.setName("Test Income 1");
-        createIncomeDTO1.setAmount(BigDecimal.valueOf(250.0));
-        createIncomeDTO1.setIdCategory(savedCategory.getId());
+        Income income2 = new Income();
+        income2.setName("Test Income 1");
+        income2.setAmount(BigDecimal.valueOf(250.0));
+        income2.setIdCategory(savedCategory.getId());
 
-        budgetService.createIncome(budget.getId(), createIncomeDTO1, user);
-        budgetService.createIncome(budget.getId(), createIncomeDTO, user);
+        budgetService.createIncome(budget.getId(), income1, user);
+        budgetService.createIncome(budget.getId(), income2, user);
 
         mockMvc.perform(get("/api/budgets/" + savedBudget.getId() + "/categories/" + savedCategory.getId() + "/incomes/total")
                         .contentType(MediaType.APPLICATION_JSON))

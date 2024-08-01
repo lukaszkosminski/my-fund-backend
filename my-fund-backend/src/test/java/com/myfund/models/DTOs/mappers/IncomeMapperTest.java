@@ -20,7 +20,7 @@ class IncomeMapperTest {
         createIncomeDTO.setIdCategory(1L);
         createIncomeDTO.setIdSubCategory(2L);
 
-        Income income = IncomeMapper.createIncomeDTOtoIncome(createIncomeDTO);
+        Income income = IncomeMapper.toIncome(createIncomeDTO);
 
         assertNotNull(income);
         assertEquals("Salary", income.getName());
@@ -39,7 +39,7 @@ class IncomeMapperTest {
         income.setIdSubCategory(2L);
         income.setLocalDateTime(LocalDateTime.of(2023, 10, 1, 10, 0));
 
-        IncomeDTO incomeDTO = IncomeMapper.incomeMapToIncomeDTO(income);
+        IncomeDTO incomeDTO = IncomeMapper.toIncomeDTO(income);
 
         assertNotNull(incomeDTO);
         assertEquals(1L, incomeDTO.getId());

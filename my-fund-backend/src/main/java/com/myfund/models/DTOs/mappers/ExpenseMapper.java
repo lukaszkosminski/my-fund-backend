@@ -6,7 +6,7 @@ import com.myfund.models.Expense;
 
 public class ExpenseMapper {
 
-    public static Expense createExpenseDTOtoExpense(CreateExpenseDTO createExpenseDTO) {
+    public static Expense toExpense(CreateExpenseDTO createExpenseDTO) {
         Expense expense = new Expense();
         expense.setName(createExpenseDTO.getName());
         expense.setAmount(createExpenseDTO.getAmount());
@@ -15,7 +15,7 @@ public class ExpenseMapper {
         return expense;
     }
 
-    public static ExpenseDTO expensetoExpenseDTO(Expense expense){
+    public static ExpenseDTO toExpenseDTO(Expense expense){
         ExpenseDTO expenseDTO = new ExpenseDTO();
         expenseDTO.setId(expense.getId());
         expenseDTO.setName(expense.getName());

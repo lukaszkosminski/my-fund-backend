@@ -8,6 +8,6 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 public class CreateBudgetDTO {
-    
+    @NotNull
     private String name;
 }

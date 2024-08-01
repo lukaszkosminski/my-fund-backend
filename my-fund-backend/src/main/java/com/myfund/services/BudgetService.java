@@ -58,19 +58,18 @@ public class BudgetService {
         log.info("Default empty budget saved for user. Email: {}", user.getEmail());
     }
 
-    public BudgetDTO createBudget(@Valid CreateBudgetDTO createBudgetDTO, User user) throws InvalidInputException {
-        if (createBudgetDTO == null || createBudgetDTO.getName() == null || createBudgetDTO.getName().isEmpty()) {
+    public Budget createBudget(Budget budget, User user) throws InvalidInputException {
+        if (budget == null || budget.getName() == null || budget.getName().isEmpty()) {
             throw new InvalidInputException("Budget name is required");
         }
 
-        Optional<Budget> budgetOpt = budgetRepository.findByNameAndUser(createBudgetDTO.getName(), user);
+        Optional<Budget> budgetOpt = budgetRepository.findByNameAndUser(budget.getName(), user);
         if (budgetOpt.isPresent()) {
             String errorMessage = String.format("Attempt to create a duplicate budget. User Email: %s, Budget Name: %s", user.getEmail(), budgetOpt.get().getName());
             log.warn(errorMessage);
             throw new BudgetNotUniqueException(errorMessage);
         }
 
-        Budget budget = BudgetMapper.createBudgetDTOMapToBudget(createBudgetDTO);
         budget.setUser(user);
         budget.setLocalDateTime(LocalDateTime.now());
         budget.setBalance(BigDecimal.ZERO);
@@ -79,16 +78,17 @@ public class BudgetService {
         budgetRepository.save(budget);
 
         log.info("New budget saved for user. Email: {}. Name: {}", user.getEmail(), budget.getName());
-        return BudgetMapper.budgetMapToBudgetDTO(budget);
+        return budget;
     }
 
-    public List<BudgetSummaryDTO> findAllBudgetsByUser(User user) {
-        List<BudgetSummaryDTO> budgetSummaryDTOList = BudgetMapper.budgetListMapToBudgetSummaryDTOList(budgetRepository.findAllByUser(user));
-        log.info("Retrieved {} budgets for user with ID: {}", budgetSummaryDTOList.size(), user.getId());
-        return budgetSummaryDTOList;
+    public List<Budget> findAllBudgetsByUser(User user) {
+        List<Budget> allBudgetsByUser = budgetRepository.findAllByUser(user);
+//        List<BudgetSummaryDTO> budgetSummaryDTOList = BudgetMapper.toListBudgetSummaryDTO(budgetRepository.findAllByUser(user));
+        log.info("Retrieved {} budgets for user with ID: {}", allBudgetsByUser.size(), user.getId());
+        return allBudgetsByUser;
     }
 
-    public BudgetDTO findBudgetByIdAndUser(Long budgetId, User user) {
+    public Budget findBudgetByIdAndUser(Long budgetId, User user) {
         log.debug("Starting to find budget by ID: {} for user ID: {}", budgetId, user.getId());
 
         Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
@@ -98,18 +98,18 @@ public class BudgetService {
         }
 
         log.info("Budget found for user with ID: {} and budget ID: {}", user.getId(), budgetId);
-        return BudgetMapper.budgetMapToBudgetDTO(budgetOpt.get());
+        return budgetOpt.get();
     }
 
-    public ExpenseDTO createExpense(Long budgetId, CreateExpenseDTO createExpenseDTO, User user) throws InvalidInputException {
+    public Expense createExpense(Long budgetId, Expense expense, User user) throws InvalidInputException {
         log.debug("Starting to create expense for budget ID: {} and user ID: {}", budgetId, user.getId());
 
-        if (createExpenseDTO.getName() == null || createExpenseDTO.getName().isEmpty() || createExpenseDTO.getAmount() == null) {
+        if (expense.getName() == null || expense.getName().isEmpty() || expense.getAmount() == null) {
             log.warn("Expense name is required. User ID: {}, Budget ID: {}", user.getId(), budgetId);
             throw new InvalidInputException("Expense name is required");
         }
 
-        if (createExpenseDTO.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+        if (expense.getAmount().compareTo(BigDecimal.ZERO) < 0) {
             log.warn("Amount cannot be negative for expense creation. User ID: {}, Budget ID: {}", user.getId(), budgetId);
             throw new InvalidInputException("Amount cannot be negative");
         }
@@ -122,12 +122,11 @@ public class BudgetService {
 
         log.debug("Budget found for budget ID: {} and user ID: {}. Proceeding with expense creation.", budgetId, user.getId());
 
-        if (!validateCategoryAndSubCategory(createExpenseDTO.getIdCategory(), createExpenseDTO.getIdSubCategory(), user)) {
-            log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}", createExpenseDTO.getIdSubCategory(), createExpenseDTO.getIdCategory(), user.getId());
-            throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createExpenseDTO.getIdSubCategory() + " is not related to category with ID: " + createExpenseDTO.getIdCategory());
+        if (!validateCategoryAndSubCategory(expense.getIdCategory(), expense.getIdSubCategory(), user)) {
+            log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}", expense.getIdSubCategory(), expense.getIdCategory(), user.getId());
+            throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + expense.getIdSubCategory() + " is not related to category with ID: " + expense.getIdCategory());
         }
 
-        Expense expense = ExpenseMapper.createExpenseDTOtoExpense(createExpenseDTO);
         Budget budget = budgetOpt.get();
         expense.setBudget(budget);
         expense.setLocalDateTime(LocalDate.now().atStartOfDay());
@@ -136,18 +135,18 @@ public class BudgetService {
         updateTotalExpense(budget);
 
         log.info("Expense created for budget ID: {} and user ID: {}", budgetId, user.getId());
-        return ExpenseMapper.expensetoExpenseDTO(expense);
+        return expense;
     }
 
-    public IncomeDTO createIncome(Long budgetId, CreateIncomeDTO createIncomeDTO, User user) throws InvalidInputException {
+    public Income createIncome(Long budgetId, Income income, User user) throws InvalidInputException {
         log.debug("Starting to create income for budget ID: {} and user ID: {}", budgetId, user.getId());
 
-        if (createIncomeDTO.getName() == null || createIncomeDTO.getName().isEmpty() || createIncomeDTO.getAmount() == null) {
+        if (income.getName() == null || income.getName().isEmpty() || income.getAmount() == null) {
             log.warn("Expense name is required. User ID: {}, Budget ID: {}", user.getId(), budgetId);
             throw new InvalidInputException("Expense name is required");
         }
 
-        if (createIncomeDTO.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+        if (income.getAmount().compareTo(BigDecimal.ZERO) < 0) {
             log.warn("Amount cannot be negative for expense creation. User ID: {}, Budget ID: {}", user.getId(), budgetId);
             throw new InvalidInputException("Amount cannot be negative");
         }
@@ -160,12 +159,11 @@ public class BudgetService {
 
         log.debug("Budget found for budget ID: {} and user ID: {}. Proceeding with income creation.", budgetId, user.getId());
 
-        if (!validateCategoryAndSubCategory(createIncomeDTO.getIdCategory(), createIncomeDTO.getIdSubCategory(), user)) {
-            log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}", createIncomeDTO.getIdSubCategory(), createIncomeDTO.getIdCategory(), user.getId());
-            throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + createIncomeDTO.getIdSubCategory() + " is not related to category with ID: " + createIncomeDTO.getIdCategory());
+        if (!validateCategoryAndSubCategory(income.getIdCategory(), income.getIdSubCategory(), user)) {
+            log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}", income.getIdSubCategory(), income.getIdCategory(), user.getId());
+            throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + income.getIdSubCategory() + " is not related to category with ID: " + income.getIdCategory());
         }
 
-        Income income = IncomeMapper.createIncomeDTOtoIncome(createIncomeDTO);
         Budget budget = budgetOpt.get();
         income.setBudget(budget);
         income.setLocalDateTime(LocalDate.now().atStartOfDay());
@@ -174,7 +172,7 @@ public class BudgetService {
         updateTotalIncome(budget);
 
         log.info("Income created for budget ID: {} and user ID: {}", budgetId, user.getId());
-        return IncomeMapper.incomeMapToIncomeDTO(income);
+        return income;
     }
 
     public ExpenseDTO updateExpense(Long budgetId, Long expenseId, CreateExpenseDTO createExpenseDTO, User user) throws InvalidInputException {
@@ -212,7 +210,7 @@ public class BudgetService {
         expenseRepository.save(expense);
 
         log.info("Expense successfully updated. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
-        return ExpenseMapper.expensetoExpenseDTO(expense);
+        return ExpenseMapper.toExpenseDTO(expense);
     }
 
     public IncomeDTO updateIncome(Long budgetId, Long incomeId, CreateIncomeDTO createIncomeDTO, User user) throws InvalidInputException {
@@ -250,7 +248,7 @@ public class BudgetService {
         incomeRepository.save(income);
 
         log.info("Income successfully updated. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
-        return IncomeMapper.incomeMapToIncomeDTO(income);
+        return IncomeMapper.toIncomeDTO(income);
     }
 
     public boolean validateCategoryAndSubCategory(Long categoryId, Long subCategoryId, User user) {

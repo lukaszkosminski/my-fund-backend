@@ -1,6 +1,7 @@
 package com.myfund.services.csv;
 
 import com.myfund.exceptions.InvalidInputException;
+import com.myfund.models.Budget;
 import com.myfund.models.DTOs.BudgetDTO;
 import com.myfund.models.DTOs.mappers.BudgetMapper;
 import com.myfund.models.Expense;
@@ -72,9 +73,9 @@ class AbstractCsvParserTest {
 
         User user = new User();
         Long budgetId = 1L;
-        BudgetDTO budgetDTO = new BudgetDTO();
-        budgetDTO.setId(budgetId);
-        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budgetDTO);
+        Budget budget = new Budget();
+        budget.setId(budgetId);
+        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budget);
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream("header\nincome,1000".getBytes(StandardCharsets.UTF_8)));
 
         parser.parse(file, user, budgetId);
@@ -84,7 +85,7 @@ class AbstractCsvParserTest {
         Income savedIncome = incomeCaptor.getValue();
         assertEquals(new BigDecimal("1000"), savedIncome.getAmount());
         assertEquals(user, savedIncome.getUser());
-        assertEquals(budgetDTO.getId(), savedIncome.getBudget().getId());
+        assertEquals(budget.getId(), savedIncome.getBudget().getId());
     }
 
     @Test
@@ -92,9 +93,9 @@ class AbstractCsvParserTest {
 
         User user = new User();
         Long budgetId = 1L;
-        BudgetDTO budgetDTO = new BudgetDTO();
-        budgetDTO.setId(budgetId);
-        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budgetDTO);
+        Budget budget = new Budget();
+        budget.setId(budgetId);
+        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budget);
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream("header\nexpense,500".getBytes(StandardCharsets.UTF_8)));
 
         parser.parse(file, user, budgetId);
@@ -104,7 +105,7 @@ class AbstractCsvParserTest {
         Expense savedExpense = expenseCaptor.getValue();
         assertEquals(new BigDecimal("500"), savedExpense.getAmount());
         assertEquals(user, savedExpense.getUser());
-        assertEquals(budgetDTO.getId(), savedExpense.getBudget().getId());
+        assertEquals(budget.getId(), savedExpense.getBudget().getId());
     }
 
     @Test
@@ -112,9 +113,9 @@ class AbstractCsvParserTest {
 
         User user = new User();
         Long budgetId = 1L;
-        BudgetDTO budgetDTO = new BudgetDTO();
-        budgetDTO.setId(budgetId);
-        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budgetDTO);
+        Budget budget = new Budget();
+        budget.setId(budgetId);
+        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budget);
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream("header\n".getBytes(StandardCharsets.UTF_8)));
 
         parser.parse(file, user, budgetId);
@@ -128,9 +129,9 @@ class AbstractCsvParserTest {
 
         User user = new User();
         Long budgetId = 1L;
-        BudgetDTO budgetDTO = new BudgetDTO();
-        budgetDTO.setId(budgetId);
-        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budgetDTO);
+        Budget budget = new Budget();
+        budget.setId(budgetId);
+        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budget);
         when(file.getInputStream()).thenThrow(new IOException("Test Exception"));
 
         parser.parse(file, user, budgetId);
@@ -144,9 +145,9 @@ class AbstractCsvParserTest {
 
         User user = new User();
         Long budgetId = 1L;
-        BudgetDTO budgetDTO = new BudgetDTO();
-        budgetDTO.setId(budgetId);
-        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budgetDTO);
+        Budget budget = new Budget();
+        budget.setId(budgetId);
+        when(budgetService.findBudgetByIdAndUser(budgetId, user)).thenReturn(budget);
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream("header\ninvalid,line\nincome,1000".getBytes(StandardCharsets.UTF_8)));
 
         parser.parse(file, user, budgetId);
@@ -156,51 +157,51 @@ class AbstractCsvParserTest {
         Income savedIncome = incomeCaptor.getValue();
         assertEquals(new BigDecimal("1000"), savedIncome.getAmount());
         assertEquals(user, savedIncome.getUser());
-        assertEquals(budgetDTO.getId(), savedIncome.getBudget().getId());
+        assertEquals(budget.getId(), savedIncome.getBudget().getId());
     }
 
     @Test
     void processLine_ShouldProcessIncome() throws InvalidInputException {
 
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
         String line = "income,1000";
 
-        parser.processLine(line, user, budgetDTO);
+        parser.processLine(line, user, budget);
 
         ArgumentCaptor<Income> incomeCaptor = ArgumentCaptor.forClass(Income.class);
         verify(budgetService, times(1)).saveIncomeFromCsv(incomeCaptor.capture());
         Income savedIncome = incomeCaptor.getValue();
         assertEquals(new BigDecimal("1000"), savedIncome.getAmount());
         assertEquals(user, savedIncome.getUser());
-        assertEquals(budgetDTO.getId(), savedIncome.getBudget().getId());
+        assertEquals(budget.getId(), savedIncome.getBudget().getId());
     }
 
     @Test
     void processLine_ShouldProcessExpense() throws InvalidInputException {
 
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
         String line = "expense,500";
 
-        parser.processLine(line, user, budgetDTO);
+        parser.processLine(line, user, budget);
 
         ArgumentCaptor<Expense> expenseCaptor = ArgumentCaptor.forClass(Expense.class);
         verify(budgetService, times(1)).saveExpenseFromCsv(expenseCaptor.capture());
         Expense savedExpense = expenseCaptor.getValue();
         assertEquals(new BigDecimal("500"), savedExpense.getAmount());
         assertEquals(user, savedExpense.getUser());
-        assertEquals(budgetDTO.getId(), savedExpense.getBudget().getId());
+        assertEquals(budget.getId(), savedExpense.getBudget().getId());
     }
 
     @Test
     void processLine_ShouldNotProcessInvalidLine() throws InvalidInputException {
 
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
         String line = "invalid,line";
 
-        parser.processLine(line, user, budgetDTO);
+        parser.processLine(line, user, budget);
 
         verify(budgetService, never()).saveIncomeFromCsv(any(Income.class));
         verify(budgetService, never()).saveExpenseFromCsv(any(Expense.class));
@@ -210,10 +211,10 @@ class AbstractCsvParserTest {
     void processLine_ShouldHandleEmptyLine() throws InvalidInputException {
 
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
         String line = "";
 
-        parser.processLine(line, user, budgetDTO);
+        parser.processLine(line, user, budget);
 
         verify(budgetService, never()).saveIncomeFromCsv(any(Income.class));
         verify(budgetService, never()).saveExpenseFromCsv(any(Expense.class));
@@ -224,16 +225,16 @@ class AbstractCsvParserTest {
 
         String[] values = {"income", "1000"};
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
 
-        parser.processIncome(values, user, budgetDTO);
+        parser.processIncome(values, user, budget);
 
         ArgumentCaptor<Income> incomeCaptor = ArgumentCaptor.forClass(Income.class);
         verify(budgetService, times(1)).saveIncomeFromCsv(incomeCaptor.capture());
         Income savedIncome = incomeCaptor.getValue();
         assertEquals(new BigDecimal("1000"), savedIncome.getAmount());
         assertEquals(user, savedIncome.getUser());
-        assertEquals(budgetDTO.getId(), savedIncome.getBudget().getId());
+        assertEquals(budget.getId(), savedIncome.getBudget().getId());
     }
 
     @Test
@@ -241,9 +242,9 @@ class AbstractCsvParserTest {
 
         String[] values = {"income", "2000"};
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
 
-        parser.processIncome(values, user, budgetDTO);
+        parser.processIncome(values, user, budget);
 
         verify(budgetService, times(1)).saveIncomeFromCsv(any(Income.class));
     }
@@ -253,9 +254,9 @@ class AbstractCsvParserTest {
 
         String[] values = {"income", "4000"};
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
 
-        parser.processIncome(values, user, budgetDTO);
+        parser.processIncome(values, user, budget);
 
         ArgumentCaptor<Income> incomeCaptor = ArgumentCaptor.forClass(Income.class);
         verify(budgetService).saveIncomeFromCsv(incomeCaptor.capture());
@@ -268,14 +269,14 @@ class AbstractCsvParserTest {
 
         String[] values = {"income", "5000"};
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
 
-        parser.processIncome(values, user, budgetDTO);
+        parser.processIncome(values, user, budget);
 
         ArgumentCaptor<Income> incomeCaptor = ArgumentCaptor.forClass(Income.class);
         verify(budgetService).saveIncomeFromCsv(incomeCaptor.capture());
         Income savedIncome = incomeCaptor.getValue();
-        assertEquals(budgetDTO.getId(), savedIncome.getBudget().getId());
+        assertEquals(budget.getId(), savedIncome.getBudget().getId());
     }
 
     @Test
@@ -283,9 +284,9 @@ class AbstractCsvParserTest {
 
         String[] values = {"Expense", "100.00"};
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
 
-        parser.processExpense(values, user, budgetDTO);
+        parser.processExpense(values, user, budget);
 
         ArgumentCaptor<Expense> expenseCaptor = ArgumentCaptor.forClass(Expense.class);
         verify(budgetService).saveExpenseFromCsv(expenseCaptor.capture());
@@ -301,9 +302,9 @@ class AbstractCsvParserTest {
 
         String[] values = {"Expense", "100.00"};
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
 
-        parser.processExpense(values, user, budgetDTO);
+        parser.processExpense(values, user, budget);
 
         ArgumentCaptor<Expense> expenseCaptor = ArgumentCaptor.forClass(Expense.class);
         verify(budgetService).saveExpenseFromCsv(expenseCaptor.capture());
@@ -317,9 +318,9 @@ class AbstractCsvParserTest {
 
         String[] values = {"Expense", "100.00"};
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
 
-        parser.processExpense(values, user, budgetDTO);
+        parser.processExpense(values, user, budget);
 
         ArgumentCaptor<Expense> expenseCaptor = ArgumentCaptor.forClass(Expense.class);
         verify(budgetService).saveExpenseFromCsv(expenseCaptor.capture());
@@ -332,9 +333,9 @@ class AbstractCsvParserTest {
     void processExpense_ShouldCallSaveExpenseFromCsv() throws InvalidInputException {
         String[] values = {"Expense", "100.00"};
         User user = new User();
-        BudgetDTO budgetDTO = new BudgetDTO();
+        Budget budget = new Budget();
 
-        parser.processExpense(values, user, budgetDTO);
+        parser.processExpense(values, user, budget);
 
         verify(budgetService, times(1)).saveExpenseFromCsv(any(Expense.class));
     }

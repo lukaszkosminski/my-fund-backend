@@ -20,7 +20,7 @@ class ExpenseMapperTest {
         createExpenseDTO.setIdCategory(1L);
         createExpenseDTO.setIdSubCategory(2L);
 
-        Expense expense = ExpenseMapper.createExpenseDTOtoExpense(createExpenseDTO);
+        Expense expense = ExpenseMapper.toExpense(createExpenseDTO);
 
         assertNotNull(expense, "Expense should not be null");
         assertEquals(createExpenseDTO.getName(), expense.getName(), "Expense name should match");
@@ -39,7 +39,7 @@ class ExpenseMapperTest {
         expense.setIdSubCategory(2L);
         expense.setLocalDateTime(LocalDateTime.of(2023, 10, 1, 12, 0));
 
-        ExpenseDTO expenseDTO = ExpenseMapper.expensetoExpenseDTO(expense);
+        ExpenseDTO expenseDTO = ExpenseMapper.toExpenseDTO(expense);
 
         assertNotNull(expenseDTO, "ExpenseDTO should not be null");
         assertEquals(expense.getId(), expenseDTO.getId(), "Expense ID should match");

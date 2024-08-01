@@ -1,9 +1,11 @@
 package com.myfund.controllers;
 
 import com.myfund.exceptions.InvalidInputException;
-import com.myfund.models.BankName;
+import com.myfund.models.*;
 import com.myfund.models.DTOs.*;
-import com.myfund.models.User;
+import com.myfund.models.DTOs.mappers.BudgetMapper;
+import com.myfund.models.DTOs.mappers.ExpenseMapper;
+import com.myfund.models.DTOs.mappers.IncomeMapper;
 import com.myfund.services.BudgetService;
 import com.myfund.services.csv.CsvReaderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -30,32 +33,33 @@ public class BudgetController {
     }
 
     @PostMapping("/budgets")
-    public ResponseEntity<BudgetDTO> createBudget(@RequestBody CreateBudgetDTO createBudgetDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
-        BudgetDTO budgetDTO = budgetService.createBudget(createBudgetDTO, user);
-        return new ResponseEntity<>(budgetDTO, HttpStatus.CREATED);
+    public ResponseEntity<BudgetDTO> createBudget(@RequestBody @Valid CreateBudgetDTO createBudgetDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
+        Budget budget = budgetService.createBudget(BudgetMapper.toBudget(createBudgetDTO), user);
+        return new ResponseEntity<>(BudgetMapper.toBudgetDTO(budget), HttpStatus.CREATED);
     }
 
     @GetMapping("/budgets/{budgetId}")
     public ResponseEntity<BudgetDTO> getBudgetById(@PathVariable("budgetId") Long budgetId, @AuthenticationPrincipal User user) {
-        BudgetDTO budgetDTO = budgetService.findBudgetByIdAndUser(budgetId, user);
-        return new ResponseEntity<>(budgetDTO, HttpStatus.OK);
+        Budget budget = budgetService.findBudgetByIdAndUser(budgetId, user);
+        return new ResponseEntity<>(BudgetMapper.toBudgetDTO(budget), HttpStatus.OK);
     }
 
     @GetMapping("/budgets")
     public ResponseEntity<List<BudgetSummaryDTO>> getAllBudgets(@AuthenticationPrincipal User user) {
-        return new ResponseEntity<>(budgetService.findAllBudgetsByUser(user), HttpStatus.OK);
+        List<Budget> allBudgetsByUser = budgetService.findAllBudgetsByUser(user);
+        return new ResponseEntity<>(BudgetMapper.toListBudgetSummaryDTO(allBudgetsByUser), HttpStatus.OK);
     }
 
     @PostMapping("/budgets/{budgetId}/expenses")
-    public ResponseEntity<ExpenseDTO> createExpense(@PathVariable("budgetId") Long budgetId, @RequestBody CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
-        ExpenseDTO expenseDTO = budgetService.createExpense(budgetId, createExpenseDTO, user);
-        return new ResponseEntity<>(expenseDTO, HttpStatus.CREATED);
+    public ResponseEntity<ExpenseDTO> createExpense(@PathVariable("budgetId") Long budgetId, @RequestBody @Valid CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
+        Expense expense = budgetService.createExpense(budgetId, ExpenseMapper.toExpense(createExpenseDTO), user);
+        return new ResponseEntity<>(ExpenseMapper.toExpenseDTO(expense), HttpStatus.CREATED);
     }
 
     @PostMapping("/budgets/{budgetId}/incomes")
-    public ResponseEntity<IncomeDTO> createIncome(@PathVariable("budgetId") Long budgetId, @RequestBody CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
-        IncomeDTO incomeDTO = budgetService.createIncome(budgetId, createIncomeDTO, user);
-        return new ResponseEntity<>(incomeDTO, HttpStatus.CREATED);
+    public ResponseEntity<IncomeDTO> createIncome(@PathVariable("budgetId") Long budgetId, @RequestBody @Valid CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
+        Income income = budgetService.createIncome(budgetId, IncomeMapper.toIncome(createIncomeDTO), user);
+        return new ResponseEntity<>(IncomeMapper.toIncomeDTO(income), HttpStatus.CREATED);
     }
 
     @PatchMapping("/budgets/{budgetId}/expenses/{expenseId}")

@@ -19,7 +19,7 @@ public class BudgetMapperTest {
         CreateBudgetDTO createBudgetDTO = new CreateBudgetDTO();
         createBudgetDTO.setName("Test Budget");
 
-        Budget budget = BudgetMapper.createBudgetDTOMapToBudget(createBudgetDTO);
+        Budget budget = BudgetMapper.toBudget(createBudgetDTO);
 
         assertNotNull(budget, "Budget should not be null");
         assertEquals("Test Budget", budget.getName(), "Budget name should match");
@@ -34,7 +34,7 @@ public class BudgetMapperTest {
         budget.setTotalExpense(new BigDecimal("500.0"));
         budget.setTotalIncome(new BigDecimal("1500.0"));
 
-        BudgetDTO budgetDTO = BudgetMapper.budgetMapToBudgetDTO(budget);
+        BudgetDTO budgetDTO = BudgetMapper.toBudgetDTO(budget);
 
         assertNotNull(budgetDTO, "BudgetDTO should not be null");
         assertEquals(1L, budgetDTO.getId(), "BudgetDTO ID should match");
@@ -61,7 +61,7 @@ public class BudgetMapperTest {
         budget2.setTotalIncome(new BigDecimal("3000.0"));
 
         List<Budget> budgets = Arrays.asList(budget1, budget2);
-        List<BudgetSummaryDTO> budgetSummaryDTOs = BudgetMapper.budgetListMapToBudgetSummaryDTOList(budgets);
+        List<BudgetSummaryDTO> budgetSummaryDTOs = BudgetMapper.toListBudgetSummaryDTO(budgets);
 
         assertNotNull(budgetSummaryDTOs, "BudgetSummaryDTO list should not be null");
         assertEquals(2, budgetSummaryDTOs.size(), "BudgetSummaryDTO list size should match");
@@ -90,7 +90,7 @@ public class BudgetMapperTest {
         budget.setTotalExpense(new BigDecimal("500.0"));
         budget.setTotalIncome(new BigDecimal("1500.0"));
 
-        BudgetSummaryDTO budgetSummaryDTO = BudgetMapper.budgetMapToBudgetSummaryDTO(budget);
+        BudgetSummaryDTO budgetSummaryDTO = BudgetMapper.toBudgetSummaryDTO(budget);
 
         assertNotNull(budgetSummaryDTO, "BudgetSummaryDTO should not be null");
         assertEquals(1L, budgetSummaryDTO.getId(), "BudgetSummaryDTO ID should match");
@@ -109,7 +109,7 @@ public class BudgetMapperTest {
         budgetDTO.setTotalExpense(new BigDecimal("500.0"));
         budgetDTO.setTotalIncome(new BigDecimal("1500.0"));
 
-        Budget budget = BudgetMapper.budgetDTOMapToBudget(budgetDTO);
+        Budget budget = BudgetMapper.toBudget(budgetDTO);
 
         assertNotNull(budget, "Budget should not be null");
         assertEquals(1L, budget.getId(), "Budget ID should match");

@@ -6,7 +6,7 @@ import com.myfund.models.Income;
 
 public class IncomeMapper {
 
-    public static Income createIncomeDTOtoIncome(CreateIncomeDTO createIncomeDTO) {
+    public static Income toIncome(CreateIncomeDTO createIncomeDTO) {
         Income income = new Income();
         income.setName(createIncomeDTO.getName());
         income.setAmount(createIncomeDTO.getAmount());
@@ -15,7 +15,7 @@ public class IncomeMapper {
         return income;
     }
 
-    public static IncomeDTO incomeMapToIncomeDTO(Income income) {
+    public static IncomeDTO toIncomeDTO(Income income) {
         IncomeDTO incomeDTO = new IncomeDTO();
         incomeDTO.setId(income.getId());
         incomeDTO.setName(income.getName());
