@@ -1,4 +1,4 @@
-package com.myfund.integration;
+package com.myfund.controllers;
 
 import com.myfund.models.DTOs.ApplicationDetailsDTO;
 import com.myfund.services.ApplicationDetailsService;

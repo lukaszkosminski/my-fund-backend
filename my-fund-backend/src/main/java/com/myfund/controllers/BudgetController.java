@@ -1,4 +1,4 @@
-package com.myfund.integration;
+package com.myfund.controllers;
 
 import com.myfund.exceptions.InvalidInputException;
 import com.myfund.models.*;

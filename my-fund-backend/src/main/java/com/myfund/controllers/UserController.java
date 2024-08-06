@@ -1,4 +1,4 @@
-package com.myfund.integration;
+package com.myfund.controllers;
 
 import com.myfund.models.DTOs.UserDTO;
 import com.myfund.models.DTOs.mappers.UserMapper;

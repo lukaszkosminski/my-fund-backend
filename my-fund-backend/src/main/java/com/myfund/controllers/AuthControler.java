@@ -1,4 +1,4 @@
-package com.myfund.integration;
+package com.myfund.controllers;
 
 import com.myfund.models.DTOs.CreateUserDTO;
 import com.myfund.models.DTOs.PasswordChangeDTO;
