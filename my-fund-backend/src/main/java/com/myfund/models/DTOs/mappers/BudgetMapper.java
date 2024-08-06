@@ -9,60 +9,35 @@ import java.util.stream.Collectors;
 
 public class BudgetMapper {
 
-    public static Budget createBudgetDTOMapToBudget(CreateBudgetDTO createBudgetDTO) {
-        Budget budget = new Budget();
-        budget.setName(createBudgetDTO.getName());
+    public static Budget toModel(CreateBudgetDTO createBudgetDTO) {
+        Budget budget = Budget.builder().name(createBudgetDTO.getName()).build();
         return budget;
     }
 
-    public static BudgetDTO budgetMapToBudgetDTO(Budget budget) {
-        BudgetDTO budgetDTO = new BudgetDTO();
-        budgetDTO.setId(budget.getId());
-        budgetDTO.setName(budget.getName());
-        budgetDTO.setBalance(budget.getBalance());
-        budgetDTO.setTotalExpense(budget.getTotalExpense());
-        budgetDTO.setTotalIncome(budget.getTotalIncome());
-        List<ExpenseDTO> expenseDTOs = (budget.getExpenses() != null) ? budget.getExpenses().stream()
-                .map(ExpenseMapper::expensetoExpenseDTO)
-                .collect(Collectors.toList()) : Collections.emptyList();
-        budgetDTO.setExpenses(expenseDTOs);
-        List<IncomeDTO> incomeDTOs = (budget.getIncomes() != null) ? budget.getIncomes().stream()
-                .map(IncomeMapper::incomeMapToIncomeDTO)
-                .collect(Collectors.toList()) : Collections.emptyList();
-        budgetDTO.setIncomes(incomeDTOs);
-        return budgetDTO;
+    public static BudgetDTO toDTO(Budget budget) {
+        return BudgetDTO.builder()
+                .id(budget.getId())
+                .name(budget.getName())
+                .balance(budget.getBalance())
+                .totalExpense(budget.getTotalExpense())
+                .totalIncome(budget.getTotalIncome())
+                .expenses((budget.getExpenses() != null) ? budget.getExpenses().stream()
+                        .map(ExpenseMapper::toDTO)
+                        .collect(Collectors.toList()) : Collections.emptyList())
+                .incomes((budget.getIncomes() != null) ? budget.getIncomes().stream()
+                        .map(IncomeMapper::toDTO)
+                        .collect(Collectors.toList()) : Collections.emptyList())
+                .build();
     }
 
-    public static List<BudgetSummaryDTO> budgetListMapToBudgetSummaryDTOList(List<Budget> allBudgetByUser) {
-        return allBudgetByUser.stream()
-               .map(budget -> {
-                    BudgetSummaryDTO budgetSummaryDTO = new BudgetSummaryDTO();
-                    budgetSummaryDTO.setId(budget.getId());
-                    budgetSummaryDTO.setName(budget.getName());
-                    budgetSummaryDTO.setBalance(budget.getBalance());
-                    budgetSummaryDTO.setTotalExpense(budget.getTotalExpense());
-                    budgetSummaryDTO.setTotalIncome(budget.getTotalIncome());
-                    return budgetSummaryDTO;
-                })
-               .collect(Collectors.toList());
-    }
-    public static BudgetSummaryDTO budgetMapToBudgetSummaryDTO(Budget budget){
-        BudgetSummaryDTO budgetSummaryDTO = new BudgetSummaryDTO();
-        budgetSummaryDTO.setId(budget.getId());
-        budgetSummaryDTO.setName(budget.getName());
-        budgetSummaryDTO.setBalance(budget.getBalance());
-        budgetSummaryDTO.setTotalExpense(budget.getTotalExpense());
-        budgetSummaryDTO.setTotalIncome(budget.getTotalIncome());
-        return budgetSummaryDTO;
-    }
-
-    public static Budget budgetDTOMapToBudget(BudgetDTO budgetDTO) {
-        Budget budget = new Budget();
-        budget.setId(budgetDTO.getId());
-        budget.setName(budgetDTO.getName());
-        budget.setBalance(budgetDTO.getBalance());
-        budget.setTotalExpense(budgetDTO.getTotalExpense());
-        budget.setTotalIncome(budgetDTO.getTotalIncome());
+    public static Budget toModelFromDTO(BudgetDTO budgetDTO) {
+        Budget budget = Budget.builder()
+                .id(budgetDTO.getId())
+                .name(budgetDTO.getName())
+                .totalIncome(budgetDTO.getTotalIncome())
+                .totalExpense(budgetDTO.getTotalExpense())
+                .balance(budgetDTO.getBalance())
+                .build();
         return budget;
     }
 }

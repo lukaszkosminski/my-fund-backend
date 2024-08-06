@@ -4,9 +4,7 @@ import com.myfund.services.encryption.BigDecimalEncryptor;
 import com.myfund.services.encryption.LocalDateTimeEncryptor;
 import com.myfund.services.encryption.StringEncryptor;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -17,6 +15,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Expense {
 
     @Id

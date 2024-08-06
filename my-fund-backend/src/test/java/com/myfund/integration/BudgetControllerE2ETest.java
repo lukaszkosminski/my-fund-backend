@@ -1,10 +1,7 @@
-package com.myfund.controllers;
+package com.myfund.integration;
 
 import com.myfund.exceptions.InvalidInputException;
 import com.myfund.models.*;
-import com.myfund.models.DTOs.CreateBudgetDTO;
-import com.myfund.models.DTOs.CreateExpenseDTO;
-import com.myfund.models.DTOs.CreateIncomeDTO;
 import com.myfund.repositories.*;
 import com.myfund.services.BudgetService;
 import org.junit.jupiter.api.*;
@@ -15,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.MySQLContainer;
@@ -23,7 +19,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -76,12 +72,13 @@ public class BudgetControllerE2ETest {
         org.springframework.security.core.userdetails.User springUser =
                 new org.springframework.security.core.userdetails.User("testUser", "testPassword", new ArrayList<>());
 
-        User customUser = new User();
-        customUser.setId(1L);
-        customUser.setUsername(springUser.getUsername());
-        customUser.setPassword("testPassword");
-        customUser.setRole("USER");
-        customUser.setEmail("test@example.com");
+        User customUser = User.builder()
+                .id(1L)
+                .username(springUser.getUsername())
+                .password("testPassword")
+                .role("USER")
+                .email("test@example.com")
+                .build();
         userRepository.save(customUser);
 
         SecurityContextHolder.getContext().setAuthentication(new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
@@ -159,12 +156,10 @@ public class BudgetControllerE2ETest {
 
     @Test
     public void createBudget_NameAlreadyExists_ShouldThrowException() throws Exception {
-        String createBudgetJson = "{\"name\":\"Test Budget\"}"; // Name already exists for the user
+        String createBudgetJson = "{\"name\":\"Test Budget\"}";
 
-        // Save a budget with the same name for the user
-        Budget existingBudget = new Budget();
-        existingBudget.setName("Test Budget");
-        existingBudget.setUser(userRepository.findById(1L).get());
+        Budget existingBudget = Budget.builder().user(userRepository.findById(1L).get()).name("Test Budget").build();
+
         budgetRepository.save(existingBudget);
 
         mockMvc.perform(post("/api/budgets")
@@ -180,14 +175,11 @@ public class BudgetControllerE2ETest {
     public void getBudgetById_Success() throws Exception {
         String expectedBudgetJson = "{\"id\":1, \"name\":\"Test Budget\"}";
 
-        Long budgetId = 1L;
-        Budget budget = new Budget();
-        budget.setId(budgetId);
-        budget.setName("Test Budget");
-        budget.setUser(userRepository.findById(1L).get());
+        Budget budget = Budget.builder().user(userRepository.findById(1L).get()).id(1L).name("Test Budget").build();
+
         budgetRepository.save(budget);
 
-        mockMvc.perform(get("/api/budgets/" + budgetId)
+        mockMvc.perform(get("/api/budgets/" + budget.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedBudgetJson));
@@ -217,13 +209,15 @@ public class BudgetControllerE2ETest {
         String expectedBudgetsJson = "[{\"id\":1, \"name\":\"Test Budget 1\"}, {\"id\":2, \"name\":\"Test Budget 2\"}]"; // Replace with the expected JSON representation of the budgets
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
 
-        Budget budget2 = new Budget();
-        budget2.setName("Test Budget 2");
-        budget2.setUser(user);
+        Budget budget2 = Budget.builder()
+                .name("Test Budget 2")
+                .user(user)
+                .build();
 
         budgetRepository.save(budget1);
         budgetRepository.save(budget2);
@@ -249,12 +243,10 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
         mockMvc.perform(post("/api/budgets/" + budgetId + "/expenses", budgetId)
@@ -272,12 +264,11 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
+
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
         mockMvc.perform(post("/api/budgets/" + budgetId + "/expenses", budgetId)
@@ -295,12 +286,10 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
         mockMvc.perform(post("/api/budgets/" + budgetId + "/expenses", budgetId)
@@ -318,12 +307,10 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
         mockMvc.perform(post("/api/budgets/" + budgetId + "/expenses", budgetId)
@@ -343,12 +330,10 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
         SecurityContextHolder.clearContext();
@@ -381,13 +366,11 @@ public class BudgetControllerE2ETest {
         String createIncomeJson = "{\"name\":\"Test Income\", \"amount\": \"100.0\"}";
 
         Long budgetId = 1L;
-        Budget budget = new Budget();
-        budget.setId(budgetId);
-        budget.setName("Test Budget");
-        budget.setBalance(BigDecimal.ZERO);
-        budget.setTotalExpense(BigDecimal.ZERO);
-        budget.setTotalIncome(BigDecimal.ZERO);
-        budget.setUser(userRepository.findById(1L).get());
+        Budget budget = Budget.builder()
+                .name("Test Budget 1")
+                .user(userRepository.findById(1L).get())
+                .build();
+
         budgetRepository.save(budget);
 
         mockMvc.perform(post("/api/budgets/" + budgetId + "/incomes")
@@ -407,14 +390,13 @@ public class BudgetControllerE2ETest {
         String createIncomeJson = "{\"name\":\"Test Income\", \"amount\": -100.0, \"categoryId\": 1, \"subcategoryId\": 1}";
 
         Long budgetId = 1L;
-        Budget budget = new Budget();
-        budget.setId(budgetId);
-        budget.setBalance(BigDecimal.ZERO);
-        budget.setTotalExpense(BigDecimal.ZERO);
-        budget.setTotalIncome(BigDecimal.ZERO);
-        budget.setName("Test Budget");
-        budget.setUser(userRepository.findById(1L).get());
-        budgetRepository.save(budget);
+        User user = userRepository.findById(1L).get();
+
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
+        budgetRepository.save(budget1);
 
         mockMvc.perform(post("/api/budgets/" + budgetId + "/incomes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -442,12 +424,10 @@ public class BudgetControllerE2ETest {
         SecurityContextHolder.clearContext();
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
 
@@ -465,22 +445,20 @@ public class BudgetControllerE2ETest {
         Long budgetId = 1L;
         Long expenseId = 1L;
 
-        Budget budget = new Budget();
-        budget.setUser(user);
-        budget.setId(budgetId);
-        budget.setName("Test Budget");
-        budget.setBalance(BigDecimal.ZERO);
-        budget.setTotalExpense(BigDecimal.ZERO);
-        budget.setTotalIncome(BigDecimal.ZERO);
+        Budget budget = Budget.builder()
+                .user(user)
+                .id(budgetId)
+                .name("Test Budget")
+                .build();
         budgetRepository.save(budget);
 
-        Expense expense = new Expense();
-        expense.setUser(user);
-        expense.setBudget(budget);
-        expense.setId(expenseId);
-        expense.setName("Test Expense");
-        expense.setAmount(BigDecimal.valueOf(100.0));
-        expense.setBudget(budget);
+        Expense expense = Expense.builder()
+                .user(user)
+                .budget(budget)
+                .id(expenseId)
+                .name("Test Expense")
+                .amount(BigDecimal.valueOf(100.0))
+                .build();
         expenseRepository.save(expense);
 
         mockMvc.perform(patch("/api/budgets/" + budgetId + "/expenses/" + expenseId)
@@ -506,22 +484,20 @@ public class BudgetControllerE2ETest {
         Long budgetId = 1L;
         Long expenseId = 1L;
 
-        Budget budget = new Budget();
-        budget.setUser(user);
-        budget.setId(budgetId);
-        budget.setName("Test Budget");
-        budget.setBalance(BigDecimal.ZERO);
-        budget.setTotalExpense(BigDecimal.ZERO);
-        budget.setTotalIncome(BigDecimal.ZERO);
+        Budget budget = Budget.builder()
+                .user(user)
+                .id(budgetId)
+                .name("Test Budget")
+                .build();
         budgetRepository.save(budget);
 
-        Expense expense = new Expense();
-        expense.setUser(user);
-        expense.setBudget(budget);
-        expense.setId(expenseId);
-        expense.setName("Test Expense");
-        expense.setAmount(BigDecimal.valueOf(100.0));
-        expense.setBudget(budget);
+        Expense expense = Expense.builder()
+                .user(user)
+                .budget(budget)
+                .id(expenseId)
+                .name("Test Expense")
+                .amount(BigDecimal.valueOf(100.0))
+                .build();
         expenseRepository.save(expense);
 
         mockMvc.perform(patch("/api/budgets/" + budgetId + "/expenses/" + expenseId)
@@ -547,21 +523,20 @@ public class BudgetControllerE2ETest {
         User user = userRepository.findById(1L).get();
         Long expenseId = 1L;
 
-        Budget budget = new Budget();
-        budget.setUser(user);
-        budget.setId(budgetId);
-        budget.setName("Test Budget");
-        budget.setBalance(BigDecimal.ZERO);
-        budget.setTotalExpense(BigDecimal.ZERO);
-        budget.setTotalIncome(BigDecimal.ZERO);
+        Budget budget = Budget.builder()
+                .user(user)
+                .id(budgetId)
+                .name("Test Budget")
+                .build();
         budgetRepository.save(budget);
 
-        Expense expense = new Expense();
-        expense.setId(expenseId);
-        expense.setUser(user);
-        expense.setBudget(budget);
-        expense.setName("Test Expense");
-        expense.setAmount(BigDecimal.valueOf(100.0));
+        Expense expense = Expense.builder()
+                .user(user)
+                .budget(budget)
+                .id(expenseId)
+                .name("Test Expense")
+                .amount(BigDecimal.valueOf(100.0))
+                .build();
         expenseRepository.save(expense);
 
 
@@ -592,27 +567,32 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
-        Budget savedBudget = budgetRepository.save(budget1);
+        Long budgetId = 1L;
+        Long incomeId = 1L;
 
-        Income income = new Income();
-        income.setBudget(savedBudget);
-        income.setName("Test Income");
-        income.setAmount(BigDecimal.valueOf(100.0));
-        income.setUser(user);
-        Income savedIncome = incomeRepository.save(income);
-        Long incomeId = savedIncome.getId();
-        Long budgetId = savedBudget.getId();
+        Budget budget1 = Budget.builder()
+                .user(user)
+                .id(budgetId)
+                .name("Test Budget")
+                .build();
+        budgetRepository.save(budget1);
+
+        Income income = Income.builder()
+                .id(incomeId)
+                .budget(budget1)
+                .name("Test Income")
+                .amount(BigDecimal.valueOf(100.0))
+                .localDateTime(LocalDate.now().atStartOfDay())
+                .user(user)
+                .build();
+        incomeRepository.save(income);
 
         mockMvc.perform(patch("/api/budgets/" + budgetId + "/incomes/" + incomeId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateIncomeJson))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("{\"id\":1, \"name\":\"Updated Income\", \"amount\":200.0}"));
 
         Income updatedIncome = incomeRepository.findById(incomeId).get();
         Assertions.assertEquals("Updated Income", updatedIncome.getName());
@@ -628,19 +608,20 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .user(user)
+                .id(1L)
+                .name("Test Budget")
+
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
 
-        Income income = new Income();
-        income.setName("Test Income");
-        income.setAmount(BigDecimal.valueOf(100.0));
-        income.setBudget(savedBudget);
-        income.setUser(user);
+        Income income = Income.builder()
+                .name("Test Income")
+                .amount(BigDecimal.valueOf(100.0))
+                .budget(savedBudget)
+                .user(user)
+                .build();
         Income savedIncome = incomeRepository.save(income);
         Long incomeId = savedIncome.getId();
         Long budgetId = savedBudget.getId();
@@ -664,19 +645,18 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
 
-        Income income = new Income();
-        income.setName("Test Income");
-        income.setAmount(BigDecimal.valueOf(100.0));
-        income.setBudget(savedBudget);
-        income.setUser(user);
+        Income income = Income.builder()
+                .name("Test Income")
+                .amount(BigDecimal.valueOf(100.0))
+                .budget(savedBudget)
+                .user(user)
+                .build();
         Income savedIncome = incomeRepository.save(income);
         Long incomeId = savedIncome.getId();
         Long budgetId = savedBudget.getId();
@@ -700,12 +680,10 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
 
         Long nonExistentIncomeId = 999L;
@@ -723,19 +701,18 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.ZERO);
-        budget1.setTotalExpense(BigDecimal.ZERO);
-        budget1.setTotalIncome(BigDecimal.ZERO);
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
 
-        Income income = new Income();
-        income.setName("Test Income");
-        income.setAmount(BigDecimal.valueOf(100.0));
-        income.setBudget(savedBudget);
-        income.setUser(user);
+        Income income = Income.builder()
+                .name("Test Income")
+                .amount(BigDecimal.valueOf(100.0))
+                .budget(savedBudget)
+                .user(user)
+                .build();
         Income savedIncome = incomeRepository.save(income);
         Long incomeId = savedIncome.getId();
         Long budgetId = savedBudget.getId();
@@ -754,28 +731,28 @@ public class BudgetControllerE2ETest {
 
         User user = userRepository.findById(1L).get();
 
-        Budget budget1 = new Budget();
-        budget1.setId(1L);
-        budget1.setName("Test Budget 1");
-        budget1.setUser(user);
-        budget1.setBalance(BigDecimal.valueOf(0));
-        budget1.setTotalExpense(BigDecimal.valueOf(0));
-        budget1.setTotalIncome(BigDecimal.valueOf(0));
+        Budget budget1 = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .id(1L)
+                .build();
         Budget savedBudget = budgetRepository.save(budget1);
 
 
-        CreateExpenseDTO createExpenseDTO = new CreateExpenseDTO();
-        createExpenseDTO.setName("Test Expense");
-        createExpenseDTO.setAmount(BigDecimal.valueOf(100.0));
-        createExpenseDTO.setIdCategory(1L);
+        Expense expense1 = Expense.builder()
+                .name("Test Expense")
+                .amount(BigDecimal.valueOf(100.0))
+                .idCategory(1L)
+                .build();
 
-        CreateExpenseDTO createExpenseDTO1 = new CreateExpenseDTO();
-        createExpenseDTO1.setName("Test Expense 1");
-        createExpenseDTO1.setAmount(BigDecimal.valueOf(50.0));
-        createExpenseDTO1.setIdCategory(1L);
+        Expense expense2 = Expense.builder()
+                .name("Test Expense 1")
+                .amount(BigDecimal.valueOf(50.0))
+                .idCategory(1L)
+                .build();
 
-        budgetService.createExpense(budget1.getId(), createExpenseDTO1, user );
-        budgetService.createExpense(budget1.getId(),createExpenseDTO,user );
+        budgetService.createExpense(budget1.getId(), expense1, user );
+        budgetService.createExpense(budget1.getId(),expense2,user );
 
         Long budgetId = savedBudget.getId();
         Long categoryId = 1L;
@@ -790,40 +767,42 @@ public class BudgetControllerE2ETest {
     public void getTotalExpensesForBudgetAndSubcategory_Success() throws Exception {
         User user = userRepository.findById(1L).get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
-        budget.setBalance(BigDecimal.ZERO);
-        budget.setTotalExpense(BigDecimal.ZERO);
-        budget.setTotalIncome(BigDecimal.ZERO);
+        Budget budget = Budget.builder()
+                .name("Test Budget 1")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
-        Category category = new Category();
-        category.setName("Test Category");
-        category.setUser(user);
+        Category category = Category.builder()
+                .name("Test Category")
+                .user(user)
+                .build();;
         Category savedCategory = categoryRepository.save(category);
 
-        SubCategory subCategory = new SubCategory();
-        subCategory.setName("Test SubCategory");
-        subCategory.setCategory(savedCategory);
+        SubCategory subCategory = SubCategory.builder()
+                .name("Test SubCategory")
+                .category(savedCategory)
+                .build();
         SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
 
-        Expense expense1 = new Expense();
-        expense1.setName("Test Expense 1");
-        expense1.setAmount(BigDecimal.valueOf(100.0));
-        expense1.setBudget(savedBudget);
-        expense1.setIdCategory(savedCategory.getId());
-        expense1.setIdSubCategory(savedSubCategory.getId());
-        expense1.setUser(user);
+        Expense expense1 = Expense.builder()
+                .name("Test Expense 1")
+                .amount(BigDecimal.valueOf(100.0))
+                .budget(savedBudget)
+                .idCategory(savedCategory.getId())
+                .idSubCategory(savedSubCategory.getId())
+                .user(user)
+                .build();
         expenseRepository.save(expense1);
 
-        Expense expense2 = new Expense();
-        expense2.setName("Test Expense 2");
-        expense2.setAmount(BigDecimal.valueOf(50.0));
-        expense2.setBudget(savedBudget);
-        expense2.setIdCategory(savedCategory.getId());
-        expense2.setIdSubCategory(savedSubCategory.getId());
-        expense2.setUser(user);
+        Expense expense2 = Expense.builder()
+                .name("Test Expense 2")
+                .amount(BigDecimal.valueOf(50.0))
+                .budget(savedBudget)
+                .idCategory(savedCategory.getId())
+                .idSubCategory(savedSubCategory.getId())
+                .user(user)
+                .build();
         expenseRepository.save(expense2);
 
         String expectedTotalExpensesJson = "{\"value\":150.0,\"subcategoryId\":" + savedSubCategory.getId() + ",\"typeAggregate\":\"EXPENSES_BY_SUBCATEGORY\",\"budgetId\":" + savedBudget.getId() + ",\"userId\":" + user.getId() + "}";
@@ -838,31 +817,36 @@ public class BudgetControllerE2ETest {
     public void getTotalIncomesForBudgetAndCategory_Success() throws Exception, InvalidInputException {
         User user = userRepository.findById(1L).get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
-        budget.setBalance(BigDecimal.valueOf(0));
-        budget.setTotalExpense(BigDecimal.valueOf(0));
-        budget.setTotalIncome(BigDecimal.valueOf(0));
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
-        Category category = new Category();
-        category.setName("Test Category");
-        category.setUser(user);
+        Category category = Category.builder()
+                .name("Test Category")
+                .user(user)
+                .build();
         Category savedCategory = categoryRepository.save(category);
 
-        CreateIncomeDTO createIncomeDTO = new CreateIncomeDTO();
-        createIncomeDTO.setName("Test Income");
-        createIncomeDTO.setAmount(BigDecimal.valueOf(500.0));
-        createIncomeDTO.setIdCategory(savedCategory.getId());
+        Income income1 = Income.builder()
+                .name("Test Income")
+                .amount(BigDecimal.valueOf(500.0))
+                .idCategory(savedCategory.getId())
+                .budget(savedBudget)
+                .user(user)
+                .build();
 
-        CreateIncomeDTO createIncomeDTO1 = new CreateIncomeDTO();
-        createIncomeDTO1.setName("Test Income 1");
-        createIncomeDTO1.setAmount(BigDecimal.valueOf(250.0));
-        createIncomeDTO1.setIdCategory(savedCategory.getId());
+        Income income2 = Income.builder()
+                .name("Test Income 1")
+                .amount(BigDecimal.valueOf(250.0))
+                .idCategory(savedCategory.getId())
+                .budget(savedBudget)
+                .user(user)
+                .build();
 
-        budgetService.createIncome(budget.getId(), createIncomeDTO1, user);
-        budgetService.createIncome(budget.getId(), createIncomeDTO, user);
+        budgetService.createIncome(budget.getId(), income1, user);
+        budgetService.createIncome(budget.getId(), income2, user);
 
         mockMvc.perform(get("/api/budgets/" + savedBudget.getId() + "/categories/" + savedCategory.getId() + "/incomes/total")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -876,42 +860,42 @@ public class BudgetControllerE2ETest {
     public void getTotalIncomesForBudgetAndSubcategory_Success() throws Exception, InvalidInputException {
         User user = userRepository.findById(1L).get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
-        budget.setBalance(BigDecimal.ZERO);
-        budget.setTotalExpense(BigDecimal.ZERO);
-        budget.setTotalIncome(BigDecimal.ZERO);
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
-        Category category = new Category();
-        category.setName("Test Category");
-        category.setUser(user);
+        Category category = Category.builder()
+                .name("Test Category")
+                .user(user)
+                .build();
         Category savedCategory = categoryRepository.save(category);
-
-        SubCategory subCategory = new SubCategory();
-        subCategory.setName("Test SubCategory");
-        subCategory.setCategory(savedCategory);
+        SubCategory subCategory = SubCategory.builder()
+                .name("Test SubCategory")
+                .category(savedCategory)
+                .build();
         SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
 
-        Income income = new Income();
-        income.setName("Test Income");
-        income.setAmount(BigDecimal.valueOf(500.0));
-        income.setBudget(savedBudget);
-        income.setIdCategory(savedCategory.getId());
-        income.setIdSubCategory(savedSubCategory.getId());
-        income.setUser(user);
+        Income income = Income.builder()
+                .name("Test Income")
+                .amount(BigDecimal.valueOf(500.0))
+                .budget(savedBudget)
+                .idCategory(savedCategory.getId())
+                .idSubCategory(savedSubCategory.getId())
+                .user(user)
+                .build();
         incomeRepository.save(income);
 
-        Income income1 = new Income();
-        income1.setName("Test Income 1");
-        income1.setAmount(BigDecimal.valueOf(250.0));
-        income1.setBudget(savedBudget);
-        income1.setIdCategory(savedCategory.getId());
-        income1.setIdSubCategory(savedSubCategory.getId());
-        income1.setUser(user);
+        Income income1 = Income.builder()
+                .name("Test Income 1")
+                .amount(BigDecimal.valueOf(250.0))
+                .budget(savedBudget)
+                .idCategory(savedCategory.getId())
+                .idSubCategory(savedSubCategory.getId())
+                .user(user)
+                .build();
         incomeRepository.save(income1);
-
         mockMvc.perform(get("/api/budgets/" + savedBudget.getId() + "/subcategories/" + savedSubCategory.getId() + "/incomes/total")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -924,9 +908,10 @@ public class BudgetControllerE2ETest {
     public void deleteBudget_Success() throws Exception {
         User user = userRepository.findById(1L).get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
         mockMvc.perform(delete("/api/budgets/" + savedBudget.getId())
@@ -960,16 +945,18 @@ public class BudgetControllerE2ETest {
     public void deleteExpense_Success() throws Exception {
         User user = userRepository.findById(1L).get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
-        Expense expense = new Expense();
-        expense.setName("Test Expense");
-        expense.setAmount(BigDecimal.valueOf(100));
-        expense.setBudget(savedBudget);
-        expense.setUser(user);
+        Expense expense = Expense.builder()
+                .name("Test Expense")
+                .amount(BigDecimal.valueOf(100))
+                .budget(savedBudget)
+                .user(user)
+                .build();
         Expense savedExpense = expenseRepository.save(expense);
 
         mockMvc.perform(delete("/api/budgets/" + savedBudget.getId() + "/expenses/" + savedExpense.getId())
@@ -1005,16 +992,18 @@ public class BudgetControllerE2ETest {
     public void deleteIncome_Success() throws Exception {
         User user = userRepository.findById(1L).get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
-        Income income = new Income();
-        income.setName("Test Income");
-        income.setAmount(BigDecimal.valueOf(100));
-        income.setBudget(savedBudget);
-        income.setUser(user);
+        Income income = Income.builder()
+                .name("Test Income")
+                .amount(BigDecimal.valueOf(100))
+                .budget(savedBudget)
+                .user(user)
+                .build();
         Income savedIncome = incomeRepository.save(income);
 
         mockMvc.perform(delete("/api/budgets/" + savedBudget.getId() + "/incomes/" + savedIncome.getId())
@@ -1050,23 +1039,26 @@ public class BudgetControllerE2ETest {
     public void calculateExpensesSummary_Success() throws Exception {
         User user = userRepository.findById(1L).get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
-        Expense expense1 = new Expense();
-        expense1.setName("Test Expense 1");
-        expense1.setAmount(BigDecimal.valueOf(50));
-        expense1.setBudget(savedBudget);
-        expense1.setUser(user);
+        Expense expense1 = Expense.builder()
+                .name("Test Expense 1")
+                .amount(BigDecimal.valueOf(50))
+                .budget(savedBudget)
+                .user(user)
+                .build();
         expenseRepository.save(expense1);
 
-        Expense expense2 = new Expense();
-        expense2.setName("Test Expense 2");
-        expense2.setAmount(BigDecimal.valueOf(100));
-        expense2.setBudget(savedBudget);
-        expense2.setUser(user);
+        Expense expense2 = Expense.builder()
+                .name("Test Expense 2")
+                .amount(BigDecimal.valueOf(100))
+                .budget(savedBudget)
+                .user(user)
+                .build();
         expenseRepository.save(expense2);
 
         mockMvc.perform(get("/api/budgets/" + savedBudget.getId() + "/expenses/summary")
@@ -1095,9 +1087,10 @@ public class BudgetControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
         String csvContent = "header\nPL11 1111 1111 1111 1111 1111 1111,2024-05-09,2024-05-09,ZAKUP - FIZ. UŻYCIE KARTY,,,TEST,-9.07,,,PLN\nPL11 1111 1111 1111 1111 1111 1111,2024-05-08,2024-05-08,PRZELEW PRZYCHODZĄCY,11 11 1111 1111 1111 1111 1111 11,TEST USER,TEST TITLE,,1000,,PLN";
@@ -1143,9 +1136,10 @@ public class BudgetControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
         String csvContent = "header\n2023/005;19-08-2023;17-08-2023;TEST TITLE EXPENSE;;;;;TRANSAKCJA KARTĄ;;71,15;;114,16;12;T\n2023/005;11-08-2023;11-08-2023;TEST TITLE INCOME;;;;;WPŁATA GOTÓWKI - WPŁATOMAT;;;200,00;185,31;11;T";
@@ -1190,9 +1184,10 @@ public class BudgetControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.csv", "text/csv", "".getBytes());
@@ -1222,9 +1217,10 @@ public class BudgetControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        Budget budget = new Budget();
-        budget.setName("Test Budget");
-        budget.setUser(user);
+        Budget budget = Budget.builder()
+                .name("Test Budget")
+                .user(user)
+                .build();
         Budget savedBudget = budgetRepository.save(budget);
 
         String csvContent = "header\nsome,data,for,unsupported,bank";

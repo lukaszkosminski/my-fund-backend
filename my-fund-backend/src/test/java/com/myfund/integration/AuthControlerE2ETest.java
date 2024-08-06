@@ -1,9 +1,10 @@
-package com.myfund.controllers;
+package com.myfund.integration;
 
 import com.myfund.models.DTOs.CreateUserDTO;
 import com.myfund.models.DTOs.PasswordChangeDTO;
 import com.myfund.models.DTOs.PasswordChangeRequestDTO;
 import com.myfund.models.DTOs.UserDTO;
+import com.myfund.models.User;
 import com.myfund.services.UserService;
 import com.myfund.services.email.EmailSender;
 import com.myfund.services.email.TokenService;
@@ -26,7 +27,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,10 +80,12 @@ class AuthControlerE2ETest {
 
     @Test
     public void testRegisterUser() {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("testuser");
-        createUserDTO.setPassword("password");
-        createUserDTO.setEmail("test@test.com");
+        CreateUserDTO createUserDTO = CreateUserDTO
+                .builder()
+                .email("test@test.com")
+                .password("password123")
+                .username("testuser")
+                .build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -111,11 +113,13 @@ class AuthControlerE2ETest {
 
     @Test
     public void testChangePassword() throws IOException {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("testuser");
-        createUserDTO.setPassword("oldPassword");
-        createUserDTO.setEmail("test@example.com");
-        userService.createUser(createUserDTO);
+
+        User user = User.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .password("password")
+                .build();
+        userService.createUser(user);
 
         String passwordResetToken = tokenService.createPasswordResetToken("test@example.com");
 
@@ -133,10 +137,12 @@ class AuthControlerE2ETest {
 
     @Test
     public void testRegisterUserWithExistingUsername() {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("testuser");
-        createUserDTO.setPassword("password");
-        createUserDTO.setEmail("test@test.com");
+        CreateUserDTO createUserDTO = CreateUserDTO
+                .builder()
+                .email("test@example.com")
+                .password("password123")
+                .username("testuser")
+                .build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -168,11 +174,12 @@ class AuthControlerE2ETest {
 
     @Test
     public void testChangePasswordWithInvalidToken() throws IOException {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("testuser");
-        createUserDTO.setPassword("oldPassword");
-        createUserDTO.setEmail("test@example.com");
-        userService.createUser(createUserDTO);
+        User user = User.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .password("password")
+                .build();
+        userService.createUser(user);
 
         PasswordChangeDTO passwordChangeDTO = new PasswordChangeDTO();
         passwordChangeDTO.setEmail("test@example.com");
@@ -183,17 +190,23 @@ class AuthControlerE2ETest {
         Map<String, String> errorResponse = (Map<String, String>) response.getBody();
         String currentPassword = jdbcTemplate.queryForObject("SELECT password FROM users WHERE id = 1", String.class);
 
+        System.out.println(user.getPassword());
+        System.out.println(currentPassword);
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        assertThat(passwordEncoder.matches(createUserDTO.getPassword(), currentPassword)).isTrue();
+        assertThat(user.getPassword()).isEqualTo(currentPassword);
+
         assertThat(errorResponse.get("message")).isEqualTo("Invalid token");
     }
 
     @Test
     public void testRegisterUserWithInvalidUsername() {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("us");
-        createUserDTO.setPassword("password");
-        createUserDTO.setEmail("test@test.com");
+        CreateUserDTO createUserDTO = CreateUserDTO
+                .builder()
+                .email("test@example.com")
+                .password("password123")
+                .username("t")
+                .build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -210,10 +223,12 @@ class AuthControlerE2ETest {
 
     @Test
     public void testRegisterUserWithInvalidPassword() {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("testuser");
-        createUserDTO.setPassword("pwd");
-        createUserDTO.setEmail("test@test.com");
+        CreateUserDTO createUserDTO = CreateUserDTO
+                .builder()
+                .email("test@example.com")
+                .password("pw")
+                .username("testuser")
+                .build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

@@ -1,6 +1,7 @@
 package com.myfund.services.csv;
 
 import com.myfund.exceptions.InvalidInputException;
+import com.myfund.models.Budget;
 import com.myfund.models.DTOs.BudgetDTO;
 import com.myfund.models.DTOs.mappers.BudgetMapper;
 import com.myfund.models.User;
@@ -26,7 +27,7 @@ public abstract class AbstractCsvParser {
     }
 
     public void parse(MultipartFile file, User user, Long budgetId) {
-        BudgetDTO budgetByIdAndUser = budgetService.findBudgetByIdAndUser(budgetId, user);
+        Budget budgetByIdAndUser = budgetService.findBudgetByIdAndUser(budgetId, user);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             reader.readLine();
             reader.lines().forEach(line -> processLine(line, user, budgetByIdAndUser));
@@ -35,7 +36,7 @@ public abstract class AbstractCsvParser {
         }
     }
 
-    protected void processLine(String line, User user, BudgetDTO budgetByIdAndUser) {
+    protected void processLine(String line, User user, Budget budgetByIdAndUser) {
         String[] values = line.split(getDelimiter());
         if (isIncome(values)) {
             processIncome(values, user, budgetByIdAndUser);
@@ -44,18 +45,18 @@ public abstract class AbstractCsvParser {
         }
     }
 
-    protected void processIncome(String[] values, User user, BudgetDTO budgetByIdAndUser) {
+    protected void processIncome(String[] values, User user, Budget budgetByIdAndUser) {
         Income income = mapToIncome(values);
         income.setUser(user);
-        income.setBudget(BudgetMapper.budgetDTOMapToBudget(budgetByIdAndUser));
+        income.setBudget(budgetByIdAndUser);
         budgetService.saveIncomeFromCsv(income);
         log.info("Income saved: {}", income);
     }
 
-    protected void processExpense(String[] values, User user, BudgetDTO budgetByIdAndUser) {
+    protected void processExpense(String[] values, User user, Budget budgetByIdAndUser) {
         Expense expense = mapToExpense(values);
         expense.setUser(user);
-        expense.setBudget(BudgetMapper.budgetDTOMapToBudget(budgetByIdAndUser));
+        expense.setBudget(budgetByIdAndUser);
         budgetService.saveExpenseFromCsv(expense);
         log.info("Expense saved: {}", expense);
     }

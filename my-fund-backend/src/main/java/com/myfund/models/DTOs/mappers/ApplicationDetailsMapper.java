@@ -5,7 +5,7 @@ import com.myfund.models.DTOs.ApplicationDetailsDTO;
 
 public class ApplicationDetailsMapper {
 
-    public static ApplicationDetailsDTO applicationDetailsToDTO(ApplicationDetails applicationDetails) {
+    public static ApplicationDetailsDTO toDTO(ApplicationDetails applicationDetails) {
         ApplicationDetailsDTO applicationDetailsDTO = new ApplicationDetailsDTO();
         applicationDetailsDTO.setVersion(applicationDetails.getVersion());
         applicationDetailsDTO.setBuildDate(applicationDetails.getBuildDate());

@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
@@ -49,10 +50,15 @@ public class MIlleniumCsvParser extends AbstractCsvParser {
         String dateColumn = values[1];
         String incomeColumn = values[8];
         String transactionNameColumn = values[6];
-        Income income = new Income();
-        income.setLocalDateTime(LocalDate.parse(dateColumn, DATE_FORMATTER).atStartOfDay());
-        income.setName(transactionNameColumn);
-        income.setAmount(new BigDecimal(incomeColumn.replace(',', '.')));
+
+        LocalDateTime dateTime = LocalDate.parse(dateColumn, DATE_FORMATTER).atStartOfDay();
+        BigDecimal amount = new BigDecimal(incomeColumn.replace(',', '.'));
+
+        Income income = Income.builder()
+                .name(transactionNameColumn)
+                .amount(amount)
+                .localDateTime(dateTime)
+                .build();
 
         return income;
     }
@@ -62,11 +68,14 @@ public class MIlleniumCsvParser extends AbstractCsvParser {
         String dateColumn = values[1];
         String expenseColumn = values[7];
         String transactionNameColumn = values[6];
-        Expense expense = new Expense();
-        expense.setLocalDateTime(LocalDate.parse(dateColumn, DATE_FORMATTER).atStartOfDay());
-        expense.setName(transactionNameColumn);
-        expense.setAmount(new BigDecimal(expenseColumn.replace(',', '.')));
+        LocalDateTime dateTime = LocalDate.parse(dateColumn, DATE_FORMATTER).atStartOfDay();
+        BigDecimal amount = new BigDecimal(expenseColumn.replace(',', '.'));
 
+        Expense expense = Expense.builder()
+                .name(transactionNameColumn)
+                .amount(amount)
+                .localDateTime(dateTime)
+                .build();
         return expense;
     }
 }

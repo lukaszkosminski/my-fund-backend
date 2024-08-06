@@ -13,66 +13,38 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CategoryMapper {
-    public static Category createCategoryDTOMapToCategory(CreateCategoryDTO createCategoryDTO) {
-        Category category = new Category();
+    public static Category toModel(CreateCategoryDTO createCategoryDTO) {
         List<SubCategory> subCategoryList = Optional.ofNullable(createCategoryDTO.getSubCategories())
                 .orElseGet(Collections::emptyList)
                 .stream()
-                .map(CategoryMapper::createSubCategoryDTOToSubCategory)
+                .map(SubCategoryMapper::toModel)
                 .collect(Collectors.toList());
-        category.setName(createCategoryDTO.getName());
-        category.setSubCategories(subCategoryList);
+        Category category = Category.builder().name(createCategoryDTO.getName()).subCategories(subCategoryList).build();
         return category;
     }
 
-    public static CategoryDTO categoryMapToCategoryDTO(Category category) {
-        if (category == null) {
-            return null;
-        }
-        CategoryDTO categoryDTO = new CategoryDTO();
-        categoryDTO.setId(category.getId());
-        categoryDTO.setName(category.getName());
-
+    public static CategoryDTO toDTO(Category category) {
         List<SubCategoryDTO> subCategoryDTOList = category.getSubCategories().stream()
-                .map(subCategory -> {
-                    SubCategoryDTO subCategoryDTO = new SubCategoryDTO();
-                    subCategoryDTO.setId(subCategory.getId());
-                    subCategoryDTO.setName(subCategory.getName());
-                    return subCategoryDTO;
-                })
+                .map(subCategory -> SubCategoryDTO.builder()
+                        .id(subCategory.getId())
+                        .name(subCategory.getName())
+                        .build())
                 .collect(Collectors.toList());
 
-        categoryDTO.setSubCategories(subCategoryDTOList);
-        return categoryDTO;
+        return CategoryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .subCategories(subCategoryDTOList)
+                .build();
     }
 
-    public static List<CategoryDTO> categoryListMapToCategoryListDTO(List<Category> categoryList) {
+    public static List<CategoryDTO> toListDTO(List<Category> categoryList) {
         return categoryList.stream()
-                .map(category -> {
-                    CategoryDTO categoryDTO = new CategoryDTO();
-                    categoryDTO.setName(category.getName());
-                    categoryDTO.setId(category.getId());
-                    categoryDTO.setSubCategories(CategoryMapper.subCategoryListMapToSubCategoryListDTO(category.getSubCategories()));
-                    return categoryDTO;
-                })
+                .map(category -> CategoryDTO.builder()
+                        .id(category.getId())
+                        .name(category.getName())
+                        .subCategories(SubCategoryMapper.toListDTO(category.getSubCategories()))
+                        .build())
                 .collect(Collectors.toList());
     }
-
-    public static List<SubCategoryDTO> subCategoryListMapToSubCategoryListDTO(List<SubCategory> subCategoryList) {
-        return subCategoryList.stream()
-                .map(subCategory -> {
-                    SubCategoryDTO subCategoryDTO = new SubCategoryDTO();
-                    subCategoryDTO.setId(subCategory.getId());
-                    subCategoryDTO.setName(subCategory.getName());
-                    return subCategoryDTO;
-                })
-                .collect(Collectors.toList());
-    }
-
-    private static SubCategory createSubCategoryDTOToSubCategory(CreateSubCategoryDTO createSubCategoryDTO) {
-        SubCategory subCategory = new SubCategory();
-        subCategory.setName(createSubCategoryDTO.getName());
-        return subCategory;
-    }
-
 }

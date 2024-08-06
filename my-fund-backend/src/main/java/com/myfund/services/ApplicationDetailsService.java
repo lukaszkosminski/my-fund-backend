@@ -24,7 +24,8 @@ public class ApplicationDetailsService {
         ApplicationDetails applicationDetails = new ApplicationDetails();
         applicationDetails.setVersion(appVer);
         applicationDetails.setBuildDate(convertToSystemTimezone(buildDate));
-        return ApplicationDetailsMapper.applicationDetailsToDTO(applicationDetails);
+
+        return ApplicationDetailsMapper.toDTO(applicationDetails);
     }
 
     public static String convertToSystemTimezone(String dateTime) {

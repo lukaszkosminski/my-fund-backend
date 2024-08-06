@@ -1,18 +1,21 @@
 package com.myfund.models.DTOs;
 
 import com.myfund.models.TypeAggregate;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-
-@Getter
 @Setter
-public class FinancialAggregateSubcategoryDTO {
+@Getter
+@Builder
+public class FinancialAggregateDTO {
 
     private BigDecimal value;
 
     private Long subcategoryId;
+
+    private Long categoryId;
 
     private Long budgetId;
 

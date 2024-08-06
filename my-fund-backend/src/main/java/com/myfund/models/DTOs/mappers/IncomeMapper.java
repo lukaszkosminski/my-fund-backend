@@ -6,23 +6,24 @@ import com.myfund.models.Income;
 
 public class IncomeMapper {
 
-    public static Income createIncomeDTOtoIncome(CreateIncomeDTO createIncomeDTO) {
-        Income income = new Income();
-        income.setName(createIncomeDTO.getName());
-        income.setAmount(createIncomeDTO.getAmount());
-        income.setIdCategory(createIncomeDTO.getIdCategory());
-        income.setIdSubCategory(createIncomeDTO.getIdSubCategory());
+    public static Income toModel(CreateIncomeDTO createIncomeDTO) {
+        Income income = Income.builder()
+                .name(createIncomeDTO.getName())
+                .amount(createIncomeDTO.getAmount())
+                .idCategory(createIncomeDTO.getIdCategory())
+                .idSubCategory(createIncomeDTO.getIdSubCategory())
+                .build();
         return income;
     }
 
-    public static IncomeDTO incomeMapToIncomeDTO(Income income) {
-        IncomeDTO incomeDTO = new IncomeDTO();
-        incomeDTO.setId(income.getId());
-        incomeDTO.setName(income.getName());
-        incomeDTO.setAmount(income.getAmount());
-        incomeDTO.setIdCategory(income.getIdCategory());
-        incomeDTO.setIdSubCategory(income.getIdSubCategory());
-        incomeDTO.setLocalDate(income.getLocalDateTime().toLocalDate());
-        return incomeDTO;
+    public static IncomeDTO toDTO(Income income) {
+        return IncomeDTO.builder()
+                .id(income.getId())
+                .name(income.getName())
+                .amount(income.getAmount())
+                .idCategory(income.getIdCategory())
+                .idSubCategory(income.getIdSubCategory())
+                .localDate(income.getLocalDateTime().toLocalDate())
+                .build();
     }
 }

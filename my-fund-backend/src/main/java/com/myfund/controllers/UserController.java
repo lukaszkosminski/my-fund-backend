@@ -27,7 +27,7 @@ public class UserController {
     @GetMapping("/current-user")
     @ResponseBody
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
-        return new ResponseEntity<>(UserMapper.userMapToUserDTO(user), HttpStatus.OK);
+        return new ResponseEntity<>(UserMapper.toDTO(user), HttpStatus.OK);
     }
 
 }

@@ -1,9 +1,9 @@
 package com.myfund.controllers;
 
 import com.myfund.exceptions.InvalidInputException;
-import com.myfund.models.BankName;
+import com.myfund.models.*;
 import com.myfund.models.DTOs.*;
-import com.myfund.models.User;
+import com.myfund.models.DTOs.mappers.*;
 import com.myfund.services.BudgetService;
 import com.myfund.services.csv.CsvReaderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -30,68 +31,69 @@ public class BudgetController {
     }
 
     @PostMapping("/budgets")
-    public ResponseEntity<BudgetDTO> createBudget(@RequestBody CreateBudgetDTO createBudgetDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
-        BudgetDTO budgetDTO = budgetService.createBudget(createBudgetDTO, user);
-        return new ResponseEntity<>(budgetDTO, HttpStatus.CREATED);
+    public ResponseEntity<BudgetDTO> createBudget(@RequestBody @Valid CreateBudgetDTO createBudgetDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
+        Budget budget = budgetService.createBudget(BudgetMapper.toModel(createBudgetDTO), user);
+        return new ResponseEntity<>(BudgetMapper.toDTO(budget), HttpStatus.CREATED);
     }
 
     @GetMapping("/budgets/{budgetId}")
     public ResponseEntity<BudgetDTO> getBudgetById(@PathVariable("budgetId") Long budgetId, @AuthenticationPrincipal User user) {
-        BudgetDTO budgetDTO = budgetService.findBudgetByIdAndUser(budgetId, user);
-        return new ResponseEntity<>(budgetDTO, HttpStatus.OK);
+        Budget budget = budgetService.findBudgetByIdAndUser(budgetId, user);
+        return new ResponseEntity<>(BudgetMapper.toDTO(budget), HttpStatus.OK);
     }
 
     @GetMapping("/budgets")
     public ResponseEntity<List<BudgetSummaryDTO>> getAllBudgets(@AuthenticationPrincipal User user) {
-        return new ResponseEntity<>(budgetService.findAllBudgetsByUser(user), HttpStatus.OK);
+        List<Budget> allBudgetsByUser = budgetService.findAllBudgetsByUser(user);
+        return new ResponseEntity<>(BudgetSummaryMapper.toListDTO(allBudgetsByUser), HttpStatus.OK);
     }
 
     @PostMapping("/budgets/{budgetId}/expenses")
-    public ResponseEntity<ExpenseDTO> createExpense(@PathVariable("budgetId") Long budgetId, @RequestBody CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
-        ExpenseDTO expenseDTO = budgetService.createExpense(budgetId, createExpenseDTO, user);
-        return new ResponseEntity<>(expenseDTO, HttpStatus.CREATED);
+    public ResponseEntity<ExpenseDTO> createExpense(@PathVariable("budgetId") Long budgetId, @RequestBody @Valid CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
+        Expense expense = budgetService.createExpense(budgetId, ExpenseMapper.toModel(createExpenseDTO), user);
+        return new ResponseEntity<>(ExpenseMapper.toDTO(expense), HttpStatus.CREATED);
     }
 
     @PostMapping("/budgets/{budgetId}/incomes")
-    public ResponseEntity<IncomeDTO> createIncome(@PathVariable("budgetId") Long budgetId, @RequestBody CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
-        IncomeDTO incomeDTO = budgetService.createIncome(budgetId, createIncomeDTO, user);
-        return new ResponseEntity<>(incomeDTO, HttpStatus.CREATED);
+    public ResponseEntity<IncomeDTO> createIncome(@PathVariable("budgetId") Long budgetId, @RequestBody @Valid CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
+        Income income = budgetService.createIncome(budgetId, IncomeMapper.toModel(createIncomeDTO), user);
+        return new ResponseEntity<>(IncomeMapper.toDTO(income), HttpStatus.CREATED);
     }
 
     @PatchMapping("/budgets/{budgetId}/expenses/{expenseId}")
-    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable("budgetId") Long budgetId, @PathVariable("expenseId") Long expenseId, @RequestBody CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
-        ExpenseDTO expenseDTO = budgetService.updateExpense(budgetId, expenseId, createExpenseDTO, user);
-        return new ResponseEntity<>(expenseDTO, HttpStatus.OK);
+    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable("budgetId") Long budgetId, @PathVariable("expenseId") Long expenseId, @RequestBody @Valid CreateExpenseDTO createExpenseDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
+        Expense expense = budgetService.updateExpense(budgetId, expenseId,ExpenseMapper.toModel(createExpenseDTO), user);
+        return new ResponseEntity<>(ExpenseMapper.toDTO(expense), HttpStatus.OK);
     }
 
     @PatchMapping("/budgets/{budgetId}/incomes/{incomeId}")
-    public ResponseEntity<IncomeDTO> updateIncome(@PathVariable("budgetId") Long budgetId, @PathVariable("incomeId") Long incomeId, @RequestBody CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
-        IncomeDTO incomeDTO = budgetService.updateIncome(budgetId, incomeId, createIncomeDTO, user);
-        return new ResponseEntity<>(incomeDTO, HttpStatus.OK);
+    public ResponseEntity<IncomeDTO> updateIncome(@PathVariable("budgetId") Long budgetId, @PathVariable("incomeId") Long incomeId, @RequestBody @Valid CreateIncomeDTO createIncomeDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
+        Income income = budgetService.updateIncome(budgetId, incomeId, IncomeMapper.toModel(createIncomeDTO), user);
+        return new ResponseEntity<>(IncomeMapper.toDTO(income), HttpStatus.OK);
     }
 
     @GetMapping("/budgets/{budgetId}/categories/{categoryId}/expenses/total")
-    public ResponseEntity<FinancialAggregateCategoryDTO> getTotalExpensesForBudgetAndCategory(@PathVariable("budgetId") Long budgetId, @PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
-        FinancialAggregateCategoryDTO totalExpensesByCategory = budgetService.getTotalExpensesByCategory(budgetId, categoryId, user);
-        return new ResponseEntity<>(totalExpensesByCategory, HttpStatus.OK);
+    public ResponseEntity<FinancialAggregateDTO> getTotalExpensesForBudgetAndCategory(@PathVariable("budgetId") Long budgetId, @PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
+        FinancialAggregate totalExpensesByCategory = budgetService.getTotalExpensesByCategory(budgetId, categoryId, user);
+        return new ResponseEntity<>(FinancialAggregateMapper.toDTO(totalExpensesByCategory), HttpStatus.OK);
     }
 
     @GetMapping("/budgets/{budgetId}/subcategories/{subcategoryId}/expenses/total")
-    public ResponseEntity<FinancialAggregateSubcategoryDTO> getTotalExpensesForBudgetAndSubcategory(@PathVariable("budgetId") Long budgetId, @PathVariable("subcategoryId") Long subcategoryId, @AuthenticationPrincipal User user) {
-        FinancialAggregateSubcategoryDTO totalExpensesBySubcategory = budgetService.getTotalExpensesBySubcategory(budgetId, subcategoryId, user);
-        return new ResponseEntity<>(totalExpensesBySubcategory, HttpStatus.OK);
+    public ResponseEntity<FinancialAggregateDTO> getTotalExpensesForBudgetAndSubcategory(@PathVariable("budgetId") Long budgetId, @PathVariable("subcategoryId") Long subcategoryId, @AuthenticationPrincipal User user) {
+        FinancialAggregate totalExpensesBySubcategory = budgetService.getTotalExpensesBySubcategory(budgetId, subcategoryId, user);
+        return new ResponseEntity<>(FinancialAggregateMapper.toDTO(totalExpensesBySubcategory), HttpStatus.OK);
     }
 
     @GetMapping("/budgets/{budgetId}/categories/{categoryId}/incomes/total")
-    public ResponseEntity<FinancialAggregateCategoryDTO> getTotalIncomesForBudgetAndCategory(@PathVariable("budgetId") Long budgetId, @PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
-        FinancialAggregateCategoryDTO totalIncomesByCategory = budgetService.getTotalIncomesByCategory(budgetId, categoryId, user);
-        return new ResponseEntity<>(totalIncomesByCategory, HttpStatus.OK);
+    public ResponseEntity<FinancialAggregateDTO> getTotalIncomesForBudgetAndCategory(@PathVariable("budgetId") Long budgetId, @PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
+        FinancialAggregate totalIncomesByCategory = budgetService.getTotalIncomesByCategory(budgetId, categoryId, user);
+        return new ResponseEntity<>(FinancialAggregateMapper.toDTO(totalIncomesByCategory), HttpStatus.OK);
     }
 
     @GetMapping("/budgets/{budgetId}/subcategories/{subcategoryId}/incomes/total")
-    public ResponseEntity<FinancialAggregateSubcategoryDTO> getTotalIncomesForBudgetAndSubcategory(@PathVariable("budgetId") Long budgetId, @PathVariable("subcategoryId") Long subcategoryId, @AuthenticationPrincipal User user) {
-        FinancialAggregateSubcategoryDTO totalIncomesBySubcategory = budgetService.getTotalIncomesBySubcategory(budgetId, subcategoryId, user);
-        return new ResponseEntity<>(totalIncomesBySubcategory, HttpStatus.OK);
+    public ResponseEntity<FinancialAggregateDTO> getTotalIncomesForBudgetAndSubcategory(@PathVariable("budgetId") Long budgetId, @PathVariable("subcategoryId") Long subcategoryId, @AuthenticationPrincipal User user) {
+        FinancialAggregate totalIncomesBySubcategory = budgetService.getTotalIncomesBySubcategory(budgetId, subcategoryId, user);
+        return new ResponseEntity<>(FinancialAggregateMapper.toDTO(totalIncomesBySubcategory), HttpStatus.OK);
     }
 
     @DeleteMapping("/budgets/{budgetId}")
@@ -114,8 +116,8 @@ public class BudgetController {
 
     @GetMapping("/budgets/{budgetId}/expenses/summary")
     public ResponseEntity<ExpensesSummaryDTO> calculateExpensesSummary(@PathVariable Long budgetId, @AuthenticationPrincipal User user) {
-        ExpensesSummaryDTO expensesSummaryDTO = budgetService.calculateExpensesSummary(user, budgetId);
-        return new ResponseEntity<>(expensesSummaryDTO, HttpStatus.OK);
+        ExpensesSummary expensesSummary = budgetService.calculateExpensesSummary(user, budgetId);
+        return new ResponseEntity<>(ExpensesSummaryMapper.toDTO(expensesSummary), HttpStatus.OK);
     }
 
     @PostMapping("/budgets/{budgetId}/upload-csv/{bankName}")

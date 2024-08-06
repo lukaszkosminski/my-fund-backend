@@ -35,7 +35,7 @@ class CsvReaderServiceTest  {
 
     @Test
     void parseFile_WithValidBankNameAndNullBudgetId() {
-        User user = new User();
+        User user = User.builder().build();
         BankName bankName = BankName.MILLENIUM;
 
         csvReaderService.parseFile(bankName, mockFile, user, null);
@@ -45,7 +45,7 @@ class CsvReaderServiceTest  {
 
     @Test
     void parseFile_WithUnsupportedBankNameAndNullBudgetId() {
-        User user = new User();
+        User user = User.builder().build();
         BankName unsupportedBankName = BankName.SANTANDER;
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -58,7 +58,7 @@ class CsvReaderServiceTest  {
 
     @Test
     void parseFile_WithValidBankNameNullBudgetIdAndNullFile() {
-        User user = new User();
+        User user = User.builder().build();
         BankName bankName = BankName.MILLENIUM;
 
         csvReaderService.parseFile(bankName, null, user, null);
@@ -77,7 +77,7 @@ class CsvReaderServiceTest  {
 
     @Test
     void parseFile_WithValidBankNameNullBudgetIdAndValidFileAndUser() {
-        User user = new User();
+        User user = User.builder().build();
         BankName bankName = BankName.MILLENIUM;
 
         csvReaderService.parseFile(bankName, mockFile, user, null);

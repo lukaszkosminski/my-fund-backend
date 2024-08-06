@@ -1,5 +1,6 @@
 package com.myfund.models.DTOs;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,17 +9,18 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 public class BudgetDTO {
 
     private Long id;
 
     private String name;
 
-    private BigDecimal balance;
+    @Builder.Default private BigDecimal balance = BigDecimal.ZERO;
 
-    private BigDecimal totalIncome;
+    @Builder.Default private BigDecimal totalIncome = BigDecimal.ZERO;
 
-    private BigDecimal totalExpense;
+    @Builder.Default private BigDecimal totalExpense = BigDecimal.ZERO;
 
     private List<ExpenseDTO> expenses;
 

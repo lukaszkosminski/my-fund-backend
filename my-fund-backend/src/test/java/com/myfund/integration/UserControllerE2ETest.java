@@ -1,7 +1,8 @@
-package com.myfund.controllers;
+package com.myfund.integration;
 
-import com.myfund.models.DTOs.ApplicationDetailsDTO;
-import com.myfund.services.ApplicationDetailsService;
+import com.myfund.models.User;
+import com.myfund.repositories.UserRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,12 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
-class VersionControllerE2ETest {
+class UserControllerE2ETest {
 
     @Container
     public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:8.0.26").withDatabaseName("testdb").withUsername("testuser").withPassword("testpass");
@@ -35,15 +39,10 @@ class VersionControllerE2ETest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ApplicationDetailsService applicationDetailsService;
+    private UserRepository userRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @BeforeEach
-    public void setUp() {
-        mysqlContainer.start();
-    }
 
     @AfterEach
     public void cleanUp() {
@@ -57,14 +56,51 @@ class VersionControllerE2ETest {
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
     }
 
-    @Test
-    public void testGetVersion_Success() throws Exception {
-        ApplicationDetailsDTO version = applicationDetailsService.getVersion();
+    @BeforeEach
+    public void setUp(){
+        mysqlContainer.start();
 
-        mockMvc.perform(get("/version")
+        org.springframework.security.core.userdetails.User springUser =
+                new org.springframework.security.core.userdetails.User("testUser", "testPassword", new ArrayList<>());
+
+        User customUser = User.builder()
+                .id(1L)
+                .username(springUser.getUsername())
+                .password("testPassword")
+                .budget(new ArrayList<>())
+                .role("USER")
+                .categoryList(new ArrayList<>())
+                .email("test@example.com")
+                .build();
+
+        userRepository.save(customUser);
+
+        SecurityContextHolder.getContext().setAuthentication(new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                customUser, null, springUser.getAuthorities()));
+    }
+
+    @Test
+    public void testGetCurrentUser_Success() throws Exception {
+        Optional<User> optionalUser = userRepository.findById(1L);
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        User user = optionalUser.get();
+
+        mockMvc.perform(get("/api/users/current-user")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.version").value(version.getVersion()))
-                .andExpect(jsonPath("$.buildDate").value(version.getBuildDate()));
+                .andExpect(jsonPath("$.username").value(user.getUsername()))
+                .andExpect(jsonPath("$.email").value(user.getEmail()));
     }
+
+    @Test
+    public void testGetCurrentUser_Unauthorized() throws Exception {
+        SecurityContextHolder.clearContext();
+
+        mockMvc.perform(get("/api/users/current-user")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
 }

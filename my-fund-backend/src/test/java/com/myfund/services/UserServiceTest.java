@@ -8,6 +8,8 @@ import com.myfund.models.DTOs.PasswordChangeDTO;
 import com.myfund.models.DTOs.PasswordChangeRequestDTO;
 import com.myfund.models.DTOs.UserDTO;
 import com.myfund.models.DTOs.mappers.UserMapper;
+import com.myfund.models.PasswordChange;
+import com.myfund.models.PasswordChangeRequest;
 import com.myfund.models.User;
 import com.myfund.repositories.UserRepository;
 import com.myfund.services.email.EmailSender;
@@ -56,18 +58,19 @@ class UserServiceTest {
 
     @Test
     void createUser_ShouldCreateUserSuccessfully() throws IOException {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("testuser");
-        createUserDTO.setEmail("test@example.com");
-        createUserDTO.setPassword("password");
+         User user = User.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .password("password")
+                .build();
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
 
-        UserDTO userDTO = userService.createUser(createUserDTO);
+        User userCreated = userService.createUser(user);
 
-        assertNotNull(userDTO);
+        assertNotNull(userCreated);
         verify(userRepository, times(1)).save(any(User.class));
         verify(budgetService, times(1)).createDefaultBudget(any(User.class));
         verify(emailSender, times(1)).sendWelcomeEmail(any(UserDTO.class));
@@ -75,46 +78,50 @@ class UserServiceTest {
 
     @Test
     void createUser_ShouldThrowExceptionForExistingUsername() {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setUsername("testuser");
-        createUserDTO.setEmail("test@example.com");
+        User user = User.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .password("password")
+                .build();
 
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(new User()));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 
-        assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(createUserDTO));
+        assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(user));
     }
 
     @Test
     void requestPasswordChange_ShouldSendPasswordResetEmail() throws IOException {
-        PasswordChangeRequestDTO passwordChangeRequestDTO = new PasswordChangeRequestDTO();
-        passwordChangeRequestDTO.setEmail("test@example.com");
+        PasswordChangeRequest passwordChangeRequest = new PasswordChangeRequest();
+        passwordChangeRequest.setEmail("test@example.com");
 
-        User user = new User();
-        user.setEmail("test@example.com");
+        User user = User.builder()
+                .email("test@example.com")
+                .build();
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(tokenService.createPasswordResetToken("test@example.com")).thenReturn("resetToken");
 
-        userService.requestPasswordChange(passwordChangeRequestDTO);
+        userService.requestPasswordChange(passwordChangeRequest);
 
         verify(emailSender, times(1)).sendPasswordResetEmail(any(UserDTO.class), eq("resetToken"));
     }
 
     @Test
     void changePassword_ShouldChangePasswordSuccessfully() {
-        PasswordChangeDTO passwordChangeDTO = new PasswordChangeDTO();
-        passwordChangeDTO.setEmail("test@example.com");
-        passwordChangeDTO.setToken("validToken");
-        passwordChangeDTO.setNewPassword("newPassword");
+        PasswordChange passwordChange = new PasswordChange();
+        passwordChange.setEmail("test@example.com");
+        passwordChange.setToken("validToken");
+        passwordChange.setNewPassword("newPassword");
 
-        User user = new User();
-        user.setEmail("test@example.com");
+        User user = User.builder()
+                .email("test@example.com")
+                .build();
 
         when(tokenService.getPasswordResetToken("test@example.com")).thenReturn("validToken");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
 
-        userService.changePassword(passwordChangeDTO);
+        userService.changePassword(passwordChange);
 
         verify(userRepository, times(1)).save(user);
         verify(tokenService, times(1)).invalidatePasswordResetToken("test@example.com");
@@ -122,13 +129,13 @@ class UserServiceTest {
 
     @Test
     void changePassword_ShouldThrowExceptionForInvalidToken() {
-        PasswordChangeDTO passwordChangeDTO = new PasswordChangeDTO();
-        passwordChangeDTO.setEmail("test@example.com");
-        passwordChangeDTO.setToken("invalidToken");
-        passwordChangeDTO.setNewPassword("newPassword");
+        PasswordChange passwordChange = new PasswordChange();
+        passwordChange.setEmail("test@example.com");
+        passwordChange.setToken("invalidToken");
+        passwordChange.setNewPassword("newPassword");
 
         when(tokenService.getPasswordResetToken("test@example.com")).thenReturn("validToken");
 
-        assertThrows(InvalidTokenException.class, () -> userService.changePassword(passwordChangeDTO));
+        assertThrows(InvalidTokenException.class, () -> userService.changePassword(passwordChange));
     }
 }

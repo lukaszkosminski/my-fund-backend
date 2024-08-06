@@ -7,26 +7,18 @@ import com.myfund.models.User;
 
 public class UserMapper {
 
-    public static User createUserDTOMapToUser(CreateUserDTO createUserDTO) {
-        User user = new User();
-        user.setEmail(createUserDTO.getEmail());
-        user.setPassword(createUserDTO.getPassword());
-        user.setUsername(createUserDTO.getUsername());
-        return user;
+    public static User toModel(CreateUserDTO createUserDTO) {
+        return User.builder()
+                .email(createUserDTO.getEmail())
+                .password(createUserDTO.getPassword())
+                .username(createUserDTO.getUsername())
+                .build();
     }
 
-//    public static User editUserDTOMapToUser(EditUserDTO editUserDTO) {
-//        User user = new User();
-//        user.setEmail(editUserDTO.getEmail());
-//        user.setPassword(editUserDTO.getPassword());
-//        user.setUsername(editUserDTO.getUsename());
-//        return user;
-//    }
-
-    public static UserDTO userMapToUserDTO(User user) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setEmail(user.getEmail());
-        userDTO.setUsername(user.getUsername());
-        return userDTO;
+    public static UserDTO toDTO(User user) {
+        return UserDTO.builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .build();
     }
 }
