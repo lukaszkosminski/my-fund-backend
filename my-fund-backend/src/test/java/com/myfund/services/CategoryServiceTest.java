@@ -49,31 +49,32 @@ class CategoryServiceTest {
     @Test
     void findAllCategoriesByUser() {
 
-        User mockUser = new User();
-        mockUser.setId(1L);
+        User mockUser = User.builder().id(1L).build();
 
-        Category category1 = new Category();
-        category1.setId(1L);
-        category1.setName("Category1");
 
-        Category category2 = new Category();
-        category2.setId(2L);
-        category2.setName("Category2");
+        Category category1 = Category.builder()
+                .name("Category 1")
+                .id(1L)
+                .subCategories(new ArrayList<>())
+                .build();
 
-        SubCategory subCategory1 = new SubCategory();
-        subCategory1.setId(1L);
-        subCategory1.setName("SubCategory1");
+        Category category2 = Category.builder()
+                .name("Category 2")
+                .id(2L)
+                .subCategories(new ArrayList<>())
+                .build();
+
+        SubCategory subCategory1 = SubCategory.builder().id(1L).name("SubCategory1").build();
+
         category1.setSubCategories(Arrays.asList(subCategory1));
 
-        SubCategory subCategory2 = new SubCategory();
-        subCategory2.setId(2L);
-        subCategory2.setName("SubCategory2");
+        SubCategory subCategory2 = SubCategory.builder().id(2L).name("SubCategory2").build();
 
         category2.setSubCategories(Arrays.asList(subCategory2));
 
         List<Category> categories = Arrays.asList(category1, category2);
         when(categoryRepository.findAllCategoriesByUser(mockUser)).thenReturn(categories);
-        List<CategoryDTO> result = categoryService.findAllCategoriesByUser(mockUser);
+        List<Category> result = categoryService.findAllCategoriesByUser(mockUser);
 
         assertNotNull(result, "The result should not be null");
         assertEquals(2, result.size(), "The size of the result list does not match the expected value");
@@ -89,21 +90,22 @@ class CategoryServiceTest {
     void findCategoryByIdAndUser_WhenCategoryExists() {
 
         Long categoryId = 1L;
-        User user = new User();
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setName("Test Category");
-        category.setUser(user);
-        category.setSubCategories(Arrays.asList(new SubCategory()));
+        User user = User.builder().build();
+        Category category = Category.builder()
+                .id(categoryId)
+                .name("Test Category")
+                .user(user)
+                .subCategories(Arrays.asList(SubCategory.builder().build()))
+                .build();
 
-        CategoryDTO categoryDTO = new CategoryDTO();
-        categoryDTO.setId(category.getId());
-        categoryDTO.setName(category.getName());
-        categoryDTO.setSubCategories(Arrays.asList(new SubCategoryDTO()));
+        CategoryDTO categoryDTO = CategoryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .subCategories(Arrays.asList(SubCategoryDTO.builder().build())).build();
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
 
-        CategoryDTO result = categoryService.findCategoryByIdAndUser(categoryId, user);
+        Category result = categoryService.findCategoryByIdAndUser(categoryId, user);
 
 
         assertEquals(categoryDTO.getId(), result.getId(), "Category ID should match");
@@ -116,8 +118,7 @@ class CategoryServiceTest {
     void findCategoryByIdAndUser_WhenCategoryDoesNotExist() {
 
         Long categoryId = 1L;
-        User user = new User();
-
+        User user = User.builder().build();
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
         assertThrows(CategoryNotFoundException.class, () -> {
             categoryService.findCategoryByIdAndUser(categoryId, user);
@@ -129,46 +130,50 @@ class CategoryServiceTest {
     @Test
     void createCategory_NewCategory() throws InvalidInputException {
 
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        CreateCategoryDTO createCategoryDTO = new CreateCategoryDTO();
-        createCategoryDTO.setName("New Category");
+        Category category = Category.builder()
+                .name("New Category")
+                .user(user)
+                .subCategories(new ArrayList<>())
+                .build();
 
-        when(categoryRepository.findByNameAndUser(createCategoryDTO.getName(), user)).thenReturn(Optional.empty());
+        when(categoryRepository.findByNameAndUser(category.getName(), user)).thenReturn(Optional.empty());
         when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CategoryDTO result = categoryService.createCategory(createCategoryDTO, user);
+        Category result = categoryService.createCategory(category, user);
 
         assertNotNull(result, "The result should not be null");
-        assertEquals(createCategoryDTO.getName(), result.getName(), "The name of the category does not match");
+        assertEquals(category.getName(), result.getName(), "The name of the category does not match");
 
-        verify(categoryRepository, times(1)).findByNameAndUser(createCategoryDTO.getName(), user);
+        verify(categoryRepository, times(1)).findByNameAndUser(category.getName(), user);
         verify(categoryRepository, times(2)).save(any(Category.class));
     }
 
     @Test
     void createCategory_ExistingCategory() {
 
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        CreateCategoryDTO createCategoryDTO = new CreateCategoryDTO();
-        createCategoryDTO.setName("Existing Category");
-        createCategoryDTO.setSubCategories(Arrays.asList(new CreateSubCategoryDTO()));
+        Category category = Category.builder()
+                .name("Existing Category")
+                .user(user)
+                .subCategories(Arrays.asList(SubCategory.builder().build()))
+                .build();
 
-        Category existingCategory = new Category();
-        existingCategory.setId(1L);
-        existingCategory.setName(createCategoryDTO.getName());
-        existingCategory.setUser(user);
-        existingCategory.setSubCategories(Arrays.asList(new SubCategory()));
+        Category existingCategory = Category.builder()
+                .id(1L)
+                .name(category.getName())
+                .user(user)
+                .subCategories(Arrays.asList(SubCategory.builder().build()))
+                .build();
 
-        when(categoryRepository.findByNameAndUser(createCategoryDTO.getName(), user)).thenReturn(Optional.of(existingCategory));
+        when(categoryRepository.findByNameAndUser(category.getName(), user)).thenReturn(Optional.of(existingCategory));
 
-        assertThrows(CategoryNotUniqueException.class, () -> categoryService.createCategory(createCategoryDTO, user),
+        assertThrows(CategoryNotUniqueException.class, () -> categoryService.createCategory(category, user),
                 "Category already exists for this user");
 
-        verify(categoryRepository, times(1)).findByNameAndUser(createCategoryDTO.getName(), user);
+        verify(categoryRepository, times(1)).findByNameAndUser(category.getName(), user);
         verify(categoryRepository, never()).save(any(Category.class));
     }
 
@@ -176,30 +181,26 @@ class CategoryServiceTest {
     void updateCategory_WhenCategoryExists() {
 
         Long categoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        CreateSubCategoryDTO createSubCategoryDTO = new CreateSubCategoryDTO();
-        createSubCategoryDTO.setName("CreateSubCategory");
+        SubCategory subCategory = SubCategory.builder().id(1L).name("test subcategory").build();
 
-        SubCategory subCategory = new SubCategory();
-        subCategory.setId(1L);
-        subCategory.setName(createSubCategoryDTO.getName());
+        Category existingCategory = Category.builder()
+                .id(categoryId)
+                .name("Old Category")
+                .user(user)
+                .subCategories(new ArrayList<>(Arrays.asList(subCategory)))
+                .build();
 
-        Category existingCategory = new Category();
-        existingCategory.setId(categoryId);
-        existingCategory.setName("Old Category");
-        existingCategory.setUser(user);
-        existingCategory.setSubCategories(new ArrayList<>(Arrays.asList(subCategory)));
-
-        CreateCategoryDTO createCategoryDTO = new CreateCategoryDTO();
-        createCategoryDTO.setName("Updated Category");
-        createCategoryDTO.setSubCategories(Arrays.asList(createSubCategoryDTO));
+        Category category = Category.builder()
+                .name("Updated Category")
+                .subCategories(Arrays.asList(subCategory))
+                .build();
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(existingCategory));
         when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CategoryDTO updatedCategory = categoryService.updateCategory(categoryId, createCategoryDTO, user);
+        Category updatedCategory = categoryService.updateCategory(categoryId, category, user);
 
         assertNotNull(updatedCategory, "Updated category should not be null");
         assertEquals("Updated Category", updatedCategory.getName(), "Category name should be updated");
@@ -211,16 +212,17 @@ class CategoryServiceTest {
     void updateCategory_WhenCategoryDoesNotExist() {
 
         Long categoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        CreateCategoryDTO createCategoryDTO = new CreateCategoryDTO();
-        createCategoryDTO.setName("Nonexistent Category");
+
+        Category category = Category.builder()
+                .name("Nonexistent Category")
+                .build();
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
 
         assertThrows(CategoryNotFoundException.class, () -> {
-            categoryService.updateCategory(categoryId, createCategoryDTO, user);
+            categoryService.updateCategory(categoryId, category, user);
         }, "Category not found");
 
         verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
@@ -230,11 +232,11 @@ class CategoryServiceTest {
     @Test
     void deleteCategoryByIdAndUser_WhenCategoryExists() {
         Long categoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        Category category = new Category();
-        category.setId(categoryId);
+        Category category = Category.builder()
+                .id(categoryId)
+                .build();
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
         categoryService.deleteCategoryByIdAndUser(categoryId, user);
@@ -248,8 +250,7 @@ class CategoryServiceTest {
     void deleteCategoryByIdAndUser_WhenCategoryDoesNotExist_ShouldThrowException() {
 
         Long categoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
 
@@ -263,15 +264,13 @@ class CategoryServiceTest {
     void isSubcategoryRelatedToCategory_WhenCategoryExistsAndSubcategoryIsRelated() {
         Long categoryId = 1L;
         Long subcategoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setUser(user);
+        Category category = Category.builder()
+                .id(categoryId)
+                .build();
 
-        SubCategory subCategory = new SubCategory();
-        subCategory.setId(subcategoryId);
+        SubCategory subCategory = SubCategory.builder().id(subcategoryId).name("Test Subcategory").build();
         category.setSubCategories(List.of(subCategory));
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
@@ -286,15 +285,13 @@ class CategoryServiceTest {
     void isSubcategoryRelatedToCategory_WhenCategoryExistsAndSubcategoryIsNotRelated() {
         Long categoryId = 1L;
         Long subcategoryId = 2L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setUser(user);
+        Category category = Category.builder()
+                .id(categoryId)
+                .build();
 
-        SubCategory subCategory = new SubCategory();
-        subCategory.setId(1L);
+        SubCategory subCategory = SubCategory.builder().id(1L).name("Test Subcategory").build();
         category.setSubCategories(List.of(subCategory));
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
@@ -309,8 +306,7 @@ class CategoryServiceTest {
     void isSubcategoryRelatedToCategory_WhenCategoryDoesNotExist() {
         Long categoryId = 1L;
         Long subcategoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
 
@@ -335,13 +331,13 @@ class CategoryServiceTest {
     void isSubcategoryRelatedToCategory_WhenSubcategoryListIsEmpty() {
         Long categoryId = 1L;
         Long subcategoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .id(categoryId)
+                .user(user)
+                .subCategories(new ArrayList<>())
+                .build();
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
 
@@ -355,16 +351,15 @@ class CategoryServiceTest {
     void deleteSubcategoryByIdsAndUser_Success() {
         Long categoryId = 1L;
         Long subcategoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .user(user)
+                .id(categoryId)
+                .subCategories(new ArrayList<>())
+                .build();
 
-        SubCategory subCategory = new SubCategory();
-        subCategory.setId(subcategoryId);
+        SubCategory subCategory = SubCategory.builder().id(subcategoryId).name("Test Subcategory").build();
         category.getSubCategories().add(subCategory);
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
@@ -381,8 +376,7 @@ class CategoryServiceTest {
     void deleteSubcategoryByIdsAndUser_CategoryNotFound() {
         Long categoryId = 1L;
         Long subcategoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
 
@@ -398,13 +392,14 @@ class CategoryServiceTest {
     void deleteSubcategoryByIdsAndUser_SubcategoryNotFound() {
         Long categoryId = 1L;
         Long subcategoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .user(user)
+                .id(categoryId)
+                .subCategories(new ArrayList<>())
+                .build();
+
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));
 
@@ -418,18 +413,16 @@ class CategoryServiceTest {
     void deleteSubcategoryByIdsAndUser_MultipleSubcategories() {
         Long categoryId = 1L;
         Long subcategoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .user(user)
+                .id(categoryId)
+                .subCategories(new ArrayList<>())
+                .build();
 
-        SubCategory subCategory1 = new SubCategory();
-        subCategory1.setId(subcategoryId);
-        SubCategory subCategory2 = new SubCategory();
-        subCategory2.setId(2L);
+        SubCategory subCategory1 = SubCategory.builder().id(1L).name("Test Subcategory 1").build();
+        SubCategory subCategory2 = SubCategory.builder().id(2L).name("Test Subcategory 2").build();
         category.getSubCategories().add(subCategory1);
         category.getSubCategories().add(subCategory2);
 
@@ -447,16 +440,16 @@ class CategoryServiceTest {
     void deleteSubcategoryByIdsAndUser_SubcategoryNotBelongToCategory() {
         Long categoryId = 1L;
         Long subcategoryId = 1L;
-        User user = new User();
-        user.setId(1L);
+        User user = User.builder().id(1L).build();
 
-        Category category = new Category();
-        category.setId(categoryId);
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .user(user)
+                .id(categoryId)
+                .subCategories(new ArrayList<>())
+                .build();
 
-        SubCategory subCategory = new SubCategory();
-        subCategory.setId(2L); // Different ID
+        SubCategory subCategory = SubCategory.builder().id(2L).name("Test Subcategory").build();
+
         category.getSubCategories().add(subCategory);
 
         when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.of(category));

@@ -2,18 +2,19 @@ package com.myfund.models;
 
 import com.myfund.services.encryption.StringEncryptor;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Table(name = "category")
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Setter
 @Entity
 @ToString
+@Builder
 public class Category {
 
     @Id

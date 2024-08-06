@@ -1,19 +1,20 @@
-package com.myfund.controllers;
+package com.myfund.integration;
 
 import com.myfund.exceptions.InvalidInputException;
+import com.myfund.models.Category;
 import com.myfund.models.DTOs.CategoryDTO;
 import com.myfund.models.DTOs.CreateCategoryDTO;
+import com.myfund.models.DTOs.mappers.CategoryMapper;
 import com.myfund.models.User;
 import com.myfund.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -28,25 +29,26 @@ public class CategoryController {
 
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDTO>> getAllCategories(@AuthenticationPrincipal User user) {
-        return new ResponseEntity<>(categoryService.findAllCategoriesByUser(user), HttpStatus.OK);
+        List<Category> allCategoriesByUser = categoryService.findAllCategoriesByUser(user);
+        return new ResponseEntity<>(CategoryMapper.toListDTO(allCategoriesByUser), HttpStatus.OK);
     }
 
     @GetMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
-        CategoryDTO categoryDTO = categoryService.findCategoryByIdAndUser(categoryId, user);
-        return new ResponseEntity<>(categoryDTO, HttpStatus.OK);
+        Category category = categoryService.findCategoryByIdAndUser(categoryId, user);
+        return new ResponseEntity<>(CategoryMapper.toDTO(category), HttpStatus.OK);
     }
 
     @PostMapping("/categories")
-    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
-        CategoryDTO categoryDTO = categoryService.createCategory(createCategoryDTO, user);
-        return new ResponseEntity<>(categoryDTO, HttpStatus.CREATED);
+    public ResponseEntity<CategoryDTO> createCategory(@RequestBody @Valid CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
+        Category category = categoryService.createCategory(CategoryMapper.toModel(createCategoryDTO), user);
+        return new ResponseEntity<>(CategoryMapper.toDTO(category), HttpStatus.CREATED);
     }
 
     @PatchMapping("/categories/{categoryId}")
-    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable("categoryId") Long categoryId, @RequestBody CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) {
-        CategoryDTO categoryDTO = categoryService.updateCategory(categoryId, createCategoryDTO, user);
-        return new ResponseEntity<>(categoryDTO, HttpStatus.OK);
+    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable("categoryId") Long categoryId, @RequestBody @Valid CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) {
+        Category category = categoryService.updateCategory(categoryId, CategoryMapper.toModel(createCategoryDTO), user);
+        return new ResponseEntity<>(CategoryMapper.toDTO(category), HttpStatus.OK);
     }
 
     @DeleteMapping("/categories/{categoryId}")

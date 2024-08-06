@@ -39,13 +39,13 @@ public class CategoryService {
         this.budgetService = budgetService;
     }
 
-    public List<CategoryDTO> findAllCategoriesByUser(User user) {
-        List<CategoryDTO> categoryDTOs = CategoryMapper.categoryListMapToCategoryListDTO(categoryRepository.findAllCategoriesByUser(user));
-        log.info("Retrieved {} categories for user with ID: {}", categoryDTOs.size(), user.getId());
-        return categoryDTOs;
+    public List<Category> findAllCategoriesByUser(User user) {
+        List<Category> category = categoryRepository.findAllCategoriesByUser(user);
+        log.info("Retrieved {} categories for user with ID: {}", category.size(), user.getId());
+        return category;
     }
 
-    public CategoryDTO findCategoryByIdAndUser(Long categoryId, User user) {
+    public Category findCategoryByIdAndUser(Long categoryId, User user) {
         log.debug("Starting to find category by ID: {} for user ID: {}", categoryId, user.getId());
 
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
@@ -55,22 +55,20 @@ public class CategoryService {
         }
 
         log.info("Category found for user with ID: {} and category ID: {}", user.getId(), categoryId);
-        return CategoryMapper.categoryMapToCategoryDTO(existingCategoryOpt.get());
+        return existingCategoryOpt.get();
     }
 
-    public CategoryDTO createCategory(CreateCategoryDTO createCategoryDTO, User user) throws InvalidInputException {
-        log.debug("Starting to create a new category with name: {} for user ID: {}", createCategoryDTO.getName(), user.getId());
-        if (createCategoryDTO.getName() == null || createCategoryDTO.getName().isEmpty()) {
+    public Category createCategory(Category category, User user) throws InvalidInputException {
+        log.debug("Starting to create a new category with name: {} for user ID: {}", category.getName(), user.getId());
+        if (category.getName() == null || category.getName().isEmpty()) {
             log.warn("Category name is required.");
             throw new InvalidInputException("Category name is required");
         }
-        Optional<Category> existingCategory = categoryRepository.findByNameAndUser(createCategoryDTO.getName(), user);
-        Category category;
+        Optional<Category> existingCategory = categoryRepository.findByNameAndUser(category.getName(), user);
         if (existingCategory.isPresent()) {
-            log.warn("Category creation attempt failed. Category with name: {} already exists for user ID: {}", createCategoryDTO.getName(), user.getId());
+            log.warn("Category creation attempt failed. Category with name: {} already exists for user ID: {}", category.getName(), user.getId());
             throw new CategoryNotUniqueException("Category with name: " + existingCategory.get().getName() + " is not unique");
         }
-        category = CategoryMapper.createCategoryDTOMapToCategory(createCategoryDTO);
         category.setUser(user);
         Category savedCategory = categoryRepository.save(category);
         ArrayList<SubCategory> subCategoryList = new ArrayList<>();
@@ -82,36 +80,37 @@ public class CategoryService {
         category.getSubCategories().clear();
         category.getSubCategories().addAll(subCategoryList);
         categoryRepository.save(category);
-        log.info("New category created with name: {} for user ID: {}", createCategoryDTO.getName(), user.getId());
-        return CategoryMapper.categoryMapToCategoryDTO(category);
+        log.info("New category created with name: {} for user ID: {}", category.getName(), user.getId());
+        return category;
     }
 
-    public CategoryDTO updateCategory(Long categoryId, CreateCategoryDTO createCategoryDTO, User user) {
+    public Category updateCategory(Long categoryId, Category category, User user) {
         log.debug("Starting to update category with ID: {} for user ID: {}", categoryId, user.getId());
         Optional<Category> existingCategoryOpt = categoryRepository.findByIdAndUser(categoryId, user);
         if (existingCategoryOpt.isPresent()) {
-            Category category = existingCategoryOpt.get();
-            category.setName(createCategoryDTO.getName());
+            Category existingCategory = existingCategoryOpt.get();
+            existingCategory.setName(category.getName());
 
-            List<SubCategory> existingSubCategories = category.getSubCategories();
-            createCategoryDTO.getSubCategories().forEach(createSubCategoryDTO -> {
-                Optional<SubCategory> existingSubCategory = existingSubCategories.stream().filter(subCategory -> subCategory.getName().equals(createSubCategoryDTO.getName())).findFirst();
+            List<SubCategory> existingSubCategories = existingCategory.getSubCategories();
+            category.getSubCategories().forEach(subCategory -> {
+                Optional<SubCategory> existingSubCategory = existingSubCategories.stream()
+                        .filter(sc -> sc.getName().equals(subCategory.getName()))
+                        .findFirst();
                 if (!existingSubCategory.isPresent()) {
-                    SubCategory newSubCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
-                    newSubCategory.setCategory(category);
-                    existingSubCategories.add(newSubCategory);
+                    subCategory.setCategory(existingCategory);
+                    existingSubCategories.add(subCategory);
                 }
             });
 
-            categoryRepository.save(category);
-            CategoryDTO categoryDTO = CategoryMapper.categoryMapToCategoryDTO(category);
+            categoryRepository.save(existingCategory);
             log.info("Category with ID: {} updated for user ID: {}", categoryId, user.getId());
-            return categoryDTO;
+            return existingCategory;
         } else {
             log.warn("Category not found for user ID: {} and category ID: {}", user.getId(), categoryId);
             throw new CategoryNotFoundException("Category not found for user with ID: " + user.getId() + " and category ID: " + categoryId);
         }
     }
+
 
     @Transactional
     public void deleteCategoryByIdAndUser(Long categoryId, User user) {

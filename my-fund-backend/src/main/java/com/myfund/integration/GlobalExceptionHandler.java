@@ -1,4 +1,4 @@
-package com.myfund.controllers;
+package com.myfund.integration;
 
 import com.myfund.exceptions.*;
 import org.springframework.http.HttpStatus;

@@ -1,6 +1,5 @@
-package com.myfund.controllers;
+package com.myfund.integration;
 
-import com.myfund.models.ApplicationDetails;
 import com.myfund.models.DTOs.ApplicationDetailsDTO;
 import com.myfund.services.ApplicationDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -13,7 +13,7 @@ class SubCategoryMapperTest {
         CreateSubCategoryDTO createSubCategoryDTO = new CreateSubCategoryDTO();
         createSubCategoryDTO.setName("Test SubCategory");
 
-        SubCategory subCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
+        SubCategory subCategory = SubCategoryMapper.toModel(createSubCategoryDTO);
 
         assertNotNull(subCategory, "The mapped SubCategory should not be null");
         assertEquals("Test SubCategory", subCategory.getName(), "The name of the SubCategory does not match the expected value");
@@ -24,7 +24,7 @@ class SubCategoryMapperTest {
         CreateSubCategoryDTO createSubCategoryDTO = new CreateSubCategoryDTO();
         createSubCategoryDTO.setName(null);
 
-        SubCategory subCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
+        SubCategory subCategory = SubCategoryMapper.toModel(createSubCategoryDTO);
 
         assertNotNull(subCategory, "The mapped SubCategory should not be null");
         assertNull(subCategory.getName(), "The name of the SubCategory should be null");
@@ -35,7 +35,7 @@ class SubCategoryMapperTest {
         CreateSubCategoryDTO createSubCategoryDTO = new CreateSubCategoryDTO();
         createSubCategoryDTO.setName("");
 
-        SubCategory subCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
+        SubCategory subCategory = SubCategoryMapper.toModel(createSubCategoryDTO);
 
         assertNotNull(subCategory, "The mapped SubCategory should not be null");
         assertEquals("", subCategory.getName(), "The name of the SubCategory should be an empty string");
@@ -46,7 +46,7 @@ class SubCategoryMapperTest {
         CreateSubCategoryDTO createSubCategoryDTO = new CreateSubCategoryDTO();
         createSubCategoryDTO.setName("   ");
 
-        SubCategory subCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
+        SubCategory subCategory = SubCategoryMapper.toModel(createSubCategoryDTO);
 
         assertNotNull(subCategory, "The mapped SubCategory should not be null");
         assertEquals("   ", subCategory.getName(), "The name of the SubCategory should be whitespace");
@@ -57,7 +57,7 @@ class SubCategoryMapperTest {
         CreateSubCategoryDTO createSubCategoryDTO = new CreateSubCategoryDTO();
         createSubCategoryDTO.setName("!@#$%^&*()");
 
-        SubCategory subCategory = SubCategoryMapper.createSubCategoryMapToSubcategory(createSubCategoryDTO);
+        SubCategory subCategory = SubCategoryMapper.toModel(createSubCategoryDTO);
 
         assertNotNull(subCategory, "The mapped SubCategory should not be null");
         assertEquals("!@#$%^&*()", subCategory.getName(), "The name of the SubCategory should match the special characters");

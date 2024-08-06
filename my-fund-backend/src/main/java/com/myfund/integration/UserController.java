@@ -1,4 +1,4 @@
-package com.myfund.controllers;
+package com.myfund.integration;
 
 import com.myfund.models.DTOs.UserDTO;
 import com.myfund.models.DTOs.mappers.UserMapper;
@@ -27,7 +27,7 @@ public class UserController {
     @GetMapping("/current-user")
     @ResponseBody
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
-        return new ResponseEntity<>(UserMapper.toUserDTO(user), HttpStatus.OK);
+        return new ResponseEntity<>(UserMapper.toDTO(user), HttpStatus.OK);
     }
 
 }

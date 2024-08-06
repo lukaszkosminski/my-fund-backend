@@ -14,13 +14,16 @@ class IncomeMapperTest {
 
     @Test
     void testCreateIncomeDTOtoIncome() {
-        CreateIncomeDTO createIncomeDTO = new CreateIncomeDTO();
-        createIncomeDTO.setName("Salary");
-        createIncomeDTO.setAmount(new BigDecimal("5000"));
-        createIncomeDTO.setIdCategory(1L);
-        createIncomeDTO.setIdSubCategory(2L);
 
-        Income income = IncomeMapper.toIncome(createIncomeDTO);
+        CreateIncomeDTO createIncomeDTO = CreateIncomeDTO
+                .builder()
+                .name("Salary")
+                .amount(new BigDecimal("5000"))
+                .idCategory(1L)
+                .idSubCategory(2L)
+                .build();
+
+        Income income = IncomeMapper.toModel(createIncomeDTO);
 
         assertNotNull(income);
         assertEquals("Salary", income.getName());
@@ -31,15 +34,16 @@ class IncomeMapperTest {
 
     @Test
     void testIncomeMapToIncomeDTO() {
-        Income income = new Income();
-        income.setId(1L);
-        income.setName("Salary");
-        income.setAmount(new BigDecimal("5000"));
-        income.setIdCategory(1L);
-        income.setIdSubCategory(2L);
-        income.setLocalDateTime(LocalDateTime.of(2023, 10, 1, 10, 0));
+        Income income = Income.builder()
+                .id(1L)
+                .name("Salary")
+                .amount(new BigDecimal("5000"))
+                .idCategory(1L)
+                .idSubCategory(2L)
+                .localDateTime(LocalDateTime.of(2023, 10, 1, 10, 0))
+                .build();
 
-        IncomeDTO incomeDTO = IncomeMapper.toIncomeDTO(income);
+        IncomeDTO incomeDTO = IncomeMapper.toDTO(income);
 
         assertNotNull(incomeDTO);
         assertEquals(1L, incomeDTO.getId());

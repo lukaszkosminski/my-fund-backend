@@ -1,29 +1,31 @@
 package com.myfund.models.DTOs.mappers;
 
+import com.myfund.exceptions.ExpenseNotFoundException;
 import com.myfund.models.DTOs.CreateExpenseDTO;
 import com.myfund.models.DTOs.ExpenseDTO;
 import com.myfund.models.Expense;
 
 public class ExpenseMapper {
 
-    public static Expense toExpense(CreateExpenseDTO createExpenseDTO) {
-        Expense expense = new Expense();
-        expense.setName(createExpenseDTO.getName());
-        expense.setAmount(createExpenseDTO.getAmount());
-        expense.setIdCategory(createExpenseDTO.getIdCategory());
-        expense.setIdSubCategory(createExpenseDTO.getIdSubCategory());
+    public static Expense toModel(CreateExpenseDTO createExpenseDTO) {
+        Expense expense = Expense.builder()
+                .name(createExpenseDTO.getName())
+                .amount(createExpenseDTO.getAmount())
+                .idCategory(createExpenseDTO.getIdCategory())
+                .idSubCategory(createExpenseDTO.getIdSubCategory()).build();
         return expense;
     }
 
-    public static ExpenseDTO toExpenseDTO(Expense expense){
-        ExpenseDTO expenseDTO = new ExpenseDTO();
-        expenseDTO.setId(expense.getId());
-        expenseDTO.setName(expense.getName());
-        expenseDTO.setAmount(expense.getAmount());
-        expenseDTO.setIdCategory(expense.getIdCategory());
-        expenseDTO.setIdSubCategory(expense.getIdSubCategory());
-        expenseDTO.setLocalDate(expense.getLocalDateTime().toLocalDate());
-        return expenseDTO;
+    public static ExpenseDTO toDTO(Expense expense){
+        return ExpenseDTO.builder()
+                .id(expense.getId())
+                .name(expense.getName())
+                .amount(expense.getAmount())
+                .idCategory(expense.getIdCategory())
+                .idSubCategory(expense.getIdSubCategory())
+                .localDate(expense.getLocalDateTime().toLocalDate())
+                .build();
+
     }
 
 

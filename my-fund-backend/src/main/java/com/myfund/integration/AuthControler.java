@@ -1,4 +1,4 @@
-package com.myfund.controllers;
+package com.myfund.integration;
 
 import com.myfund.models.DTOs.CreateUserDTO;
 import com.myfund.models.DTOs.PasswordChangeDTO;
@@ -30,19 +30,19 @@ public class AuthControler {
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody CreateUserDTO createUserDTO) throws IOException {
-        User user = userService.createUser(UserMapper.toUser(createUserDTO));
-        return new ResponseEntity<>(UserMapper.toUserDTO(user), HttpStatus.CREATED);
+        User user = userService.createUser(UserMapper.toModel(createUserDTO));
+        return new ResponseEntity<>(UserMapper.toDTO(user), HttpStatus.CREATED);
     }
 
     @PostMapping("/request-change-password")
     public ResponseEntity<?> requestChangePassword(@Valid @RequestBody PasswordChangeRequestDTO passwordChangeRequestDTO) {
-        userService.requestPasswordChange(PasswordChangeRequestMapper.toPasswordChangeRequest(passwordChangeRequestDTO));
+        userService.requestPasswordChange(PasswordChangeRequestMapper.toModel(passwordChangeRequestDTO));
         return new ResponseEntity<>(passwordChangeRequestDTO, HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@Valid @RequestBody PasswordChangeDTO passwordChangeDTO) {
-        userService.changePassword(PasswordChangeMapper.toPasswordChange(passwordChangeDTO));
+        userService.changePassword(PasswordChangeMapper.toModel(passwordChangeDTO));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

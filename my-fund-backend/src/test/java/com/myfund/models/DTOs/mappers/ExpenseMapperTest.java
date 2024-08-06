@@ -14,13 +14,14 @@ class ExpenseMapperTest {
 
     @Test
     void testCreateExpenseDTOtoExpense() {
-        CreateExpenseDTO createExpenseDTO = new CreateExpenseDTO();
-        createExpenseDTO.setName("Test Expense");
-        createExpenseDTO.setAmount(new BigDecimal("100.00"));
-        createExpenseDTO.setIdCategory(1L);
-        createExpenseDTO.setIdSubCategory(2L);
+        CreateExpenseDTO createExpenseDTO = CreateExpenseDTO.builder()
+                .name("Test Expense")
+                .amount(new BigDecimal("100.00"))
+                .idCategory(1L)
+                .idSubCategory(2L)
+                .build();
 
-        Expense expense = ExpenseMapper.toExpense(createExpenseDTO);
+        Expense expense = ExpenseMapper.toModel(createExpenseDTO);
 
         assertNotNull(expense, "Expense should not be null");
         assertEquals(createExpenseDTO.getName(), expense.getName(), "Expense name should match");
@@ -31,15 +32,16 @@ class ExpenseMapperTest {
 
     @Test
     void testExpensetoExpenseDTO() {
-        Expense expense = new Expense();
-        expense.setId(1L);
-        expense.setName("Test Expense");
-        expense.setAmount(new BigDecimal("100.00"));
-        expense.setIdCategory(1L);
-        expense.setIdSubCategory(2L);
-        expense.setLocalDateTime(LocalDateTime.of(2023, 10, 1, 12, 0));
+        Expense expense = Expense.builder()
+                .id(1L)
+                .name("Test Expense")
+                .amount(new BigDecimal("100.00"))
+                .idCategory(1L)
+                .idSubCategory(2L)
+                .localDateTime(LocalDateTime.of(2023, 10, 1, 12, 0))
+                .build();
 
-        ExpenseDTO expenseDTO = ExpenseMapper.toExpenseDTO(expense);
+        ExpenseDTO expenseDTO = ExpenseMapper.toDTO(expense);
 
         assertNotNull(expenseDTO, "ExpenseDTO should not be null");
         assertEquals(expense.getId(), expenseDTO.getId(), "Expense ID should match");

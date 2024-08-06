@@ -25,7 +25,7 @@ class CategoryMapperTest {
         categoryDTO.setName("Category1");
         categoryDTO.setSubCategories(Arrays.asList(subCategoryDTO));
 
-        Category category = CategoryMapper.createCategoryDTOMapToCategory(categoryDTO);
+        Category category = CategoryMapper.toModel(categoryDTO);
 
         assertEquals("Category1", category.getName(), "Category name does not match");
         assertTrue(category.getSubCategories().size() == 1, "SubCategory list size does not match");
@@ -35,16 +35,15 @@ class CategoryMapperTest {
     @Test
     void testCategoryMapToCategoryDTO() {
 
-        SubCategory subCategory = new SubCategory();
-        subCategory.setId(1L);
-        subCategory.setName("SubCategory1");
+        SubCategory subCategory = SubCategory.builder().id(1L).name("SubCategory1").build();
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Category1");
-        category.setSubCategories(Arrays.asList(subCategory));
+        Category category = Category.builder()
+                .name("Test Category")
+                .id(1L)
+                .subCategories(Arrays.asList(subCategory))
+                .build();
 
-        CategoryDTO categoryDTO = CategoryMapper.categoryMapToCategoryDTO(category);
+        CategoryDTO categoryDTO = CategoryMapper.toDTO(category);
 
         assertNotNull(categoryDTO, "CategoryDTO should not be null");
         assertEquals(category.getId(), categoryDTO.getId(), "Category ID does not match");
@@ -57,18 +56,16 @@ class CategoryMapperTest {
     @Test
     void testCategoryListMapToCategoryListDTO() {
 
-        SubCategory subCategory1 = new SubCategory();
-        subCategory1.setId(1L);
-        subCategory1.setName("SubCategory1");
-
-        Category category1 = new Category();
-        category1.setId(1L);
-        category1.setName("Category1");
-        category1.setSubCategories(Arrays.asList(subCategory1));
+        SubCategory subCategory1 = SubCategory.builder().id(1L).name("SubCategory1").build();
+        Category category1 = Category.builder()
+                .name("Test Category")
+                .id(1L)
+                .subCategories(Arrays.asList(subCategory1))
+                .build();
 
         List<Category> categories = Arrays.asList(category1);
 
-        List<CategoryDTO> categoryDTOs = CategoryMapper.categoryListMapToCategoryListDTO(categories);
+        List<CategoryDTO> categoryDTOs = CategoryMapper.toListDTO(categories);
         CategoryDTO categoryDTO = categoryDTOs.get(0);
 
         assertNotNull(categoryDTOs, "The returned list should not be null");
@@ -84,16 +81,12 @@ class CategoryMapperTest {
     @Test
     void testSubCategoryListMapToSubCategoryListDTO() {
 
-        SubCategory subCategory1 = new SubCategory();
-        subCategory1.setId(1L);
-        subCategory1.setName("SubCategory1");
+        SubCategory subCategory1 = SubCategory.builder().id(1L).name("SubCategory1").build();
 
-        SubCategory subCategory2 = new SubCategory();
-        subCategory2.setId(2L);
-        subCategory2.setName("SubCategory2");
+        SubCategory subCategory2 = SubCategory.builder().id(2L).name("SubCategory2").build();
 
         List<SubCategory> subCategoryList = Arrays.asList(subCategory1, subCategory2);
-        List<SubCategoryDTO> subCategoryDTOList = CategoryMapper.subCategoryListMapToSubCategoryListDTO(subCategoryList);
+        List<SubCategoryDTO> subCategoryDTOList = SubCategoryMapper.toListDTO(subCategoryList);
 
         assertNotNull(subCategoryDTOList, "The returned list should not be null");
         assertEquals(2, subCategoryDTOList.size(), "The size of the returned list does not match the expected value");

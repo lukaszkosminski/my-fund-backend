@@ -2,14 +2,15 @@ package com.myfund.models;
 
 import com.myfund.services.encryption.StringEncryptor;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @ToString
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "subcategory")
 public class SubCategory {
     @Id

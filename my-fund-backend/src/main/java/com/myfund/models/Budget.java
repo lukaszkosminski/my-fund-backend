@@ -1,9 +1,7 @@
 package com.myfund.models;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,7 +15,10 @@ import com.myfund.services.encryption.BigDecimalEncryptor;
 @Setter
 @Entity
 @ToString
+@Builder
 @Table(name = "budget")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Budget {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,11 +41,14 @@ public class Budget {
     private List<Income> incomes;
 
     @Convert(converter = BigDecimalEncryptor.class)
-    private BigDecimal balance;
+    @Builder.Default
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @Convert(converter = BigDecimalEncryptor.class)
-    private BigDecimal totalIncome;
+    @Builder.Default
+    private BigDecimal totalIncome = BigDecimal.ZERO;
 
     @Convert(converter = BigDecimalEncryptor.class)
-    private BigDecimal totalExpense;
+    @Builder.Default
+    private BigDecimal totalExpense = BigDecimal.ZERO;
 }

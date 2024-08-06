@@ -1,6 +1,7 @@
 package com.myfund.models.DTOs;
 
 import jakarta.persistence.Column;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 @Getter
 @Setter
+@Builder
 public class CreateIncomeDTO {
 
     @NotNull

@@ -1,7 +1,6 @@
 package com.myfund.models.DTOs.mappers;
 
-import com.myfund.models.DTOs.FinancialAggregateCategoryDTO;
-import com.myfund.models.DTOs.FinancialAggregateSubcategoryDTO;
+import com.myfund.models.DTOs.FinancialAggregateDTO;
 import com.myfund.models.FinancialAggregate;
 import com.myfund.models.TypeAggregate;
 import org.junit.jupiter.api.Test;
@@ -14,14 +13,14 @@ public class FinancialAggregateMapperTest {
 
     @Test
     void testToFinancialAggregateCategoryDTO() {
-        FinancialAggregate financialAggregate = new FinancialAggregate();
-        financialAggregate.setValue(new BigDecimal("100.0"));
-        financialAggregate.setCategoryId(1L);
-        financialAggregate.setTypeAggregate(TypeAggregate.EXPENSES_BY_CATEGORY);
-        financialAggregate.setBudgetId(2L);
-        financialAggregate.setUserId(3L);
-
-        FinancialAggregateCategoryDTO dto = FinancialAggregateMapper.toFinancialAggregateCategoryDTO(financialAggregate);
+        FinancialAggregate financialAggregate = FinancialAggregate.builder()
+                .value(new BigDecimal("100.0"))
+                .categoryId(1L)
+                .typeAggregate(TypeAggregate.EXPENSES_BY_CATEGORY)
+                .budgetId(2L)
+                .userId(3L)
+                .build();
+        FinancialAggregateDTO dto = FinancialAggregateMapper.toDTO(financialAggregate);
 
         assertEquals(new BigDecimal("100.0"), dto.getValue());
         assertEquals(1L, dto.getCategoryId());
@@ -32,14 +31,15 @@ public class FinancialAggregateMapperTest {
 
     @Test
     void testToFinancialAggregateSubcategoryDTO() {
-        FinancialAggregate financialAggregate = new FinancialAggregate();
-        financialAggregate.setValue(new BigDecimal("200.0"));
-        financialAggregate.setSubcategoryId(4L);
-        financialAggregate.setTypeAggregate(TypeAggregate.EXPENSES_BY_CATEGORY);
-        financialAggregate.setBudgetId(5L);
-        financialAggregate.setUserId(6L);
+        FinancialAggregate financialAggregate = FinancialAggregate.builder()
+                .value(new BigDecimal("200.0"))
+                .subcategoryId(4L)
+                .typeAggregate(TypeAggregate.EXPENSES_BY_CATEGORY)
+                .budgetId(5L)
+                .userId(6L)
+                .build();
 
-        FinancialAggregateSubcategoryDTO dto = FinancialAggregateMapper.toFinancialAggregateSubcategoryDTO(financialAggregate);
+        FinancialAggregateDTO dto = FinancialAggregateMapper.toDTO(financialAggregate);
 
         assertEquals(new BigDecimal("200.0"), dto.getValue());
         assertEquals(4L, dto.getSubcategoryId());
@@ -50,14 +50,15 @@ public class FinancialAggregateMapperTest {
 
     @Test
     void testToFinancialAggregateCategoryDTO_OverrideValue() {
-        FinancialAggregate financialAggregate = new FinancialAggregate();
-        financialAggregate.setValue(new BigDecimal("300.0"));
-        financialAggregate.setCategoryId(7L);
-        financialAggregate.setTypeAggregate(TypeAggregate.EXPENSES_BY_CATEGORY);
-        financialAggregate.setBudgetId(8L);
-        financialAggregate.setUserId(9L);
+        FinancialAggregate financialAggregate = FinancialAggregate.builder()
+                .value(new BigDecimal("300.0"))
+                .categoryId(7L)
+                .typeAggregate(TypeAggregate.EXPENSES_BY_CATEGORY)
+                .budgetId(8L)
+                .userId(9L)
+                .build();
 
-        FinancialAggregateCategoryDTO dto = FinancialAggregateMapper.toFinancialAggregateCategoryDTO(financialAggregate);
+        FinancialAggregateDTO dto = FinancialAggregateMapper.toDTO(financialAggregate);
         dto.setValue(new BigDecimal("400.0"));
 
         assertEquals(new BigDecimal("400.0"), dto.getValue());

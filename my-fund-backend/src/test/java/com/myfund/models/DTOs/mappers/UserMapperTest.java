@@ -12,12 +12,15 @@ public class UserMapperTest {
 
     @Test
     void testCreateUserDTOMapToUser() {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setEmail("test@example.com");
-        createUserDTO.setPassword("password123");
-        createUserDTO.setUsername("testuser");
 
-        User user = UserMapper.toUser(createUserDTO);
+        CreateUserDTO createUserDTO = CreateUserDTO
+                .builder()
+                .email("test@example.com")
+                .password("password123")
+                .username("testuser")
+                .build();
+
+        User user = UserMapper.toModel(createUserDTO);
 
         assertNotNull(user, "The user should not be null");
         assertEquals(createUserDTO.getEmail(), user.getEmail(), "The email should match");
@@ -27,11 +30,9 @@ public class UserMapperTest {
 
     @Test
     void testUserMapToUserDTO() {
-        User user = new User();
-        user.setEmail("user@example.com");
-        user.setUsername("user123");
+        User user =User.builder().email("test@test.pl").username("testUser").build();
 
-        UserDTO userDTO = UserMapper.toUserDTO(user);
+        UserDTO userDTO = UserMapper.toDTO(user);
 
         assertNotNull(userDTO, "The userDTO should not be null");
         assertEquals(user.getEmail(), userDTO.getEmail(), "The email should match");
@@ -40,12 +41,14 @@ public class UserMapperTest {
 
     @Test
     void testCreateUserDTOMapToUser_NullValues() {
-        CreateUserDTO createUserDTO = new CreateUserDTO();
-        createUserDTO.setEmail(null);
-        createUserDTO.setPassword(null);
-        createUserDTO.setUsername(null);
+        CreateUserDTO createUserDTO = CreateUserDTO
+                .builder()
+                .email(null)
+                .password(null)
+                .username(null)
+                .build();
 
-        User user = UserMapper.toUser(createUserDTO);
+        User user = UserMapper.toModel(createUserDTO);
 
         assertNotNull(user, "The user should not be null");
         assertEquals(createUserDTO.getEmail(), user.getEmail(), "The email should match");

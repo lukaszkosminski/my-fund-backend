@@ -1,4 +1,4 @@
-package com.myfund.controllers;
+package com.myfund.integration;
 
 import com.myfund.models.Category;
 import com.myfund.models.SubCategory;
@@ -65,12 +65,13 @@ public class CategoryControllerE2ETest {
         org.springframework.security.core.userdetails.User springUser =
                 new org.springframework.security.core.userdetails.User("testUser", "testPassword", new ArrayList<>());
 
-        User customUser = new User();
-        customUser.setId(1L);
-        customUser.setUsername(springUser.getUsername());
-        customUser.setPassword("testPassword");
-        customUser.setRole("USER");
-        customUser.setEmail("test@example.com");
+        User customUser = User.builder()
+                .id(1L)
+                .username(springUser.getUsername())
+                .password("testPassword")
+                .role("USER")
+                .email("test@example.com")
+                .build();
         userRepository.save(customUser);
 
         SecurityContextHolder.getContext().setAuthentication(new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
@@ -98,16 +99,18 @@ public class CategoryControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        Category category = new Category();
-        category.setName("Test Category 1");
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .name("Test Category 1")
+                .user(user)
+                .subCategories(new ArrayList<>())
+                .build();
         categoryRepository.save(category);
 
-        Category category2 = new Category();
-        category2.setName("Test Category 2");
-        category2.setUser(user);
-        category2.setSubCategories(new ArrayList<>());
+        Category category2 = Category.builder()
+                .name("Test Category 2")
+                .user(user)
+                .subCategories(new ArrayList<>())
+                .build();
         categoryRepository.save(category2);
 
         mockMvc.perform(get("/api/categories")
@@ -135,10 +138,11 @@ public class CategoryControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        Category category = new Category();
-        category.setName("Test Category");
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .name("Test Category")
+                .user(user)
+                .subCategories(new ArrayList<>())
+                .build();
         categoryRepository.save(category);
 
         mockMvc.perform(get("/api/categories/" + category.getId())
@@ -210,10 +214,11 @@ public class CategoryControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        Category category = new Category();
-        category.setName("Old Category");
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .name("Old Category")
+                .user(user)
+                .subCategories(new ArrayList<>())
+                .build();
         Category savedCategory = categoryRepository.save(category);
 
         String updateCategoryJson = "{\"name\":\"Updated Category\", \"subCategories\":[{\"name\":\"SubCategory1\"}, {\"name\":\"SubCategory2\"}]}";
@@ -258,10 +263,11 @@ public class CategoryControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        Category category = new Category();
-        category.setName("Category to Delete");
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .name("Category to Delete")
+                .user(user)
+                .subCategories(new ArrayList<>())
+                .build();
         Category savedCategory = categoryRepository.save(category);
 
         mockMvc.perform(delete("/api/categories/" + savedCategory.getId())
@@ -287,14 +293,14 @@ public class CategoryControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        Category category = new Category();
-        category.setName("Category with Subcategory");
-        category.setUser(user);
-        category.setSubCategories(new ArrayList<>());
+        Category category = Category.builder()
+                .name("Test Category 1")
+                .user(user)
+                .subCategories(new ArrayList<>())
+                .build();
 
-        SubCategory subCategory = new SubCategory();
-        subCategory.setName("Subcategory to Delete");
-        subCategory.setCategory(category);
+        SubCategory subCategory = SubCategory.builder().name("SubCategory1").category(category).build();
+
         category.getSubCategories().add(subCategory);
 
         Category savedCategory = categoryRepository.save(category);

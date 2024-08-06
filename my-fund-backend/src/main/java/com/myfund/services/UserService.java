@@ -58,7 +58,7 @@ public class UserService {
         log.info("User saved successfully. Email: {}, Pass: {}, ", user.getEmail(), maskHash(user.getPassword()));
         userRepository.save(user);
         budgetService.createDefaultBudget(user);
-        emailSender.sendWelcomeEmail(UserMapper.toUserDTO(user));
+        emailSender.sendWelcomeEmail(UserMapper.toDTO(user));
         return user;
     }
 
@@ -85,7 +85,7 @@ public class UserService {
         if (userOpt.isPresent()) {
             String passwordResetToken = tokenService.createPasswordResetToken(userOpt.get().getEmail());
             try {
-                UserDTO userDTO = UserMapper.toUserDTO(userOpt.get());
+                UserDTO userDTO = UserMapper.toDTO(userOpt.get());
                 emailSender.sendPasswordResetEmail(userDTO, passwordResetToken);
             } catch (IOException e) {
                 log.error("Failed to send password reset email", e);

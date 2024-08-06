@@ -58,10 +58,11 @@ class UserServiceTest {
 
     @Test
     void createUser_ShouldCreateUserSuccessfully() throws IOException {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
-        user.setPassword("password");
+         User user = User.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .password("password")
+                .build();
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
@@ -77,12 +78,13 @@ class UserServiceTest {
 
     @Test
     void createUser_ShouldThrowExceptionForExistingUsername() {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setEmail("test@example.com");
-        user.setPassword("password");
+        User user = User.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .password("password")
+                .build();
 
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(new User()));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 
         assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(user));
     }
@@ -92,8 +94,9 @@ class UserServiceTest {
         PasswordChangeRequest passwordChangeRequest = new PasswordChangeRequest();
         passwordChangeRequest.setEmail("test@example.com");
 
-        User user = new User();
-        user.setEmail("test@example.com");
+        User user = User.builder()
+                .email("test@example.com")
+                .build();
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(tokenService.createPasswordResetToken("test@example.com")).thenReturn("resetToken");
@@ -110,8 +113,9 @@ class UserServiceTest {
         passwordChange.setToken("validToken");
         passwordChange.setNewPassword("newPassword");
 
-        User user = new User();
-        user.setEmail("test@example.com");
+        User user = User.builder()
+                .email("test@example.com")
+                .build();
 
         when(tokenService.getPasswordResetToken("test@example.com")).thenReturn("validToken");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
