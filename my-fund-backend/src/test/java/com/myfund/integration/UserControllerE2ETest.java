@@ -87,7 +87,7 @@ class UserControllerE2ETest {
         }
         User user = optionalUser.get();
 
-        mockMvc.perform(get("/api/users/current-user")
+        mockMvc.perform(get("/api/v1/users/current-user")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value(user.getUsername()))
@@ -98,7 +98,7 @@ class UserControllerE2ETest {
     public void testGetCurrentUser_Unauthorized() throws Exception {
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(get("/api/users/current-user")
+        mockMvc.perform(get("/api/v1/users/current-user")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }

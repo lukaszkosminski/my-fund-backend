@@ -18,7 +18,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/v1")
 public class AuthControler {
 
     private final UserService userService;

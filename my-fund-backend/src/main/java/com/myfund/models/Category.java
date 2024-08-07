@@ -8,12 +8,10 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Table(name = "category")
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
 @Entity
-@ToString
+@Data
 @Builder
 public class Category {
 

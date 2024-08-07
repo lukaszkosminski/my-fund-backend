@@ -12,12 +12,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Table(name = "income")
-@Getter
-@Setter
 @Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class Income {
 
     @Id

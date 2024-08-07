@@ -17,7 +17,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -27,37 +27,37 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/categories")
+    @GetMapping()
     public ResponseEntity<List<CategoryDTO>> getAllCategories(@AuthenticationPrincipal User user) {
         List<Category> allCategoriesByUser = categoryService.findAllCategoriesByUser(user);
         return new ResponseEntity<>(CategoryMapper.toListDTO(allCategoriesByUser), HttpStatus.OK);
     }
 
-    @GetMapping("/categories/{categoryId}")
+    @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
         Category category = categoryService.findCategoryByIdAndUser(categoryId, user);
         return new ResponseEntity<>(CategoryMapper.toDTO(category), HttpStatus.OK);
     }
 
-    @PostMapping("/categories")
+    @PostMapping()
     public ResponseEntity<CategoryDTO> createCategory(@RequestBody @Valid CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) throws InvalidInputException {
         Category category = categoryService.createCategory(CategoryMapper.toModel(createCategoryDTO), user);
         return new ResponseEntity<>(CategoryMapper.toDTO(category), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/categories/{categoryId}")
+    @PatchMapping("/{categoryId}")
     public ResponseEntity<CategoryDTO> updateCategory(@PathVariable("categoryId") Long categoryId, @RequestBody @Valid CreateCategoryDTO createCategoryDTO, @AuthenticationPrincipal User user) {
         Category category = categoryService.updateCategory(categoryId, CategoryMapper.toModel(createCategoryDTO), user);
         return new ResponseEntity<>(CategoryMapper.toDTO(category), HttpStatus.OK);
     }
 
-    @DeleteMapping("/categories/{categoryId}")
+    @DeleteMapping("/{categoryId}")
     public ResponseEntity<?> deleteCategory(@PathVariable("categoryId") Long categoryId, @AuthenticationPrincipal User user) {
         categoryService.deleteCategoryByIdAndUser(categoryId, user);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @DeleteMapping("/categories/{categoryId}/subcategories/{subcategoryId}")
+    @DeleteMapping("/{categoryId}/subcategories/{subcategoryId}")
     public ResponseEntity<?> deleteSubcategory(@PathVariable("categoryId") Long categoryId, @PathVariable("subcategoryId") Long subcategoryId, @AuthenticationPrincipal User user) {
         categoryService.deleteSubcategoryByIdsAndUser(categoryId, subcategoryId, user);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);

@@ -2,11 +2,11 @@ package com.myfund.models.DTOs;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class PasswordChangeDTO {
 
     @Email(message = "Invalid email format")

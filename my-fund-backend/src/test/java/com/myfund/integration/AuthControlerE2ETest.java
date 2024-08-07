@@ -91,7 +91,7 @@ class AuthControlerE2ETest {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<CreateUserDTO> request = new HttpEntity<>(createUserDTO, headers);
 
-        ResponseEntity<UserDTO> response = restTemplate.postForEntity("http://localhost:" + port + "/register", request, UserDTO.class);
+        ResponseEntity<UserDTO> response = restTemplate.postForEntity("http://localhost:" + port + "/v1/register", request, UserDTO.class);
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -106,7 +106,7 @@ class AuthControlerE2ETest {
         PasswordChangeRequestDTO passwordChangeRequestDTO = new PasswordChangeRequestDTO();
         passwordChangeRequestDTO.setEmail("test@example.com");
 
-        ResponseEntity<?> response = restTemplate.postForEntity("http://localhost:" + port + "/request-change-password", passwordChangeRequestDTO, Void.class);
+        ResponseEntity<?> response = restTemplate.postForEntity("http://localhost:" + port + "/v1/request-change-password", passwordChangeRequestDTO, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
     }
@@ -128,7 +128,7 @@ class AuthControlerE2ETest {
         passwordChangeDTO.setToken(passwordResetToken);
         passwordChangeDTO.setNewPassword("newPassword");
 
-        ResponseEntity<?> response = restTemplate.postForEntity("http://localhost:" + port + "/change-password", passwordChangeDTO, Void.class);
+        ResponseEntity<?> response = restTemplate.postForEntity("http://localhost:" + port + "/v1/change-password", passwordChangeDTO, Void.class);
         String newPassword = jdbcTemplate.queryForObject("SELECT password FROM users WHERE id = 1", String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
@@ -148,8 +148,8 @@ class AuthControlerE2ETest {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<CreateUserDTO> request = new HttpEntity<>(createUserDTO, headers);
 
-        ResponseEntity<UserDTO> initialResponse = restTemplate.postForEntity("http://localhost:" + port + "/register", request, UserDTO.class);
-        ResponseEntity<Map> duplicateResponse = restTemplate.postForEntity("http://localhost:" + port + "/register", request, Map.class);
+        ResponseEntity<UserDTO> initialResponse = restTemplate.postForEntity("http://localhost:" + port + "/v1/register", request, UserDTO.class);
+        ResponseEntity<Map> duplicateResponse = restTemplate.postForEntity("http://localhost:" + port + "/v1/register", request, Map.class);
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
         Map<String, String> errorResponse = (Map<String, String>) duplicateResponse.getBody();
 
@@ -165,7 +165,7 @@ class AuthControlerE2ETest {
         PasswordChangeRequestDTO passwordChangeRequestDTO = new PasswordChangeRequestDTO();
         passwordChangeRequestDTO.setEmail("invalid#example.com");
 
-        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/request-change-password", passwordChangeRequestDTO, Map.class);
+        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/v1/request-change-password", passwordChangeRequestDTO, Map.class);
         Map<String, String> errorResponse = (Map<String, String>) response.getBody();
 
         assertThat(errorResponse.get("email")).isEqualTo("Invalid email format");
@@ -186,7 +186,7 @@ class AuthControlerE2ETest {
         passwordChangeDTO.setToken("invalidToken");
         passwordChangeDTO.setNewPassword("newPassword");
 
-        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/change-password", passwordChangeDTO, Map.class);
+        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/v1/change-password", passwordChangeDTO, Map.class);
         Map<String, String> errorResponse = (Map<String, String>) response.getBody();
         String currentPassword = jdbcTemplate.queryForObject("SELECT password FROM users WHERE id = 1", String.class);
 
@@ -212,7 +212,7 @@ class AuthControlerE2ETest {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<CreateUserDTO> request = new HttpEntity<>(createUserDTO, headers);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/register", request, Map.class);
+        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/v1/register", request, Map.class);
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
         Map<String, String> errorResponse = (Map<String, String>) response.getBody();
 
@@ -234,7 +234,7 @@ class AuthControlerE2ETest {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<CreateUserDTO> request = new HttpEntity<>(createUserDTO, headers);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/register", request, Map.class);
+        ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/v1/register", request, Map.class);
         Map<String, String> errorResponse = (Map<String, String>) response.getBody();
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
 

@@ -11,14 +11,12 @@ import com.myfund.services.encryption.StringEncryptor;
 import com.myfund.services.encryption.LocalDateTimeEncryptor;
 import com.myfund.services.encryption.BigDecimalEncryptor;
 
-@Getter
-@Setter
 @Entity
-@ToString
 @Builder
-@Table(name = "budget")
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
+@Table(name = "budget")
 public class Budget {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -82,7 +82,6 @@ public class BudgetService {
 
     public List<Budget> findAllBudgetsByUser(User user) {
         List<Budget> allBudgetsByUser = budgetRepository.findAllByUser(user);
-//        List<BudgetSummaryDTO> budgetSummaryDTOList = BudgetMapper.toListBudgetSummaryDTO(budgetRepository.findAllByUser(user));
         log.info("Retrieved {} budgets for user with ID: {}", allBudgetsByUser.size(), user.getId());
         return allBudgetsByUser;
     }

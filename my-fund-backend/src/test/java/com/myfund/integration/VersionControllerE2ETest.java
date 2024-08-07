@@ -61,7 +61,7 @@ class VersionControllerE2ETest {
     public void testGetVersion_Success() throws Exception {
         ApplicationDetailsDTO version = applicationDetailsService.getVersion();
 
-        mockMvc.perform(get("/version")
+        mockMvc.perform(get("/v1/version")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.version").value(version.getVersion()))

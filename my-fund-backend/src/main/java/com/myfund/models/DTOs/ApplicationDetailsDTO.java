@@ -1,10 +1,10 @@
 package com.myfund.models.DTOs;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class ApplicationDetailsDTO {
 
     private String version;
