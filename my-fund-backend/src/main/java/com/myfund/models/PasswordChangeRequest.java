@@ -1,10 +1,8 @@
 package com.myfund.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class PasswordChangeRequest {
 
     private String email;

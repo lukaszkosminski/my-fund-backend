@@ -3,6 +3,7 @@ package com.myfund.services.email;
 
 import com.myfund.exceptions.EmailThrottleException;
 import com.myfund.models.DTOs.UserDTO;
+import com.myfund.models.User;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -41,9 +42,9 @@ public class PostmarkEmailClient implements EmailSender {
     }
 
     @Override
-    public void sendWelcomeEmail(UserDTO userDTO) throws IOException {
+    public void sendWelcomeEmail(User user) throws IOException {
 
-        log.info("Starting to send email to: {}", userDTO.getEmail());
+        log.info("Starting to send email to: {}", user.getEmail());
 
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(apiUrl);
@@ -51,7 +52,7 @@ public class PostmarkEmailClient implements EmailSender {
             post.setHeader("Accept", "application/json");
             post.setHeader("Content-Type", "application/json");
             post.setHeader("X-Postmark-Server-Token", apiKey);
-            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35874742, \"TemplateModel\": {\"name\": \"%s\", \"product_name\": \"my fund\"}}", emailSender, userDTO.getEmail(), userDTO.getUsername());
+            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35874742, \"TemplateModel\": {\"name\": \"%s\", \"product_name\": \"my fund\"}}", emailSender, user.getEmail(), user.getUsername());
             post.setEntity(new StringEntity(json));
 
             HttpResponse response = client.execute(post);
@@ -64,21 +65,21 @@ public class PostmarkEmailClient implements EmailSender {
             log.error("Failed to send email. Server response: {}", responseString);
 
         } catch (IOException e) {
-            log.error("Failed to send email to: {}", userDTO.getEmail(), e);
+            log.error("Failed to send email to: {}", user.getEmail(), e);
             throw e;
         }
     }
 
     @Override
-    public void sendPasswordResetEmail(UserDTO userDTO, String resetToken) throws IOException {
-        log.info("Starting to send password reset email to: {}", userDTO.getEmail());
+    public void sendPasswordResetEmail(User user, String resetToken) throws IOException {
+        log.info("Starting to send password reset email to: {}", user.getEmail());
 
-        if (!emailThrottleService.canSendEmail(userDTO.getEmail())) {
-            log.error("Email limit exceeded for: {}", userDTO.getEmail());
+        if (!emailThrottleService.canSendEmail(user.getEmail())) {
+            log.error("Email limit exceeded for: {}", user.getEmail());
             throw new EmailThrottleException("Email limit exceeded");
         }
 
-        String changePasswordUrlWithParams = changePasswordUrl + resetToken + "&email=" + userDTO.getEmail();
+        String changePasswordUrlWithParams = changePasswordUrl + resetToken + "&email=" + user.getEmail();
 
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(apiUrl);
@@ -86,12 +87,12 @@ public class PostmarkEmailClient implements EmailSender {
             post.setHeader("Accept", "application/json");
             post.setHeader("Content-Type", "application/json");
             post.setHeader("X-Postmark-Server-Token", apiKey);
-            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35917746, \"TemplateModel\": {\"name\": \"%s\", \"action_url\": \"%s\"}}", emailSender, userDTO.getEmail(), userDTO.getUsername(), changePasswordUrlWithParams);
+            String json = String.format("{\"From\": \"%s\", \"To\": \"%s\", \"TemplateId\": 35917746, \"TemplateModel\": {\"name\": \"%s\", \"action_url\": \"%s\"}}", emailSender, user.getEmail(), user.getUsername(), changePasswordUrlWithParams);
             post.setEntity(new StringEntity(json));
 
             HttpResponse response = client.execute(post);
             String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
-            emailThrottleService.incrementEmailCount(userDTO.getEmail());
+            emailThrottleService.incrementEmailCount(user.getEmail());
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 log.info("Password reset email sent successfully. Server response: {}", responseString);
@@ -100,7 +101,7 @@ public class PostmarkEmailClient implements EmailSender {
             log.error("Failed to send password reset email. Server response: {}", responseString);
 
         } catch (IOException e) {
-            log.error("Failed to send password reset email to: {}", userDTO.getEmail(), e);
+            log.error("Failed to send password reset email to: {}", user.getEmail(), e);
             throw e;
         }
     }

@@ -2,13 +2,14 @@ package com.myfund.models;
 
 import com.myfund.models.DTOs.ExpensesSummaryDTO;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-@Getter
+@Data
 public class ExpensesSummary {
 
     private final List<ExpensesSummary.CategoryExpenses> expensesSummary;

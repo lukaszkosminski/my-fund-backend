@@ -5,12 +5,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@ToString
-@Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Table(name = "subcategory")
 public class SubCategory {
     @Id

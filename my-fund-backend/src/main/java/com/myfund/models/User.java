@@ -12,10 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import java.util.Collection;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @Entity
-@ToString
 @Validated
 @Table(name = "users")
 @Builder

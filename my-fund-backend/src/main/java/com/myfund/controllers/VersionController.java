@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/v1/")
 public class VersionController {
 
     private final ApplicationDetailsService applicationDetailsService;

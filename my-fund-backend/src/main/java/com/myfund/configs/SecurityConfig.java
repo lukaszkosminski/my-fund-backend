@@ -25,12 +25,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/*").permitAll()
+                        .requestMatchers("/v1/*").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/api/v1/**").authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/signin")
+                        .loginPage("/v1/signin")
                         .successHandler((request, response, authentication) -> {
                             response.setStatus(200);
                         })

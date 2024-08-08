@@ -102,7 +102,7 @@ public class BudgetControllerE2ETest {
 
         String createBudgetJson = "{\"name\":\"Test Budget\"}";
 
-        mockMvc.perform(post("/api/budgets")
+        mockMvc.perform(post("/api/v1/budgets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createBudgetJson))
                 .andExpect(status().isCreated())
@@ -117,7 +117,7 @@ public class BudgetControllerE2ETest {
     public void createBudget_MissingName() throws Exception {
         String createBudgetJson = "{}";
 
-        mockMvc.perform(post("/api/budgets")
+        mockMvc.perform(post("/api/v1/budgets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createBudgetJson))
                 .andExpect(status().isBadRequest());
@@ -130,7 +130,7 @@ public class BudgetControllerE2ETest {
     public void createBudget_InvalidJson() throws Exception {
         String createBudgetJson = "{\"invalidField\":\"value\"}";
 
-        mockMvc.perform(post("/api/budgets")
+        mockMvc.perform(post("/api/v1/budgets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createBudgetJson))
                 .andExpect(status().isBadRequest());
@@ -145,7 +145,7 @@ public class BudgetControllerE2ETest {
 
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(post("/api/budgets")
+        mockMvc.perform(post("/api/v1/budgets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createBudgetJson))
                 .andExpect(status().isUnauthorized());
@@ -162,7 +162,7 @@ public class BudgetControllerE2ETest {
 
         budgetRepository.save(existingBudget);
 
-        mockMvc.perform(post("/api/budgets")
+        mockMvc.perform(post("/api/v1/budgets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createBudgetJson))
                 .andExpect(status().isConflict());
@@ -179,7 +179,7 @@ public class BudgetControllerE2ETest {
 
         budgetRepository.save(budget);
 
-        mockMvc.perform(get("/api/budgets/" + budget.getId())
+        mockMvc.perform(get("/api/v1/budgets/" + budget.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedBudgetJson));
@@ -189,7 +189,7 @@ public class BudgetControllerE2ETest {
     public void getBudgetById_NotFound() throws Exception {
         Long nonExistentBudgetId = 999L;
 
-        mockMvc.perform(get("/api/budgets/" + nonExistentBudgetId)
+        mockMvc.perform(get("/api/v1/budgets/" + nonExistentBudgetId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
@@ -199,7 +199,7 @@ public class BudgetControllerE2ETest {
         Long budgetId = 1L;
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(get("/api/budgets/" + budgetId)
+        mockMvc.perform(get("/api/v1/budgets/" + budgetId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -222,7 +222,7 @@ public class BudgetControllerE2ETest {
         budgetRepository.save(budget1);
         budgetRepository.save(budget2);
 
-        mockMvc.perform(get("/api/budgets")
+        mockMvc.perform(get("/api/v1/budgets")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedBudgetsJson));
@@ -232,7 +232,7 @@ public class BudgetControllerE2ETest {
     public void getAllBudgets_Unauthorized() throws Exception {
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(get("/api/budgets")
+        mockMvc.perform(get("/api/v1/budgets")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -249,7 +249,7 @@ public class BudgetControllerE2ETest {
                 .build();
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
-        mockMvc.perform(post("/api/budgets/" + budgetId + "/expenses", budgetId)
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses", budgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createExpenseJson))
                 .andExpect(status().isCreated());
@@ -271,7 +271,7 @@ public class BudgetControllerE2ETest {
 
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
-        mockMvc.perform(post("/api/budgets/" + budgetId + "/expenses", budgetId)
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses", budgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createExpenseJson))
                 .andExpect(status().isBadRequest());
@@ -292,7 +292,7 @@ public class BudgetControllerE2ETest {
                 .build();
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
-        mockMvc.perform(post("/api/budgets/" + budgetId + "/expenses", budgetId)
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses", budgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createExpenseJson))
                 .andExpect(status().isBadRequest());
@@ -313,7 +313,7 @@ public class BudgetControllerE2ETest {
                 .build();
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
-        mockMvc.perform(post("/api/budgets/" + budgetId + "/expenses", budgetId)
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses", budgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createExpenseJson))
                 .andExpect(status().isBadRequest());
@@ -337,7 +337,7 @@ public class BudgetControllerE2ETest {
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
         SecurityContextHolder.clearContext();
-        mockMvc.perform(post("/api/budgets/" + budgetId + "/expenses", budgetId)
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses", budgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createExpenseJson))
                 .andExpect(status().isUnauthorized());
@@ -352,7 +352,7 @@ public class BudgetControllerE2ETest {
 
         Long nonExistentBudgetId = 999L;
 
-        mockMvc.perform(post("/api/budgets/" + nonExistentBudgetId + "/expenses", nonExistentBudgetId)
+        mockMvc.perform(post("/api/v1/budgets/" + nonExistentBudgetId + "/expenses", nonExistentBudgetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createExpenseJson))
                 .andExpect(status().isConflict());
@@ -373,7 +373,7 @@ public class BudgetControllerE2ETest {
 
         budgetRepository.save(budget);
 
-        mockMvc.perform(post("/api/budgets/" + budgetId + "/incomes")
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/incomes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createIncomeJson))
                 .andExpect(status().isCreated())
@@ -398,7 +398,7 @@ public class BudgetControllerE2ETest {
                 .build();
         budgetRepository.save(budget1);
 
-        mockMvc.perform(post("/api/budgets/" + budgetId + "/incomes")
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/incomes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createIncomeJson))
                 .andExpect(status().isBadRequest())
@@ -412,7 +412,7 @@ public class BudgetControllerE2ETest {
 
         Long nonExistentBudgetId = 999L;
 
-        mockMvc.perform(post("/api/budgets/" + nonExistentBudgetId + "/incomes")
+        mockMvc.perform(post("/api/v1/budgets/" + nonExistentBudgetId + "/incomes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createIncomeJson))
                 .andExpect(status().isConflict());
@@ -431,7 +431,7 @@ public class BudgetControllerE2ETest {
         Budget savedBudget = budgetRepository.save(budget1);
         Long budgetId = savedBudget.getId();
 
-        mockMvc.perform(post("/api/budgets/" + budgetId + "/incomes")
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/incomes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createIncomeJson))
                 .andExpect(status().isUnauthorized());
@@ -461,7 +461,7 @@ public class BudgetControllerE2ETest {
                 .build();
         expenseRepository.save(expense);
 
-        mockMvc.perform(patch("/api/budgets/" + budgetId + "/expenses/" + expenseId)
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/expenses/" + expenseId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateExpenseJson))
                 .andExpect(status().isOk())
@@ -500,7 +500,7 @@ public class BudgetControllerE2ETest {
                 .build();
         expenseRepository.save(expense);
 
-        mockMvc.perform(patch("/api/budgets/" + budgetId + "/expenses/" + expenseId)
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/expenses/" + expenseId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateExpenseJson))
                 .andExpect(status().isBadRequest());
@@ -540,7 +540,7 @@ public class BudgetControllerE2ETest {
         expenseRepository.save(expense);
 
 
-        mockMvc.perform(patch("/api/budgets/" + budgetId + "/expenses/" + nonExistentExpenseId)
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/expenses/" + nonExistentExpenseId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateExpenseJson))
                 .andExpect(status().isConflict());
@@ -555,7 +555,7 @@ public class BudgetControllerE2ETest {
 
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(patch("/api/budgets/" + budgetId + "/expenses/" + expenseId)
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/expenses/" + expenseId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateExpenseJson))
                 .andExpect(status().isUnauthorized());
@@ -587,7 +587,7 @@ public class BudgetControllerE2ETest {
                 .build();
         incomeRepository.save(income);
 
-        mockMvc.perform(patch("/api/budgets/" + budgetId + "/incomes/" + incomeId)
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/incomes/" + incomeId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateIncomeJson))
                 .andExpect(status().isOk())
@@ -626,7 +626,7 @@ public class BudgetControllerE2ETest {
         Long incomeId = savedIncome.getId();
         Long budgetId = savedBudget.getId();
 
-        mockMvc.perform(patch("/api/budgets/" + budgetId + "/incomes/" + incomeId)
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/incomes/" + incomeId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateIncomeJson))
                 .andExpect(status().isBadRequest());
@@ -661,7 +661,7 @@ public class BudgetControllerE2ETest {
         Long incomeId = savedIncome.getId();
         Long budgetId = savedBudget.getId();
 
-        mockMvc.perform(patch("/api/budgets/" + budgetId + "/incomes/" + incomeId)
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/incomes/" + incomeId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateIncomeJson))
                 .andExpect(status().isBadRequest());
@@ -689,7 +689,7 @@ public class BudgetControllerE2ETest {
         Long nonExistentIncomeId = 999L;
         Long budgetId = savedBudget.getId();
 
-        mockMvc.perform(patch("/api/budgets/" + budgetId + "/incomes/" + nonExistentIncomeId)
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/incomes/" + nonExistentIncomeId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateIncomeJson))
                 .andExpect(status().isConflict());
@@ -719,7 +719,7 @@ public class BudgetControllerE2ETest {
 
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(patch("/api/budgets/" + budgetId + "/incomes/" + incomeId)
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/incomes/" + incomeId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateIncomeJson))
                 .andExpect(status().isUnauthorized());
@@ -757,7 +757,7 @@ public class BudgetControllerE2ETest {
         Long budgetId = savedBudget.getId();
         Long categoryId = 1L;
 
-        mockMvc.perform(get("/api/budgets/" + budgetId + "/categories/" + categoryId + "/expenses/total")
+        mockMvc.perform(get("/api/v1/budgets/" + budgetId + "/categories/" + categoryId + "/expenses/total")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedTotalExpensesJson));
@@ -807,7 +807,7 @@ public class BudgetControllerE2ETest {
 
         String expectedTotalExpensesJson = "{\"value\":150.0,\"subcategoryId\":" + savedSubCategory.getId() + ",\"typeAggregate\":\"EXPENSES_BY_SUBCATEGORY\",\"budgetId\":" + savedBudget.getId() + ",\"userId\":" + user.getId() + "}";
 
-        mockMvc.perform(get("/api/budgets/" + savedBudget.getId() + "/subcategories/" + savedSubCategory.getId() + "/expenses/total")
+        mockMvc.perform(get("/api/v1/budgets/" + savedBudget.getId() + "/subcategories/" + savedSubCategory.getId() + "/expenses/total")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedTotalExpensesJson));
@@ -848,7 +848,7 @@ public class BudgetControllerE2ETest {
         budgetService.createIncome(budget.getId(), income1, user);
         budgetService.createIncome(budget.getId(), income2, user);
 
-        mockMvc.perform(get("/api/budgets/" + savedBudget.getId() + "/categories/" + savedCategory.getId() + "/incomes/total")
+        mockMvc.perform(get("/api/v1/budgets/" + savedBudget.getId() + "/categories/" + savedCategory.getId() + "/incomes/total")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.value").value(750.0))
@@ -896,7 +896,7 @@ public class BudgetControllerE2ETest {
                 .user(user)
                 .build();
         incomeRepository.save(income1);
-        mockMvc.perform(get("/api/budgets/" + savedBudget.getId() + "/subcategories/" + savedSubCategory.getId() + "/incomes/total")
+        mockMvc.perform(get("/api/v1/budgets/" + savedBudget.getId() + "/subcategories/" + savedSubCategory.getId() + "/incomes/total")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.value").value(750.0))
@@ -914,7 +914,7 @@ public class BudgetControllerE2ETest {
                 .build();
         Budget savedBudget = budgetRepository.save(budget);
 
-        mockMvc.perform(delete("/api/budgets/" + savedBudget.getId())
+        mockMvc.perform(delete("/api/v1/budgets/" + savedBudget.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted());
 
@@ -926,7 +926,7 @@ public class BudgetControllerE2ETest {
     public void deleteBudget_NotFound() throws Exception {
         Long nonExistentBudgetId = 999L;
 
-        mockMvc.perform(delete("/api/budgets/" + nonExistentBudgetId)
+        mockMvc.perform(delete("/api/v1/budgets/" + nonExistentBudgetId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
@@ -936,7 +936,7 @@ public class BudgetControllerE2ETest {
         Long budgetId = 1L;
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(delete("/api/budgets/" + budgetId)
+        mockMvc.perform(delete("/api/v1/budgets/" + budgetId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -959,7 +959,7 @@ public class BudgetControllerE2ETest {
                 .build();
         Expense savedExpense = expenseRepository.save(expense);
 
-        mockMvc.perform(delete("/api/budgets/" + savedBudget.getId() + "/expenses/" + savedExpense.getId())
+        mockMvc.perform(delete("/api/v1/budgets/" + savedBudget.getId() + "/expenses/" + savedExpense.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted());
 
@@ -972,7 +972,7 @@ public class BudgetControllerE2ETest {
         Long nonExistentExpenseId = 999L;
         Long budgetId = 1L;
 
-        mockMvc.perform(delete("/api/budgets/" + budgetId + "/expenses/" + nonExistentExpenseId)
+        mockMvc.perform(delete("/api/v1/budgets/" + budgetId + "/expenses/" + nonExistentExpenseId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
@@ -983,7 +983,7 @@ public class BudgetControllerE2ETest {
         Long expenseId = 1L;
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(delete("/api/budgets/" + budgetId + "/expenses/" + expenseId)
+        mockMvc.perform(delete("/api/v1/budgets/" + budgetId + "/expenses/" + expenseId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -1006,7 +1006,7 @@ public class BudgetControllerE2ETest {
                 .build();
         Income savedIncome = incomeRepository.save(income);
 
-        mockMvc.perform(delete("/api/budgets/" + savedBudget.getId() + "/incomes/" + savedIncome.getId())
+        mockMvc.perform(delete("/api/v1/budgets/" + savedBudget.getId() + "/incomes/" + savedIncome.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted());
 
@@ -1019,7 +1019,7 @@ public class BudgetControllerE2ETest {
         Long nonExistentIncomeId = 999L;
         Long budgetId = 1L;
 
-        mockMvc.perform(delete("/api/budgets/" + budgetId + "/incomes/" + nonExistentIncomeId)
+        mockMvc.perform(delete("/api/v1/budgets/" + budgetId + "/incomes/" + nonExistentIncomeId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
@@ -1030,7 +1030,7 @@ public class BudgetControllerE2ETest {
         Long incomeId = 1L;
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(delete("/api/budgets/" + budgetId + "/incomes/" + incomeId)
+        mockMvc.perform(delete("/api/v1/budgets/" + budgetId + "/incomes/" + incomeId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -1061,7 +1061,7 @@ public class BudgetControllerE2ETest {
                 .build();
         expenseRepository.save(expense2);
 
-        mockMvc.perform(get("/api/budgets/" + savedBudget.getId() + "/expenses/summary")
+        mockMvc.perform(get("/api/v1/budgets/" + savedBudget.getId() + "/expenses/summary")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -1074,7 +1074,7 @@ public class BudgetControllerE2ETest {
         Long budgetId = 1L;
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(get("/api/budgets/" + budgetId + "/expenses/summary")
+        mockMvc.perform(get("/api/v1/budgets/" + budgetId + "/expenses/summary")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -1096,7 +1096,7 @@ public class BudgetControllerE2ETest {
         String csvContent = "header\nPL11 1111 1111 1111 1111 1111 1111,2024-05-09,2024-05-09,ZAKUP - FIZ. UŻYCIE KARTY,,,TEST,-9.07,,,PLN\nPL11 1111 1111 1111 1111 1111 1111,2024-05-08,2024-05-08,PRZELEW PRZYCHODZĄCY,11 11 1111 1111 1111 1111 1111 11,TEST USER,TEST TITLE,,1000,,PLN";
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.csv", "text/csv", csvContent.getBytes());
 
-        mockMvc.perform(multipart("/api/budgets/" + savedBudget.getId() + "/upload-csv/MILLENIUM")
+        mockMvc.perform(multipart("/api/v1/budgets/" + savedBudget.getId() + "/upload-csv/MILLENIUM")
                         .file(mockFile)
                         .with(request -> {
                             request.setMethod("POST");
@@ -1145,7 +1145,7 @@ public class BudgetControllerE2ETest {
         String csvContent = "header\n2023/005;19-08-2023;17-08-2023;TEST TITLE EXPENSE;;;;;TRANSAKCJA KARTĄ;;71,15;;114,16;12;T\n2023/005;11-08-2023;11-08-2023;TEST TITLE INCOME;;;;;WPŁATA GOTÓWKI - WPŁATOMAT;;;200,00;185,31;11;T";
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.csv", "text/csv", csvContent.getBytes());
 
-        mockMvc.perform(multipart("/api/budgets/" + savedBudget.getId() + "/upload-csv/SANTANDER")
+        mockMvc.perform(multipart("/api/v1/budgets/" + savedBudget.getId() + "/upload-csv/SANTANDER")
                         .file(mockFile)
                         .with(request -> {
                             request.setMethod("POST");
@@ -1192,7 +1192,7 @@ public class BudgetControllerE2ETest {
 
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.csv", "text/csv", "".getBytes());
 
-        mockMvc.perform(multipart("/api/budgets/" + savedBudget.getId() + "/upload-csv/MILLENIUM")
+        mockMvc.perform(multipart("/api/v1/budgets/" + savedBudget.getId() + "/upload-csv/MILLENIUM")
                         .file(mockFile)
                         .with(request -> {
                             request.setMethod("POST");
@@ -1226,7 +1226,7 @@ public class BudgetControllerE2ETest {
         String csvContent = "header\nsome,data,for,unsupported,bank";
         MockMultipartFile mockFile = new MockMultipartFile("file", "test.csv", "text/csv", csvContent.getBytes());
 
-        mockMvc.perform(multipart("/api/budgets/" + savedBudget.getId() + "/upload-csv/UNSUPPORTED_BANK")
+        mockMvc.perform(multipart("/api/v1/budgets/" + savedBudget.getId() + "/upload-csv/UNSUPPORTED_BANK")
                         .file(mockFile)
                         .with(request -> {
                             request.setMethod("POST");
@@ -1241,6 +1241,5 @@ public class BudgetControllerE2ETest {
         List<Income> incomes = incomeRepository.findAll();
         Assertions.assertTrue(incomes.isEmpty());
     }
-
 
 }

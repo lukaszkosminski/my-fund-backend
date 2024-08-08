@@ -113,7 +113,7 @@ public class CategoryControllerE2ETest {
                 .build();
         categoryRepository.save(category2);
 
-        mockMvc.perform(get("/api/categories")
+        mockMvc.perform(get("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Test Category 1"))
@@ -125,7 +125,7 @@ public class CategoryControllerE2ETest {
         // Clear the security context to simulate an unauthorized request
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(get("/api/categories")
+        mockMvc.perform(get("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -145,7 +145,7 @@ public class CategoryControllerE2ETest {
                 .build();
         categoryRepository.save(category);
 
-        mockMvc.perform(get("/api/categories/" + category.getId())
+        mockMvc.perform(get("/api/v1/categories/" + category.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Test Category"));
@@ -153,7 +153,7 @@ public class CategoryControllerE2ETest {
 
     @Test
     public void testGetCategoryById_NotFound() throws Exception {
-        mockMvc.perform(get("/api/categories/999")
+        mockMvc.perform(get("/api/v1/categories/999")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
@@ -162,7 +162,7 @@ public class CategoryControllerE2ETest {
     public void testGetCategoryById_Unauthorized() throws Exception {
         SecurityContextHolder.clearContext();
 
-        mockMvc.perform(get("/api/categories/1")
+        mockMvc.perform(get("/api/v1/categories/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -171,7 +171,7 @@ public class CategoryControllerE2ETest {
     public void testCreateCategory_Success() throws Exception {
         String createCategoryJson = "{\"name\":\"New Category\"}";
 
-        mockMvc.perform(post("/api/categories")
+        mockMvc.perform(post("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createCategoryJson))
                 .andExpect(status().isCreated())
@@ -185,7 +185,7 @@ public class CategoryControllerE2ETest {
     public void testCreateCategory_MissingName() throws Exception {
         String createCategoryJson = "{}";
 
-        mockMvc.perform(post("/api/categories")
+        mockMvc.perform(post("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createCategoryJson))
                 .andExpect(status().isBadRequest());
@@ -200,7 +200,7 @@ public class CategoryControllerE2ETest {
 
         String createCategoryJson = "{\"name\":\"New Category\"}";
 
-        mockMvc.perform(post("/api/categories")
+        mockMvc.perform(post("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createCategoryJson))
                 .andExpect(status().isUnauthorized());
@@ -223,7 +223,7 @@ public class CategoryControllerE2ETest {
 
         String updateCategoryJson = "{\"name\":\"Updated Category\", \"subCategories\":[{\"name\":\"SubCategory1\"}, {\"name\":\"SubCategory2\"}]}";
 
-        mockMvc.perform(patch("/api/categories/" + savedCategory.getId())
+        mockMvc.perform(patch("/api/v1/categories/" + savedCategory.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateCategoryJson))
                 .andExpect(status().isOk())
@@ -237,7 +237,7 @@ public class CategoryControllerE2ETest {
     public void testUpdateCategory_NotFound() throws Exception {
         String updateCategoryJson = "{\"name\":\"Updated Category\"}";
 
-        mockMvc.perform(patch("/api/categories/999")
+        mockMvc.perform(patch("/api/v1/categories/999")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateCategoryJson))
                 .andExpect(status().isConflict());
@@ -249,7 +249,7 @@ public class CategoryControllerE2ETest {
 
         String updateCategoryJson = "{\"name\":\"Updated Category\"}";
 
-        mockMvc.perform(patch("/api/categories/1")
+        mockMvc.perform(patch("/api/v1/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateCategoryJson))
                 .andExpect(status().isUnauthorized());
@@ -270,7 +270,7 @@ public class CategoryControllerE2ETest {
                 .build();
         Category savedCategory = categoryRepository.save(category);
 
-        mockMvc.perform(delete("/api/categories/" + savedCategory.getId())
+        mockMvc.perform(delete("/api/v1/categories/" + savedCategory.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted());
 
@@ -280,7 +280,7 @@ public class CategoryControllerE2ETest {
 
     @Test
     public void testDeleteCategory_NotFound() throws Exception {
-        mockMvc.perform(delete("/api/categories/999")
+        mockMvc.perform(delete("/api/v1/categories/999")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
@@ -306,7 +306,7 @@ public class CategoryControllerE2ETest {
         Category savedCategory = categoryRepository.save(category);
         SubCategory savedSubCategory = savedCategory.getSubCategories().get(0);
 
-        mockMvc.perform(delete("/api/categories/" + savedCategory.getId() + "/subcategories/" + savedSubCategory.getId())
+        mockMvc.perform(delete("/api/v1/categories/" + savedCategory.getId() + "/subcategories/" + savedSubCategory.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isAccepted());
 
@@ -316,7 +316,7 @@ public class CategoryControllerE2ETest {
 
     @Test
     public void testDeleteSubcategory_NotFound() throws Exception {
-        mockMvc.perform(delete("/api/categories/1/subcategories/999")
+        mockMvc.perform(delete("/api/v1/categories/1/subcategories/999")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }

@@ -1,5 +1,6 @@
 package com.myfund.models.DTOs;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+@Data
 public class ExpensesSummaryDTO {
 
     private final List<CategoryExpenses> expensesSummary;

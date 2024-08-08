@@ -2,25 +2,17 @@ package com.myfund.services;
 
 import com.myfund.exceptions.*;
 import com.myfund.models.*;
-import com.myfund.models.DTOs.*;
-import com.myfund.models.DTOs.mappers.BudgetMapper;
-import com.myfund.models.DTOs.mappers.ExpenseMapper;
-import com.myfund.models.DTOs.mappers.FinancialAggregateMapper;
-import com.myfund.models.DTOs.mappers.IncomeMapper;
 import com.myfund.repositories.BudgetRepository;
 import com.myfund.repositories.ExpenseRepository;
 import com.myfund.repositories.IncomeRepository;
-import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +20,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
@@ -38,22 +31,9 @@ public class BudgetService {
 
     private final CategoryService categoryService;
 
-    @Autowired
-    public BudgetService(BudgetRepository budgetRepository, ExpenseRepository expenseRepository, IncomeRepository incomeRepository, CategoryService categoryService) {
-        this.budgetRepository = budgetRepository;
-        this.expenseRepository = expenseRepository;
-        this.incomeRepository = incomeRepository;
-        this.categoryService = categoryService;
-    }
-
     public void createDefaultBudget(User user) {
-
-        Budget budget = Budget.builder()
-                .name("Default Budget")
-                .user(user)
-                .localDateTime(LocalDateTime.now())
-                .build();
-        budgetRepository.save(budget);
+        Budget initializedBudget = Budget.createDefault(user);
+        budgetRepository.save(initializedBudget);
         log.info("Default empty budget saved for user. Email: {}", user.getEmail());
     }
 
@@ -62,19 +42,14 @@ public class BudgetService {
             throw new InvalidInputException("Budget name is required");
         }
 
-        Optional<Budget> budgetOpt = budgetRepository.findByNameAndUser(budget.getName(), user);
-        if (budgetOpt.isPresent()) {
-            String errorMessage = String.format("Attempt to create a duplicate budget. User Email: %s, Budget Name: %s", user.getEmail(), budgetOpt.get().getName());
+        budgetRepository.findByNameAndUser(budget.getName(), user).ifPresent(budgetFound -> {
+            String errorMessage = String.format("Attempt to create a duplicate budget. User Email: %s, Budget Name: %s", user.getEmail(), budget.getName());
             log.warn(errorMessage);
             throw new BudgetNotUniqueException(errorMessage);
-        }
+        });
 
-        budget.setUser(user);
-        budget.setLocalDateTime(LocalDateTime.now());
-        budget.setBalance(BigDecimal.ZERO);
-        budget.setTotalExpense(BigDecimal.ZERO);
-        budget.setTotalIncome(BigDecimal.ZERO);
-        budgetRepository.save(budget);
+        Budget initializedBudget = Budget.create(budget, user);
+        budgetRepository.save(initializedBudget);
 
         log.info("New budget saved for user. Email: {}. Name: {}", user.getEmail(), budget.getName());
         return budget;
@@ -82,7 +57,6 @@ public class BudgetService {
 
     public List<Budget> findAllBudgetsByUser(User user) {
         List<Budget> allBudgetsByUser = budgetRepository.findAllByUser(user);
-//        List<BudgetSummaryDTO> budgetSummaryDTOList = BudgetMapper.toListBudgetSummaryDTO(budgetRepository.findAllByUser(user));
         log.info("Retrieved {} budgets for user with ID: {}", allBudgetsByUser.size(), user.getId());
         return allBudgetsByUser;
     }
@@ -90,14 +64,14 @@ public class BudgetService {
     public Budget findBudgetByIdAndUser(Long budgetId, User user) {
         log.debug("Starting to find budget by ID: {} for user ID: {}", budgetId, user.getId());
 
-        Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
-        if (!budgetOpt.isPresent()) {
-            log.warn("Budget not found for user with ID: {} and budget ID: {}", user.getId(), budgetId);
-            throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
-        }
+        Budget budget = budgetRepository.findByIdAndUser(budgetId, user)
+                .orElseThrow(() -> {
+                    log.warn("Budget not found for user with ID: {} and budget ID: {}", user.getId(), budgetId);
+                    return new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
+                });
 
         log.info("Budget found for user with ID: {} and budget ID: {}", user.getId(), budgetId);
-        return budgetOpt.get();
+        return budget;
     }
 
     public Expense createExpense(Long budgetId, Expense expense, User user) throws InvalidInputException {
@@ -113,11 +87,11 @@ public class BudgetService {
             throw new InvalidInputException("Amount cannot be negative");
         }
 
-        Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
-        if (!budgetOpt.isPresent()) {
-            log.warn("Budget not found for user ID: {} and budget ID: {}", user.getId(), budgetId);
-            throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
-        }
+        Budget budget = budgetRepository.findByIdAndUser(budgetId, user)
+                .orElseThrow(() -> {
+                    log.warn("Budget not found for user ID: {} and budget ID: {}", user.getId(), budgetId);
+                    return new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
+                });
 
         log.debug("Budget found for budget ID: {} and user ID: {}. Proceeding with expense creation.", budgetId, user.getId());
 
@@ -126,11 +100,8 @@ public class BudgetService {
             throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + expense.getIdSubCategory() + " is not related to category with ID: " + expense.getIdCategory());
         }
 
-        Budget budget = budgetOpt.get();
-        expense.setBudget(budget);
-        expense.setLocalDateTime(LocalDate.now().atStartOfDay());
-        expense.setUser(user);
-        Expense savedExpense = expenseRepository.save(expense);
+        Expense initializedExpense = Expense.create(budget, user, expense);
+        Expense savedExpense = expenseRepository.save(initializedExpense);
         updateTotalExpense(budget);
 
         log.info("Expense created for budget ID: {} and user ID: {}", budgetId, user.getId());
@@ -150,11 +121,11 @@ public class BudgetService {
             throw new InvalidInputException("Amount cannot be negative");
         }
 
-        Optional<Budget> budgetOpt = budgetRepository.findByIdAndUser(budgetId, user);
-        if (!budgetOpt.isPresent()) {
-            log.warn("Budget not found for user ID: {} and budget ID: {}", user.getId(), budgetId);
-            throw new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
-        }
+        Budget budget = budgetRepository.findByIdAndUser(budgetId, user)
+                .orElseThrow(() -> {
+                    log.warn("Budget not found for user ID: {} and budget ID: {}", user.getId(), budgetId);
+                    return new BudgetNotFoundException("Budget not found for user with ID: " + user.getId() + " and budget ID: " + budgetId);
+                });
 
         log.debug("Budget found for budget ID: {} and user ID: {}. Proceeding with income creation.", budgetId, user.getId());
 
@@ -163,11 +134,8 @@ public class BudgetService {
             throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + income.getIdSubCategory() + " is not related to category with ID: " + income.getIdCategory());
         }
 
-        Budget budget = budgetOpt.get();
-        income.setBudget(budget);
-        income.setLocalDateTime(LocalDate.now().atStartOfDay());
-        income.setUser(user);
-        Income savedIncome = incomeRepository.save(income);
+        Income initializedIncome  = Income.create(budget, user, income);
+        Income savedIncome = incomeRepository.save(initializedIncome);
         updateTotalIncome(budget);
 
         log.info("Income created for budget ID: {} and user ID: {}", budgetId, user.getId());
@@ -187,26 +155,21 @@ public class BudgetService {
             throw new InvalidInputException("Amount cannot be negative");
         }
 
-        Optional<Expense> expenseOpt = expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId);
-        if (!expenseOpt.isPresent()) {
-            log.warn("Expense not found for update. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
-            throw new ExpenseNotFoundException("Expense not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and expense ID: " + expenseId);
-        }
-
-        log.debug("Expense found for update. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
-        Expense existingExpense = expenseOpt.get();
+        Expense existingExpense = expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId)
+                .orElseThrow(() -> {
+                    log.warn("Expense not found for update. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
+                    return new ExpenseNotFoundException("Expense not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and expense ID: " + expenseId);
+                });
 
         if (!validateCategoryAndSubCategory(expense.getIdCategory(), expense.getIdSubCategory(), user)) {
             log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}. Update failed.", expense.getIdSubCategory(), expense.getIdCategory(), user.getId());
             throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + expense.getIdSubCategory() + " is not related to category with ID: " + expense.getIdCategory());
         }
 
-        existingExpense.setIdCategory(expense.getIdCategory());
-        existingExpense.setIdSubCategory(expense.getIdSubCategory());
-        existingExpense.setAmount(expense.getAmount());
-        existingExpense.setName(expense.getName());
-        existingExpense.setLocalDateTime(LocalDate.now().atStartOfDay());
-        Expense savedExpense = expenseRepository.save(existingExpense);
+        log.debug("Expense found for update. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
+
+        Expense updatedExpense = Expense.update(existingExpense, expense);
+        Expense savedExpense = expenseRepository.save(updatedExpense);
 
         log.info("Expense successfully updated. Expense ID: {}, Budget ID: {}, User ID: {}", expenseId, budgetId, user.getId());
         return savedExpense;
@@ -225,26 +188,22 @@ public class BudgetService {
             throw new InvalidInputException("Amount cannot be negative");
         }
 
-        Optional<Income> incomeOpt = incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId);
-        if (!incomeOpt.isPresent()) {
-            log.warn("Income not found for update. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
-            throw new IncomeNotFoundException("Income not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and income ID: " + incomeId);
-        }
+        Income existingIncome = incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId)
+                .orElseThrow(() -> {
+                    log.warn("Income not found for update. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
+                    return new IncomeNotFoundException("Income not found for user with ID: " + user.getId() + ", budget ID: " + budgetId + " and income ID: " + incomeId);
+                });
 
         log.debug("Income found for update. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
-        Income existingIncome = incomeOpt.get();
+
 
         if (!validateCategoryAndSubCategory(income.getIdCategory(), income.getIdSubCategory(), user)) {
             log.warn("Subcategory with ID: {} is not related to category with ID: {} for user ID: {}. Update failed.", income.getIdSubCategory(), income.getIdCategory(), user.getId());
             throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + income.getIdSubCategory() + " is not related to category with ID: " + income.getIdCategory());
         }
 
-        existingIncome.setIdCategory(income.getIdCategory());
-        existingIncome.setIdSubCategory(income.getIdSubCategory());
-        existingIncome.setAmount(income.getAmount());
-        existingIncome.setName(income.getName());
-        existingIncome.setLocalDateTime(LocalDate.now().atStartOfDay());
-        Income savedIncome = incomeRepository.save(existingIncome);
+        Income updatedIncome = Income.update(existingIncome, income);
+        Income savedIncome = incomeRepository.save(updatedIncome);
 
         log.info("Income successfully updated. Income ID: {}, Budget ID: {}, User ID: {}", incomeId, budgetId, user.getId());
         return savedIncome;
@@ -297,42 +256,38 @@ public class BudgetService {
     public void updateExpensesCategoryIdToNull(Long idCategory) {
         log.debug("Starting to update category ID to null for all expenses with category ID: {}", idCategory);
         List<Expense> expenses = expenseRepository.findByIdCategory(idCategory);
-        for (Expense expense : expenses) {
+        expenses.forEach(expense -> {
             expense.setIdCategory(null);
             expense.setIdSubCategory(null);
-            expenseRepository.save(expense);
-        }
+        });
+        expenseRepository.saveAll(expenses);
         log.info("All expenses with category ID: {} have been updated to have null category and subcategory IDs", idCategory);
     }
 
     public void updateIncomesCategoryIdToNull(Long idCategory) {
         log.debug("Starting to update category ID to null for all incomes with category ID: {}", idCategory);
         List<Income> incomes = incomeRepository.findByIdCategory(idCategory);
-        for (Income income : incomes) {
+        incomes.forEach(income -> {
             income.setIdCategory(null);
             income.setIdSubCategory(null);
-            incomeRepository.save(income);
-        }
+        });
+        incomeRepository.saveAll(incomes);
         log.info("All incomes with category ID: {} have been updated to have null category and subcategory IDs", idCategory);
     }
 
     public void updateExpensesSubcategoryIdToNull(Long subcategoryId) {
         log.debug("Starting to update subcategory ID to null for all expenses with subcategory ID: {}", subcategoryId);
         List<Expense> expenses = expenseRepository.findByIdSubCategory(subcategoryId);
-        for (Expense expense : expenses) {
-            expense.setIdSubCategory(null);
-            expenseRepository.save(expense);
-        }
+        expenses.forEach(expense -> expense.setIdSubCategory(null));
+        expenseRepository.saveAll(expenses);
         log.info("All expenses with subcategory ID: {} have been updated to have null subcategory ID", subcategoryId);
     }
 
     public void updateIncomesSubcategoryIdToNull(Long subcategoryId) {
         log.debug("Starting to update subcategory ID to null for all incomes with subcategory ID: {}", subcategoryId);
         List<Income> incomes = incomeRepository.findByIdSubCategory(subcategoryId);
-        for (Income income : incomes) {
-            income.setIdSubCategory(null);
-            incomeRepository.save(income);
-        }
+        incomes.forEach(income -> income.setIdSubCategory(null));
+        incomeRepository.saveAll(incomes);
         log.info("All incomes with subcategory ID: {} have been updated to have null subcategory ID", subcategoryId);
     }
 
@@ -343,13 +298,7 @@ public class BudgetService {
             BigDecimal totalExpenses = expenses != null ? expenses.stream()
                     .map(Expense::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
-            FinancialAggregate financialAggregate = FinancialAggregate.builder()
-                    .budgetId(budgetId)
-                    .categoryId(categoryId)
-                    .typeAggregate(TypeAggregate.EXPENSES_BY_CATEGORY)
-                    .userId(user.getId())
-                    .value(totalExpenses)
-                    .build();
+            FinancialAggregate financialAggregate = FinancialAggregate.createByCategory(totalExpenses, budgetId, categoryId, TypeAggregate.EXPENSES_BY_CATEGORY, user.getId());
             log.info("Total expenses retrieved for budget ID: {}, category ID: {}, and user ID: {}. Total: {}", budgetId, categoryId, user.getId(), totalExpenses);
             return financialAggregate;
         } catch (Exception e) {
@@ -365,13 +314,8 @@ public class BudgetService {
             BigDecimal totalExpenses = expenses != null ? expenses.stream()
                     .map(Expense::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
-            FinancialAggregate financialAggregate = FinancialAggregate.builder()
-                    .budgetId(budgetId)
-                    .subcategoryId(subcategoryId)
-                    .typeAggregate(TypeAggregate.EXPENSES_BY_SUBCATEGORY)
-                    .userId(user.getId())
-                    .value(totalExpenses)
-                    .build();
+
+            FinancialAggregate financialAggregate = FinancialAggregate.createBySubcategory(totalExpenses, budgetId, subcategoryId, TypeAggregate.EXPENSES_BY_SUBCATEGORY, user.getId());
             if (totalExpenses == null) {
                 log.info("No expenses found for budget ID: {}, subcategory ID: {}, and user ID: {}. Returning ZERO.", budgetId, subcategoryId, user.getId());
                 financialAggregate.setValue(BigDecimal.ZERO);
@@ -393,13 +337,8 @@ public class BudgetService {
             BigDecimal totalIncomes = incomes != null ? incomes.stream()
                     .map(Income::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
-            FinancialAggregate financialAggregate = FinancialAggregate.builder()
-                    .budgetId(budgetId)
-                    .categoryId(categoryId)
-                    .typeAggregate(TypeAggregate.INCOMES_BY_CATEGORY)
-                    .userId(user.getId())
-                    .value(totalIncomes)
-                    .build();
+
+            FinancialAggregate financialAggregate = FinancialAggregate.createByCategory(totalIncomes, categoryId, budgetId, TypeAggregate.INCOMES_BY_CATEGORY, user.getId());
             if (totalIncomes == null) {
                 log.info("No incomes found for budget ID: {}, category ID: {}, and user ID: {}. Returning ZERO.", budgetId, categoryId, user.getId());
                 financialAggregate.setValue(BigDecimal.ZERO);
@@ -421,12 +360,8 @@ public class BudgetService {
             BigDecimal totalIncomes = incomes != null ? incomes.stream()
                     .map(Income::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
-            FinancialAggregate financialAggregate = FinancialAggregate.builder()
-                    .budgetId(budgetId)
-                    .subcategoryId(subcategoryId)
-                    .typeAggregate(TypeAggregate.INCOMES_BY_SUBCATEGORY)
-                    .userId(user.getId())
-                    .build();
+
+          FinancialAggregate financialAggregate = FinancialAggregate.createBySubcategory(totalIncomes, budgetId, subcategoryId, TypeAggregate.INCOMES_BY_SUBCATEGORY, user.getId());
             if (totalIncomes == null) {
                 log.info("No incomes found for budget ID: {}, subcategory ID: {}, and user ID: {}. Returning ZERO.", budgetId, subcategoryId, user.getId());
                 financialAggregate.setValue(BigDecimal.ZERO);
@@ -481,11 +416,11 @@ public class BudgetService {
     public void deleteExpenseByIdAndUser(Long expenseId, User user, Long budgetId) {
         log.debug("Starting to delete expense ID: {} and user ID: {}", expenseId, user.getId());
         try {
-            Optional<Expense> expenseOpt = expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId);
-            if (expenseOpt.isEmpty()) {
-                log.error("Expense ID: {} is not associated with budget ID: {} for user ID: {}", expenseId, budgetId, user.getId());
-                throw new ExpenseNotFoundException("Expense ID: " + expenseId + " is not associated with budget ID: " + budgetId + " for user ID: " + user.getId());
-            }
+           expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId)
+                    .orElseThrow(() -> {
+                        log.error("Expense ID: {} is not associated with budget ID: {} for user ID: {}", expenseId, budgetId, user.getId());
+                        return new ExpenseNotFoundException("Expense ID: " + expenseId + " is not associated with budget ID: " + budgetId + " for user ID: " + user.getId());
+                    });
             expenseRepository.deleteExpenseByIdAndUserAndBudgetId(expenseId, user, budgetId);
             log.info("Expense ID: {} for user ID: {} successfully deleted.", expenseId, user.getId());
         } catch (Exception e) {
@@ -498,11 +433,11 @@ public class BudgetService {
     public void deleteIncomeByIdAndUser(Long incomeId, User user, Long budgetId) {
         log.debug("Starting to delete income ID: {} and user ID: {}", incomeId, user.getId());
         try {
-            Optional<Income> incomeOpt = incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId);
-            if (incomeOpt.isEmpty()) {
-                log.error("Income ID: {} is not associated with budget ID: {} for user ID: {}", incomeId, budgetId, user.getId());
-                throw new IncomeNotFoundException("Income ID: " + incomeId + " is not associated with budget ID: " + budgetId + " for user ID: " + user.getId());
-            }
+            incomeRepository.findByIdAndUserIdAndBudgetId(incomeId, user.getId(), budgetId)
+                    .orElseThrow(() -> {
+                        log.error("Expense ID: {} is not associated with budget ID: {} for user ID: {}", incomeId, budgetId, user.getId());
+                        return new ExpenseNotFoundException("Expense ID: " + incomeId + " is not associated with budget ID: " + budgetId + " for user ID: " + user.getId());
+                    });
             incomeRepository.deleteExpenseByIdAndUserAndBudgetId(incomeId, user, budgetId);
             log.info("Income ID: {} for user ID: {} successfully deleted.", incomeId, user.getId());
         } catch (Exception e) {

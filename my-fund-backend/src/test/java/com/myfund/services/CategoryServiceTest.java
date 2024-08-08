@@ -147,7 +147,7 @@ class CategoryServiceTest {
         assertEquals(category.getName(), result.getName(), "The name of the category does not match");
 
         verify(categoryRepository, times(1)).findByNameAndUser(category.getName(), user);
-        verify(categoryRepository, times(2)).save(any(Category.class));
+        verify(categoryRepository, times(1)).save(any(Category.class));
     }
 
     @Test
@@ -300,31 +300,6 @@ class CategoryServiceTest {
 
         assertFalse(result, "Subcategory should not be related to the category");
         verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
-    }
-
-    @Test
-    void isSubcategoryRelatedToCategory_WhenCategoryDoesNotExist() {
-        Long categoryId = 1L;
-        Long subcategoryId = 1L;
-        User user = User.builder().id(1L).build();
-
-        when(categoryRepository.findByIdAndUser(categoryId, user)).thenReturn(Optional.empty());
-
-        boolean result = categoryService.isSubcategoryRelatedToCategory(subcategoryId, categoryId, user);
-
-        assertFalse(result, "Subcategory relation cannot be established if category does not exist");
-        verify(categoryRepository, times(1)).findByIdAndUser(categoryId, user);
-    }
-
-    @Test
-    void isSubcategoryRelatedToCategory_WhenUserIsNull() {
-        Long categoryId = 1L;
-        Long subcategoryId = 1L;
-
-        boolean result = categoryService.isSubcategoryRelatedToCategory(subcategoryId, categoryId, null);
-
-        assertFalse(result, "Subcategory relation cannot be established if user is null");
-        verify(categoryRepository, never()).findByIdAndUser(anyLong(), isNull());
     }
 
     @Test

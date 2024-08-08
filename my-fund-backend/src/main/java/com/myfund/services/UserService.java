@@ -14,6 +14,7 @@ import com.myfund.models.User;
 import com.myfund.repositories.UserRepository;
 import com.myfund.services.email.EmailSender;
 import com.myfund.services.email.TokenService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -39,26 +41,19 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
-
-    @Autowired
-    public UserService(UserRepository userRepository, BudgetService budgetService, PasswordEncoder passwordEncoder, EmailSender emailSender, TokenService tokenService, CacheManager cacheManager) {
-        this.userRepository = userRepository;
-        this.budgetService = budgetService;
-        this.passwordEncoder = passwordEncoder;
-        this.emailSender = emailSender;
-        this.tokenService = tokenService;
-        this.cacheManager = cacheManager;
-    }
-
     public User createUser(User user) throws IOException {
         validateUniqueness(user.getUsername(), user.getEmail());
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole("USER");
+        User inicializedUser = User.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .password(passwordEncoder.encode(user.getPassword()))
+                .role("USER")
+                .build();
         log.info("User saved successfully. Email: {}, Pass: {}, ", user.getEmail(), maskHash(user.getPassword()));
-        userRepository.save(user);
-        budgetService.createDefaultBudget(user);
-        emailSender.sendWelcomeEmail(UserMapper.toDTO(user));
+        userRepository.save(inicializedUser);
+        budgetService.createDefaultBudget(inicializedUser);
+        emailSender.sendWelcomeEmail(inicializedUser);
         return user;
     }
 
@@ -69,27 +64,28 @@ public class UserService {
     }
 
     private void validateUniqueness(String username, String email) {
-        if (userRepository.findByUsername(username).isPresent()) {
+        if (userRepository.existsByUsername(username)) {
             log.info("Attempt to create a user with an existing username: {}", username);
             throw new UserAlreadyExistsException("Username is not unique");
         }
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.existsByEmail(email)) {
             log.info("Attempt to create a user with an existing email: {}", email);
             throw new UserAlreadyExistsException("Email is not unique");
         }
     }
 
     public void requestPasswordChange(PasswordChangeRequest passwordChangeRequest) {
-        Optional<User> userOpt = userRepository.findByEmail(passwordChangeRequest.getEmail());
+        User user = userRepository.findByEmail(passwordChangeRequest.getEmail())
+                .orElseThrow(() -> {
+                    log.error("User not found for email: {}", passwordChangeRequest.getEmail());
+                    return new UserNotFoundException("User not found for email: " + passwordChangeRequest.getEmail());
+                });
 
-        if (userOpt.isPresent()) {
-            String passwordResetToken = tokenService.createPasswordResetToken(userOpt.get().getEmail());
-            try {
-                UserDTO userDTO = UserMapper.toDTO(userOpt.get());
-                emailSender.sendPasswordResetEmail(userDTO, passwordResetToken);
-            } catch (IOException e) {
-                log.error("Failed to send password reset email", e);
-            }
+        String passwordResetToken = tokenService.createPasswordResetToken(user.getEmail());
+        try {
+            emailSender.sendPasswordResetEmail(user, passwordResetToken);
+        } catch (IOException e) {
+            log.error("Failed to send password reset email", e);
         }
 
         log.debug("Request for password reset received for email: {}, but no action taken.", passwordChangeRequest.getEmail());
@@ -107,13 +103,12 @@ public class UserService {
 
         log.debug("Token validation successful for email: {}", passwordChange.getEmail());
 
-        Optional<User> userOptional = userRepository.findByEmail(passwordChange.getEmail());
-        if (!userOptional.isPresent()) {
-            log.error("User not found for email: {}", passwordChange.getEmail());
-            throw new UserNotFoundException("User not found");
-        }
+        User user = userRepository.findByEmail(passwordChange.getEmail())
+                .orElseThrow(() -> {
+                    log.error("User not found for email: {}", passwordChange.getEmail());
+                    return new UserNotFoundException("User not found for email: " + passwordChange.getEmail());
+                });
 
-        User user = userOptional.get();
         user.setPassword(passwordEncoder.encode(passwordChange.getNewPassword()));
         userRepository.save(user);
         tokenService.invalidatePasswordResetToken(passwordChange.getEmail());
