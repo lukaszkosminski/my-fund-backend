@@ -48,4 +48,29 @@ public class Income {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public static Income create(Budget budget, User user, Income income) {
+        return Income.builder()
+                .name(income.getName())
+                .idCategory(income.getIdCategory())
+                .idSubCategory(income.getIdSubCategory())
+                .amount(income.getAmount())
+                .localDateTime(LocalDate.now().atStartOfDay())
+                .budget(budget)
+                .user(user)
+                .build();
+    }
+
+    public static Income update(Income income, Income newIncome) {
+        return Income.builder()
+                .id(income.getId())
+                .name(newIncome.getName())
+                .idCategory(newIncome.getIdCategory())
+                .idSubCategory(newIncome.getIdSubCategory())
+                .amount(newIncome.getAmount())
+                .localDateTime(LocalDate.now().atStartOfDay())
+                .budget(income.getBudget())
+                .user(income.getUser())
+                .build();
+    }
+
 }

@@ -49,4 +49,21 @@ public class Budget {
     @Convert(converter = BigDecimalEncryptor.class)
     @Builder.Default
     private BigDecimal totalExpense = BigDecimal.ZERO;
+
+    public static Budget createDefault(User user) {
+        return Budget.builder()
+                .name("Default Budget")
+                .user(user)
+                .localDateTime(LocalDateTime.now())
+                .build();
+    }
+
+    public static Budget create(Budget budget, User user) {
+        return Budget.builder()
+                .name(budget.getName())
+                .user(user)
+                .localDateTime(LocalDateTime.now())
+                .build();
+    }
+
 }

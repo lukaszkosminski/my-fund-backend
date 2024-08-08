@@ -1,12 +1,13 @@
 package com.myfund.services.email;
 
 import com.myfund.models.DTOs.UserDTO;
+import com.myfund.models.User;
 
 import java.io.IOException;
 
 public interface EmailSender {
-    void sendWelcomeEmail(UserDTO userDTO) throws IOException;
+    void sendWelcomeEmail(User user) throws IOException;
 
-    void sendPasswordResetEmail(UserDTO userDTO, String resetToken) throws IOException;
+    void sendPasswordResetEmail(User user, String resetToken) throws IOException;
 
 }

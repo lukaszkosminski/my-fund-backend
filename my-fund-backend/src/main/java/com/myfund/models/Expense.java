@@ -48,4 +48,28 @@ public class Expense {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public static Expense create(Budget budget, User user, Expense expense) {
+        return Expense.builder()
+                .name(expense.getName())
+                .idCategory(expense.getIdCategory())
+                .idSubCategory(expense.getIdSubCategory())
+                .amount(expense.getAmount())
+                .localDateTime(LocalDate.now().atStartOfDay())
+                .budget(budget)
+                .user(user)
+                .build();
+    }
+
+    public static Expense update(Expense expense, Expense newExpense) {
+        return Expense.builder()
+                .id(expense.getId())
+                .name(newExpense.getName())
+                .idCategory(newExpense.getIdCategory())
+                .idSubCategory(newExpense.getIdSubCategory())
+                .amount(newExpense.getAmount())
+                .localDateTime(LocalDate.now().atStartOfDay())
+                .budget(expense.getBudget())
+                .user(expense.getUser())
+                .build();
+    }
 }

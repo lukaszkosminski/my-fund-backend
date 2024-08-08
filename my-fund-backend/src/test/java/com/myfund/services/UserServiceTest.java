@@ -73,7 +73,7 @@ class UserServiceTest {
         assertNotNull(userCreated);
         verify(userRepository, times(1)).save(any(User.class));
         verify(budgetService, times(1)).createDefaultBudget(any(User.class));
-        verify(emailSender, times(1)).sendWelcomeEmail(any(UserDTO.class));
+        verify(emailSender, times(1)).sendWelcomeEmail(any(User.class));
     }
 
     @Test
@@ -84,7 +84,7 @@ class UserServiceTest {
                 .password("password")
                 .build();
 
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsername("testuser")).thenReturn(true);
 
         assertThrows(UserAlreadyExistsException.class, () -> userService.createUser(user));
     }
@@ -103,7 +103,7 @@ class UserServiceTest {
 
         userService.requestPasswordChange(passwordChangeRequest);
 
-        verify(emailSender, times(1)).sendPasswordResetEmail(any(UserDTO.class), eq("resetToken"));
+        verify(emailSender, times(1)).sendPasswordResetEmail(any(User.class), eq("resetToken"));
     }
 
     @Test

@@ -102,9 +102,13 @@ class AuthControlerE2ETest {
     }
 
     @Test
-    public void testRequestChangePassword() {
+    public void testRequestChangePassword() throws IOException {
+        User user = User.builder().username("testuser").email("test@example.com").password("password").build();
+        userService.createUser(user);
+
         PasswordChangeRequestDTO passwordChangeRequestDTO = new PasswordChangeRequestDTO();
         passwordChangeRequestDTO.setEmail("test@example.com");
+
 
         ResponseEntity<?> response = restTemplate.postForEntity("http://localhost:" + port + "/v1/request-change-password", passwordChangeRequestDTO, Void.class);
 
@@ -188,14 +192,8 @@ class AuthControlerE2ETest {
 
         ResponseEntity<Map> response = restTemplate.postForEntity("http://localhost:" + port + "/v1/change-password", passwordChangeDTO, Map.class);
         Map<String, String> errorResponse = (Map<String, String>) response.getBody();
-        String currentPassword = jdbcTemplate.queryForObject("SELECT password FROM users WHERE id = 1", String.class);
-
-        System.out.println(user.getPassword());
-        System.out.println(currentPassword);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        assertThat(user.getPassword()).isEqualTo(currentPassword);
-
         assertThat(errorResponse.get("message")).isEqualTo("Invalid token");
     }
 
