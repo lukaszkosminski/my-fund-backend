@@ -51,8 +51,7 @@ These settings are required to enable email notifications, including functionali
 2. After registration, obtain your Postmark API Key.
 3. Add the following configurations to your application.properties file:
   ```
-   email.sender=emailSender
-   encryption.key=ecnryptionKey
+   email.sender=emailSender   
    postmark.apikey=apiKey
    change.password.url=changePasswordUrl
   ```
