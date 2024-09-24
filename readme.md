@@ -55,10 +55,10 @@ These settings are required to enable email notifications, including functionali
 
 ### Encryption Key for Database Security
 My Fund uses AES-128 encryption to ensure the security of sensitive data stored in the database, such as user passwords and financial information.
+This key must be a 16-character string, which corresponds to the 128-bit key required by the AES-128 encryption algorithm. Make sure the key is exactly 128 bits (16 characters) long to properly encrypt and decrypt sensitive data stored in the database.
+This encryption ensures that even if someone gains unauthorized access to the database, the sensitive information will remain secure and unreadable without the correct key.
 
 To enable this encryption, you must provide an encryption key in the application.properties file:
 ```
 encryption.key=encyptionKey
 ```
-This key must be a 16-character string, which corresponds to the 128-bit key required by the AES-128 encryption algorithm. Make sure the key is exactly 128 bits (16 characters) long to properly encrypt and decrypt sensitive data stored in the database.
-This encryption ensures that even if someone gains unauthorized access to the database, the sensitive information will remain secure and unreadable without the correct key.
