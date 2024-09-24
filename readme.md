@@ -37,7 +37,7 @@ Before you begin, ensure you have the following installed:
    spring.datasource.url=jdbc:mysql://localhost:3306/fund-db
    spring.datasource.username=yourUsername
    spring.datasource.password=yourPassword
-   
+   ```
    
 ### Email Service Configuration
 
@@ -46,12 +46,12 @@ These settings are required to enable email notifications, including functionali
 1. Register an account on Postmark.
 2. After registration, obtain your Postmark API Key.
 3. Add the following configurations to your application.properties file:
-   ```
+  ```
    email.sender=emailSender
    encryption.key=ecnryptionKey
    postmark.apikey=apiKey
    change.password.url=changePasswordUrl
-
+  ```
 ### Encryption Key for Database Security
 My Fund uses AES-128 encryption to ensure the security of sensitive data stored in the database, such as user passwords and financial information.
 This key must be a 16-character string, which corresponds to the 128-bit key required by the AES-128 encryption algorithm. Make sure the key is exactly 128 bits (16 characters) long to properly encrypt and decrypt sensitive data stored in the database.
