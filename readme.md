@@ -51,7 +51,7 @@ These settings are required to enable email notifications, including functionali
    encryption.key=ecnryptionKey
    postmark.apikey=apiKey
    change.password.url=changePasswordUrl
-```
+
 
 ### Encryption Key for Database Security
 My Fund uses AES-128 encryption to ensure the security of sensitive data stored in the database, such as user passwords and financial information.
