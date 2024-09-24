@@ -12,8 +12,6 @@ My Fund is a comprehensive financial management application designed to help use
 - [Caching and Security](#caching-and-security)
 - [Testing and Documentation](#testing-and-documentation)
 - [CI/CD and Build Process](#ci-cd-and-build-process)
-- [Features](#features)
-- [Usage](#usage)
 
 ## Installation
 
