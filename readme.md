@@ -41,6 +41,8 @@ Before you begin, ensure you have the following installed:
    
 ### Email Service Configuration
 
+These settings are required to enable email notifications, including functionalities such as password recovery.
+
 1. Register an account on Postmark.
 2. After registration, obtain your Postmark API Key.
 3. Add the following configurations to your application.properties file:
@@ -49,7 +51,7 @@ Before you begin, ensure you have the following installed:
    encryption.key=ecnryptionKey
    postmark.apikey=apiKey
    change.password.url=changePasswordUrl
-These settings are required to enable email notifications, including functionalities such as password recovery.
+```
 
 ### Encryption Key for Database Security
 My Fund uses AES-128 encryption to ensure the security of sensitive data stored in the database, such as user passwords and financial information.
