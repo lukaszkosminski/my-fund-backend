@@ -2,7 +2,7 @@
 
 ## Description
 
-My Fund is a comprehensive financial management application designed to help users track and manage their finances efficiently. Built with Angular 17 for the frontend, Java 17 and Spring Boot 3 for the backend, and MySQL for data storage, this application offers a robust platform for personal finance management. Whether you're looking to monitor your spending, create budgets, or track investments, My Fund provides the tools you need to take control of your financial health.
+My Fund is a comprehensive financial management application designed to help users track and manage their finances efficiently. Built with Java 17 and Spring Boot 3 for the backend, and MySQL for data storage, this application offers a robust platform for personal finance management. Whether you're looking to monitor your spending, create budgets, or track investments, My Fund provides the tools you need to take control of your financial health.
 
 ## Table of Contents
 
@@ -17,7 +17,6 @@ My Fund is a comprehensive financial management application designed to help use
 
 Before you begin, ensure you have the following installed:
 - Java 17
-- Node.js and npm (for Angular)
 - MySQL
 - Docker
 
@@ -27,13 +26,6 @@ Before you begin, ensure you have the following installed:
 2. Navigate to the backend directory: `cd my-fund-backend`
 3. Build the project using Maven: `mvn clean install`
 4. Run the Spring Boot application: `java -jar target/myfund.jar`
-
-### Frontend Setup
-
-1. Navigate to the frontend directory: `cd my-fund-frontend`
-2. Install the necessary npm packages: `npm install`
-3. Start the Angular application: `ng serve`
-4. Open your browser and go to `http://localhost:4200` to view the application.
 
 ## Configuration
 
