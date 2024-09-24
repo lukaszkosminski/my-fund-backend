@@ -66,7 +66,7 @@ encryption.key=encyptionKey
 ```
 ### Caching and Security
 - Token Caching: Password reset tokens are stored in the cache for a limited duration, ensuring secure and temporary access.
-- Email Throttling: To prevent abuse, the application limits the number of emails sent to 3 per minute using the emailThrottleCache. This helps manage the rate at which password reset and notification emails are sent.
+- Email Throttling: To prevent abuse, the application limits the number of emails sent to 3 per hour using the emailThrottleCache. This helps manage the rate at which password reset and notification emails are sent.
 - Spring Security Integration: The application is secured using Spring Security, which requires users to log in to access protected resources. This ensures only authorized users can interact with sensitive endpoints.
 
 ### Testing and Documentation
