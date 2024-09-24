@@ -50,21 +50,3 @@ Before you begin, ensure you have the following installed:
    postmark.apikey=apiKey
    change.password.url=changePasswordUrl
 These settings are required to enable email notifications, including functionalities such as password recovery.
-
-
-## Usage
-
-After installation and configuration, you can use My Fund to:
-- Add and track your daily expenses and incomes.
-- Create and manage budgets for different categories.
-- View detailed reports and insights about your financial activities.
-- Set financial goals and track your progress towards achieving them.
-
-## Features
-
-- **Dashboard**: Get an overview of your financial status at a glance.
-- **Expense Tracking**: Log and categorize your daily expenses.
-- **Income Tracking**: Keep track of your income sources.
-- **Budgeting**: Set monthly budgets for different categories and monitor your spending.
-- **Reports**: Generate detailed reports and insights to understand your financial habits.
-- **Goals**: Set and track your financial goals.
