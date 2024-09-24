@@ -38,6 +38,19 @@ Before you begin, ensure you have the following installed:
    spring.datasource.username=yourUsername
    spring.datasource.password=yourPassword
    ```
+   
+### Email Service Configuration
+
+1. Register an account on Postmark.
+2. After registration, obtain your Postmark API Key.
+3. Add the following configurations to your application.properties file:
+   ```
+   email.sender=emailSender
+   encryption.key=ecnryptionKey
+   postmark.apikey=apiKey
+   change.password.url=changePasswordUrl
+These settings are required to enable email notifications, including functionalities such as password recovery.
+
 
 ## Usage
 
