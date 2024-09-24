@@ -8,8 +8,12 @@ My Fund is a comprehensive financial management application designed to help use
 
 - [Installation](#installation)
 - [Configuration](#configuration)
-- [Usage](#usage)
+- [Encryption Key for Database Security](#encryption-key-for-database-security)
+- [Caching and Security](#caching-and-security)
+- [Testing and Documentation](#testing-and-documentation)
+- [CI/CD and Build Process](#ci-cd-and-build-process)
 - [Features](#features)
+- [Usage](#usage)
 
 ## Installation
 
@@ -61,3 +65,16 @@ To enable this encryption, you must provide an encryption key in the application
 ```
 encryption.key=encyptionKey
 ```
+### Caching and Security
+- Token Caching: Password reset tokens are stored in the cache for a limited duration, ensuring secure and temporary access.
+- Email Throttling: To prevent abuse, the application limits the number of emails sent to 3 per minute using the emailThrottleCache. This helps manage the rate at which password reset and notification emails are sent.
+- Spring Security Integration: The application is secured using Spring Security, which requires users to log in to access protected resources. This ensures only authorized users can interact with sensitive endpoints.
+
+### Testing and Documentation
+- Swagger Documentation: The application includes integrated Swagger documentation that lists all available API endpoints, providing a clear overview for developers and testers to interact with the service.
+- Unit and E2E Testing: The application includes both unit tests and end-to-end (E2E) tests to ensure full coverage of functionality and user flows. The E2E tests are configured to run with a separate application-test.properties file, ensuring a test-safe environment.
+
+### CI/CD and Build Process
+- TeamCity Integration: The application build process is automated using TeamCity, which assigns a unique build number to each version. This ensures consistent and traceable builds during development and deployment.
+- Application Details Service: A custom service, ApplicationDetailsService, is used to manage and retrieve important application metadata, ensuring the build process and versioning is handled smoothly.
+- Docker for Local Development: A docker-compose.yml file is provided in the repository to set up a local MySQL database, making it easy for developers to run the application locally with a consistent environment.
