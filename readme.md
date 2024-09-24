@@ -37,7 +37,7 @@ Before you begin, ensure you have the following installed:
    spring.datasource.url=jdbc:mysql://localhost:3306/fund-db
    spring.datasource.username=yourUsername
    spring.datasource.password=yourPassword
-   ```
+   
    
 ### Email Service Configuration
 
