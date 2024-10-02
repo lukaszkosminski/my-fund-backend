@@ -66,9 +66,9 @@ public class CategoryService {
                     throw new CategoryNotUniqueException("Category with name: " + existingCategory.getName() + " is not unique");
                 });
         Category inicializedCategory = Category.create(category, user);
-        categoryRepository.save(inicializedCategory);
+        Category savedCatgory=categoryRepository.save(inicializedCategory);
         log.info("New category created with name: {} for user ID: {}", category.getName(), user.getId());
-        return category;
+        return savedCatgory;
     }
 
     public Category updateCategory(Long categoryId, Category category, User user) {

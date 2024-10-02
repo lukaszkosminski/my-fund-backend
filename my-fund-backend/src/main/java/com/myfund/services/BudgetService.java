@@ -49,10 +49,10 @@ public class BudgetService {
         });
 
         Budget initializedBudget = Budget.create(budget, user);
-        budgetRepository.save(initializedBudget);
+        Budget savedBudget = budgetRepository.save(initializedBudget);
 
         log.info("New budget saved for user. Email: {}. Name: {}", user.getEmail(), budget.getName());
-        return budget;
+        return savedBudget;
     }
 
     public List<Budget> findAllBudgetsByUser(User user) {
@@ -134,7 +134,7 @@ public class BudgetService {
             throw new SubcategoryNotRelatedToCategoryException("Subcategory with ID: " + income.getIdSubCategory() + " is not related to category with ID: " + income.getIdCategory());
         }
 
-        Income initializedIncome  = Income.create(budget, user, income);
+        Income initializedIncome = Income.create(budget, user, income);
         Income savedIncome = incomeRepository.save(initializedIncome);
         updateTotalIncome(budget);
 
@@ -294,11 +294,11 @@ public class BudgetService {
     public FinancialAggregate getTotalExpensesByCategory(Long budgetId, Long categoryId, User user) {
         log.debug("Starting to get total expenses for budget ID: {}, category ID: {}, and user ID: {}", budgetId, categoryId, user.getId());
         try {
-            List<Expense> expenses = expenseRepository.findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId());
+            List<Expense> expenses = expenseRepository.findByIdCategoryAndUserIdAndBudgetId(categoryId, user.getId(), budgetId);
             BigDecimal totalExpenses = expenses != null ? expenses.stream()
                     .map(Expense::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
-            FinancialAggregate financialAggregate = FinancialAggregate.createByCategory(totalExpenses, budgetId, categoryId, TypeAggregate.EXPENSES_BY_CATEGORY, user.getId());
+            FinancialAggregate financialAggregate = FinancialAggregate.createByCategory(totalExpenses, categoryId, budgetId, TypeAggregate.EXPENSES_BY_CATEGORY, user.getId());
             log.info("Total expenses retrieved for budget ID: {}, category ID: {}, and user ID: {}. Total: {}", budgetId, categoryId, user.getId(), totalExpenses);
             return financialAggregate;
         } catch (Exception e) {
@@ -310,12 +310,12 @@ public class BudgetService {
     public FinancialAggregate getTotalExpensesBySubcategory(Long budgetId, Long subcategoryId, User user) {
         log.debug("Starting to get total expenses for budget ID: {}, subcategory ID: {}, and user ID: {}", budgetId, subcategoryId, user.getId());
         try {
-            List<Expense> expenses = expenseRepository.findByIdSubCategoryAndUserIdAndBudgetId(budgetId, subcategoryId, user.getId());
+            List<Expense> expenses = expenseRepository.findByIdSubCategoryAndUserIdAndBudgetId(subcategoryId, user.getId(), budgetId);
             BigDecimal totalExpenses = expenses != null ? expenses.stream()
                     .map(Expense::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
 
-            FinancialAggregate financialAggregate = FinancialAggregate.createBySubcategory(totalExpenses, budgetId, subcategoryId, TypeAggregate.EXPENSES_BY_SUBCATEGORY, user.getId());
+            FinancialAggregate financialAggregate = FinancialAggregate.createBySubcategory(totalExpenses, subcategoryId, budgetId, TypeAggregate.EXPENSES_BY_SUBCATEGORY, user.getId());
             if (totalExpenses == null) {
                 log.info("No expenses found for budget ID: {}, subcategory ID: {}, and user ID: {}. Returning ZERO.", budgetId, subcategoryId, user.getId());
                 financialAggregate.setValue(BigDecimal.ZERO);
@@ -333,7 +333,7 @@ public class BudgetService {
     public FinancialAggregate getTotalIncomesByCategory(Long budgetId, Long categoryId, User user) {
         log.debug("Starting to get total incomes for budget ID: {}, category ID: {}, and user ID: {}", budgetId, categoryId, user.getId());
         try {
-            List<Income> incomes = incomeRepository.findByIdCategoryAndUserIdAndBudgetId(budgetId, categoryId, user.getId());
+            List<Income> incomes = incomeRepository.findByIdCategoryAndUserIdAndBudgetId(categoryId, user.getId(), budgetId);
             BigDecimal totalIncomes = incomes != null ? incomes.stream()
                     .map(Income::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
@@ -356,12 +356,12 @@ public class BudgetService {
     public FinancialAggregate getTotalIncomesBySubcategory(Long budgetId, Long subcategoryId, User user) {
         log.debug("Starting to get total incomes for budget ID: {}, subcategory ID: {}, and user ID: {}", budgetId, subcategoryId, user.getId());
         try {
-            List<Income> incomes = incomeRepository.findByIdSubCategoryAndUserIdAndBudgetId(budgetId, subcategoryId, user.getId());
+            List<Income> incomes = incomeRepository.findByIdSubCategoryAndUserIdAndBudgetId(subcategoryId, user.getId(), budgetId);
             BigDecimal totalIncomes = incomes != null ? incomes.stream()
                     .map(Income::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
 
-          FinancialAggregate financialAggregate = FinancialAggregate.createBySubcategory(totalIncomes, budgetId, subcategoryId, TypeAggregate.INCOMES_BY_SUBCATEGORY, user.getId());
+            FinancialAggregate financialAggregate = FinancialAggregate.createBySubcategory(totalIncomes, subcategoryId, budgetId, TypeAggregate.INCOMES_BY_SUBCATEGORY, user.getId());
             if (totalIncomes == null) {
                 log.info("No incomes found for budget ID: {}, subcategory ID: {}, and user ID: {}. Returning ZERO.", budgetId, subcategoryId, user.getId());
                 financialAggregate.setValue(BigDecimal.ZERO);
@@ -416,7 +416,7 @@ public class BudgetService {
     public void deleteExpenseByIdAndUser(Long expenseId, User user, Long budgetId) {
         log.debug("Starting to delete expense ID: {} and user ID: {}", expenseId, user.getId());
         try {
-           expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId)
+            expenseRepository.findByIdAndUserIdAndBudgetId(expenseId, user.getId(), budgetId)
                     .orElseThrow(() -> {
                         log.error("Expense ID: {} is not associated with budget ID: {} for user ID: {}", expenseId, budgetId, user.getId());
                         return new ExpenseNotFoundException("Expense ID: " + expenseId + " is not associated with budget ID: " + budgetId + " for user ID: " + user.getId());
